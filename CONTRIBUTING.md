@@ -91,21 +91,24 @@ the first commit `v0.0.0` as the baseline, so the first release is 0.1.0.
 
 ### One-time setup on npmjs.com
 
-- **First publish.** npm's trusted publishing can only be configured for a package that already
-  exists. Either add a repository secret `NPM_TOKEN`, a granular token allowed to publish
-  `@mcurcio/patchbay` with two-factor bypass enabled (a token without the bypass fails in CI with
-  `EOTP`), or publish the first version by hand from its tag:
+- **First publish, by hand.** npm's trusted publishing can only be configured for a package that
+  already exists, and npm refuses CI tokens for it: even a granular token with two-factor bypass
+  failed with `EOTP` (npm is restricting such tokens for publishing). So a maintainer publishes the
+  first version from its release tag, approving with their second factor:
 
   ```bash
   git checkout v<version>
   pnpm install --frozen-lockfile
   bash .github/release-build.sh <version>
-  npm publish ./pack/mcurcio-patchbay-<version>.tgz --access public --otp <one-time code>
+  npm publish ./pack/mcurcio-patchbay-<version>.tgz --access public --provenance=false --auth-type=web
   ```
 
+  (`--provenance=false`: only a CI run can sign provenance. `--auth-type=web` approves in the
+  browser; `--otp <code>` works too.) Then run `publish-tag` for that tag (below) to make its GitHub
+  Release.
 - **Then a trusted publisher.** On npmjs.com, under the package's settings, add a trusted publisher:
   GitHub Actions, repository `mcurcio/patchbay`, workflow `ci.yml`, no environment. Every later
-  release publishes through OIDC, with provenance, and the `NPM_TOKEN` secret can be deleted.
+  release publishes through OIDC, with provenance, and needs no `NPM_TOKEN` secret.
 - The job pushes the `CHANGELOG.md` commit and the tag to `main` with the workflow's token, so branch
   protection on `main` must let GitHub Actions push.
 
