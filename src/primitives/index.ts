@@ -9,6 +9,7 @@ export * from "./icon-button";
 export * from "./key-value";
 export * from "./panel";
 export * from "./pill";
+export * from "./radio-group";
 export * from "./section-title";
 export * from "./select";
 export * from "./sheet";

@@ -52,8 +52,8 @@ Common prop names mean the same everywhere:
 | `className` | Added to the component's own `pb-` class, never replacing it |
 
 Components built on a native element (`Button`, `TextInput`, `Select`, `Checkbox`, `Field`,
-`Splitter`, `Toolbar`, `Panel`, `Spinner`, `ThemeSwitch`) pass every other native prop through,
-`ref` included (React 19's `ref` as a prop).
+`Splitter`, `Toolbar`, `Panel`, `Spinner`, `ThemeSwitch`, and `RadioGroup` to its fieldset) pass
+every other native prop through, `ref` included (React 19's `ref` as a prop).
 
 ## Primitives (`/primitives`)
 
@@ -130,6 +130,22 @@ keeps the platform's own arrow and list. On touch both are 16 px text and at lea
 a press on the words ticks it; without one, name it by a `Field` or `aria-label`.
 `indeterminate?` (read as "mixed") is a prop, since HTML has it only as a DOM property. On touch the
 row is at least 36 px tall, with a 20 px box and 16 px words.
+
+**`RadioGroup`**: a choice of one, as native radios under a legend in one `<fieldset
+role="radiogroup">`. `legend` (its name), `legendHidden?` (the legend kept for screen readers
+only), `options: { value, label, title?, disabled? }[]`, `value` (the picked option's value; one
+no option has picks none), `onChange(value)`, `name?` (the radios' shared name; its own by
+default), `layout?: "stacked" | "inline"` (one option a row, or side by side and wrapping; others
+stack), `hint?`, `error?`.
+
+- **Controlled:** a press asks `onChange` and changes nothing until the app passes the new
+  `value`.
+- **Keyboard:** the browser's own: the group is one tab stop, and the arrow keys move the pick.
+- The hint and error are wired as `Field` wires a control's: `aria-describedby` names them (after
+  any ids it already has) and `aria-invalid` marks the group while there is an error ("" counts as
+  none). The radios are picked in the accent, and edged in the error tone while invalid.
+- `disabled` on the group disables every option. On touch each row is at least 36 px tall, with a
+  20 px radio and 16 px words.
 
 ### Layout
 
