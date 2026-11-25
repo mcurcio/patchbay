@@ -30,6 +30,7 @@ and a dark value; the rest are the same in both themes.
 | Lines | `--pb-line`, `--pb-line-strong` | Borders and the dot grid; a control's or code box's border |
 | Text | `--pb-text`, `--pb-muted`, `--pb-accent`, `--pb-on-strong` | Body text; secondary text; selection and focus; text on a filled chip |
 | Tones | `--pb-ok`, `--pb-warn`, `--pb-err`, `--pb-quiet`, `--pb-off`, `--pb-warn-soft`, `--pb-err-soft` | What a state is drawn in, and the soft surfaces under a warning or an error |
+| Derived | `--pb-scrim`, `--pb-accent-hover` | Behind a modal dialog (the canvas, 72 % opaque); a filled accent control under the pointer (the accent, 15 % toward the text colour). Mixed from the tokens above, so they follow the theme and a brand with no dark value of their own |
 | Changes | `--pb-added`, `--pb-removed`, `--pb-renamed` | An edit not yet applied |
 | Meters | `--pb-meter-low`, `--pb-meter-mid`, `--pb-meter-hot`, `--pb-meter-peak` | A level bar's three zones and its peak tick |
 | Code | `--pb-code-surface`, `--pb-code-surface-readonly`, `--pb-code-border`, `--pb-code-text`, `--pb-code-directive`, `--pb-code-keyword`, `--pb-code-variable`, `--pb-code-number`, `--pb-code-string`, `--pb-code-comment`, `--pb-code-punctuation`, `--pb-code-error`, `--pb-code-error-surface` | A code box and its highlighter's token colours (the surfaces, border, text and error surface point at the tokens above) |

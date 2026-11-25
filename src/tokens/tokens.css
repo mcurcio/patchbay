@@ -187,6 +187,15 @@
   }
 }
 
+/* Derived colours: mixed from the theme's tokens, so they follow the theme and a brand without a dark value of their
+   own (var() resolves on :root, after the theme and the brand). A brand may still override them. */
+:root {
+  /* Behind a modal dialog: the canvas, mostly opaque. */
+  --pb-scrim: color-mix(in srgb, var(--pb-surface) 72%, transparent);
+  /* A filled accent control under the pointer: the accent pulled toward the text colour. */
+  --pb-accent-hover: color-mix(in srgb, var(--pb-accent) 85%, var(--pb-text));
+}
+
 /* React Flow's own variables point at the tokens, so its canvas, dot grid, wires, handles and minimap follow the
    theme and the brand. Its colorMode prop is not used: it would fight data-theme. Set on .react-flow, so each var()
    resolves where React Flow reads it. */

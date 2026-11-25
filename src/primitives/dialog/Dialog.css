@@ -11,7 +11,7 @@
   box-sizing: border-box;
   padding: max(10vh, env(safe-area-inset-top)) max(var(--pb-space-5), env(safe-area-inset-right))
     max(var(--pb-space-5), env(safe-area-inset-bottom)) max(var(--pb-space-5), env(safe-area-inset-left));
-  background: color-mix(in srgb, var(--pb-surface) 72%, transparent);
+  background: var(--pb-scrim);
   animation: pb-dialog-fade var(--pb-motion-fast) ease-out;
 }
 
