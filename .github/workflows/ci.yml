@@ -109,5 +109,5 @@ jobs:
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }} # optional: only the first publish needs it (CONTRIBUTING.md, Releases)
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }} # optional: trusted publishing needs no token (CONTRIBUTING.md, Releases)
         run: .github/release/node_modules/.bin/semantic-release

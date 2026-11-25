@@ -91,14 +91,31 @@ the first commit `v0.0.0` as the baseline, so the first release is 0.1.0.
 
 ### One-time setup on npmjs.com
 
-- **First publish:** npm's trusted publishing can only be configured for a package that already exists.
-  Add a repository secret `NPM_TOKEN` (a granular access token allowed to publish `@mcurcio/patchbay`)
-  before the first release; the job uses it when it is set.
-- **Afterwards:** on npmjs.com, under the package's settings, add a trusted publisher: GitHub Actions,
-  repository `mcurcio/patchbay`, workflow `ci.yml`, no environment. Releases then publish through OIDC
-  and the `NPM_TOKEN` secret can be deleted.
+- **First publish, by hand.** npm's trusted publishing can only be configured for a package that
+  already exists, and npm rejects a token that cannot pass two-factor authentication from CI
+  (`EOTP`). So the first version is published by a maintainer, from its release tag:
+
+  ```bash
+  git checkout v<version>
+  pnpm install --frozen-lockfile
+  bash .github/release-build.sh <version>
+  npm publish ./pack/mcurcio-patchbay-<version>.tgz --access public --otp <one-time code>
+  ```
+
+- **Then a trusted publisher.** On npmjs.com, under the package's settings, add a trusted publisher:
+  GitHub Actions, repository `mcurcio/patchbay`, workflow `ci.yml`, no environment. Every later
+  release publishes through OIDC, with provenance, and needs no token. (`release-npm.sh` still uses
+  an `NPM_TOKEN` secret if one is set, for a token that can publish without a one-time password.)
 - The job pushes the `CHANGELOG.md` commit and the tag to `main` with the workflow's token, so branch
   protection on `main` must let GitHub Actions push.
+
+### When a publish fails after the tag
+
+semantic-release tags the release before it publishes, so a failed publish leaves the tag, the
+`CHANGELOG.md` commit and no package or GitHub Release; re-running the job releases nothing. Publish
+that tag's build by hand as above, then make its GitHub Release from the tag with its section of
+`CHANGELOG.md` (`gh release create v<version> --verify-tag --notes-file <notes>`), attaching the
+tarball.
 
 ### Checking a release locally
 
