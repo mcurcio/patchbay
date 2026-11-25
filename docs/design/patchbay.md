@@ -47,8 +47,8 @@ Built: [`docs/components.md`](../components.md#primitives-primitives).
 
 ### 4.2 Composites (`/composites`)
 
-`Banner` and `StatusWords` are built: [`docs/components.md`](../components.md#composites-composites).
-Still to build:
+`Banner`, `StatusWords` and `DiffView` are built:
+[`docs/components.md`](../components.md#composites-composites). Still to build:
 
 | Component | Props (sketch) |
 |---|---|
@@ -57,7 +57,6 @@ Still to build:
 | `Toaster` | (provider) |
 | `CodeEditor` | `value`, `onChange`, `language?: "knobly"`, `highlight?: (text) => spans`, `diagnostics?: { line, column?, severity, message }[]`, `readOnly?`, `onCaret?` |
 | `CodeText` | `value`, `language?` or `highlight?` (read-only, highlighted) |
-| `DiffView` | `diff` (unified text) or `files: { path, diff }[]` |
 | `SchemaForm` | `schema` (JSON Schema subset), `value`, `onChange`, `errors?`, `fieldSlot?` |
 
 **Highlighting.** `CodeEditor` and `CodeText` highlight [knobly](https://github.com/mcurcio/knobly)

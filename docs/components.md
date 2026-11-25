@@ -240,6 +240,25 @@ drawn in the order given, which is most urgent first, plus native `ul` props (na
   reader reads a change when it is free; it stays in the page while empty, ready for the next
   change. The dots are drawn, not read.
 
+### Code
+
+**`DiffView`**: unified diff text, drawn line by line in code type on the code surface. Either
+`diff` (one diff, drawn whole without a heading) or `files: { path, diff }[]` (one section per
+file, in order), plus `level?` (the files' headings, h2 to h6, h3 by default), `collapsed?` (the
+paths folded away), `onToggle?(path, open)`, and native `div` props.
+
+- **Lines:** each keeps its `+` or `-`, so a change never rests on colour alone. Added lines are in
+  `--pb-added` and removed ones in `--pb-removed`, each with a bar of its tone at the start; hunk
+  headers (`@@`) are in `--pb-code-directive`; git's header lines (`diff --git`, `index`, `---`,
+  `+++`) and `\ No newline at end of file` in `--pb-code-comment`. CRLF reads as LF.
+- **Files:** each is a heading holding a button labelled by the file's name (the path's last part),
+  with the whole path as its title. The button folds the file (`aria-expanded`, `aria-controls`).
+  With `collapsed` the app holds the fold and a press only calls `onToggle`; without it the view
+  keeps its own, every file open at first, and still calls `onToggle`.
+- A wide diff scrolls sideways; each diff body is a tab stop, so it scrolls from the keyboard too.
+  On touch the heading buttons are at least 36 px tall with 16 px words. The chevron turns on
+  `--pb-motion-fast`, so it is still under reduced motion.
+
 ## Hooks (`/hooks`)
 
 ### `usePersistentState`

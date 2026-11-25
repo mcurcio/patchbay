@@ -1,0 +1,132 @@
+/* A diff (DiffView.tsx): unified diff text in code type on the code surface, added and removed lines in the change
+   tones with a bar of their tone at the start, hunk headers in the directive colour and git's header lines in the
+   comment colour. Given files, each is a section under a heading button that folds it. */
+.pb-diff {
+  display: grid;
+  gap: var(--pb-space-3);
+  min-width: 0;
+  font-family: var(--pb-font-ui);
+  font-size: var(--pb-text-md);
+  color: var(--pb-text);
+}
+
+.pb-diff-file {
+  display: grid;
+  gap: var(--pb-space-2);
+  min-width: 0;
+}
+
+.pb-diff-file-title {
+  margin: 0;
+  font-size: var(--pb-text-md);
+  font-weight: 600;
+}
+
+.pb-diff-toggle {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pb-space-2);
+  max-width: 100%;
+  min-height: 28px;
+  padding: 0 var(--pb-space-2);
+  border: 0;
+  border-radius: var(--pb-radius-control);
+  background: transparent;
+  color: var(--pb-text);
+  font: inherit;
+  text-align: start;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pb-diff-toggle:hover {
+  background: var(--pb-sunken);
+}
+
+.pb-diff-toggle:focus-visible {
+  outline: 2px solid var(--pb-accent);
+  outline-offset: 0;
+}
+
+.pb-diff-chevron {
+  flex: none;
+  color: var(--pb-muted);
+  transition: transform var(--pb-motion-fast) ease-out;
+}
+
+.pb-diff-file[data-open] .pb-diff-chevron {
+  transform: rotate(90deg);
+}
+
+.pb-diff-body {
+  margin: 0;
+  padding: var(--pb-space-3) 0;
+  overflow-x: auto;
+  border: 1px solid var(--pb-code-border);
+  border-radius: var(--pb-radius-control);
+  background: var(--pb-code-surface);
+  color: var(--pb-code-text);
+  font-family: var(--pb-font-code);
+  font-size: var(--pb-code-size);
+  line-height: 1.5;
+}
+
+.pb-diff-body[hidden] {
+  display: none;
+}
+
+.pb-diff-body:focus-visible {
+  outline: 2px solid var(--pb-accent);
+  outline-offset: -2px;
+}
+
+/* At least the box's width, so a line's start bar runs the length of a wide diff. */
+.pb-diff-code {
+  display: inline-block;
+  min-width: 100%;
+  font: inherit;
+}
+
+.pb-diff-line {
+  display: block;
+  padding: 0 var(--pb-space-4) 0 var(--pb-space-3);
+  border-inline-start: 3px solid transparent;
+  white-space: pre;
+}
+
+.pb-diff-line[data-kind="add"] {
+  border-inline-start-color: currentColor;
+  color: var(--pb-added);
+}
+
+.pb-diff-line[data-kind="del"] {
+  border-inline-start-color: currentColor;
+  color: var(--pb-removed);
+}
+
+.pb-diff-line[data-kind="hunk"] {
+  color: var(--pb-code-directive);
+}
+
+.pb-diff-line[data-kind="meta"],
+.pb-diff-line[data-kind="note"] {
+  color: var(--pb-code-comment);
+}
+
+/* A finger: a heading button at least 36 px tall with 16 px words. */
+@media (hover: none) and (pointer: coarse) {
+  .pb-diff-toggle {
+    min-height: 36px;
+    font-size: 16px;
+  }
+}
+
+/* Forced colours drop the tones; the "+" and "-" carry the change, and the start bars stay as the text colour. */
+@media (forced-colors: active) {
+  .pb-diff-line[data-kind="add"],
+  .pb-diff-line[data-kind="del"] {
+    border-inline-start-color: CanvasText;
+  }
+}
