@@ -5,6 +5,14 @@ name: CI
 on:
   push:
   pull_request:
+  # Publish an existing release tag (the publish-tag job): when a release's publish failed after semantic-release
+  # tagged it, a rerun releases nothing, so this builds that tag, publishes it to npm and makes its GitHub Release.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "The release tag to publish, e.g. v0.1.0"
+        required: true
+        type: string
 
 # A newer push to a pull request cancels its older run; runs on branches each finish.
 concurrency:
@@ -111,3 +119,58 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }} # optional: trusted publishing needs no token (CONTRIBUTING.md, Releases)
         run: .github/release/node_modules/.bin/semantic-release
+
+  # Run by hand (Actions, CI, Run workflow, with a tag): publishes a release tag that semantic-release made but did not
+  # publish (CONTRIBUTING.md, "When a publish fails after the tag"). It builds the tag's tree as the release job would,
+  # publishes the package unless npm already has that version, and makes the GitHub Release from the tag's section of
+  # CHANGELOG.md unless it exists. Safe to run again. Lives in ci.yml so the trusted publisher named for ci.yml covers it.
+  publish-tag:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    concurrency:
+      group: release
+      cancel-in-progress: false
+    permissions:
+      contents: write # the GitHub Release
+      id-token: write # npm trusted publishing and provenance
+    env:
+      TAG: ${{ inputs.tag }}
+    steps:
+      - name: Check the tag's form
+        run: |
+          [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::'$TAG' is not a release tag like v1.2.3"; exit 1; }
+          echo "VERSION=${TAG#v}" >> "$GITHUB_ENV"
+      - uses: actions/checkout@v7
+        with:
+          ref: refs/tags/${{ inputs.tag }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - run: bash .github/release-build.sh "$VERSION"
+      - name: Publish to npm
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }} # optional: trusted publishing needs no token
+        run: |
+          if [ "$(npm view "@mcurcio/patchbay@$VERSION" version 2>/dev/null)" = "$VERSION" ]; then
+            echo "::notice::npm already has @mcurcio/patchbay@$VERSION; not publishing."
+          else
+            bash .github/release-npm.sh "$VERSION"
+          fi
+      - name: Make the GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            echo "::notice::The GitHub Release $TAG exists; leaving it."
+            exit 0
+          fi
+          # The tag's section of CHANGELOG.md: from its "## [x.y.z]" heading to the next release's heading.
+          awk -v v="$VERSION" '
+            /^##? \[/ { if (found) exit; if (index($0, "[" v "]")) { found = 1; next } }
+            found { print }
+          ' CHANGELOG.md > "$RUNNER_TEMP/notes.md"
+          [ -s "$RUNNER_TEMP/notes.md" ] || { echo "::error::No section for $VERSION in CHANGELOG.md"; exit 1; }
+          gh release create "$TAG" --verify-tag --title "$TAG" --notes-file "$RUNNER_TEMP/notes.md" \
+            "./pack/mcurcio-patchbay-$VERSION.tgz#npm package ($TAG)"

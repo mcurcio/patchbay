@@ -91,9 +91,10 @@ the first commit `v0.0.0` as the baseline, so the first release is 0.1.0.
 
 ### One-time setup on npmjs.com
 
-- **First publish, by hand.** npm's trusted publishing can only be configured for a package that
-  already exists, and npm rejects a token that cannot pass two-factor authentication from CI
-  (`EOTP`). So the first version is published by a maintainer, from its release tag:
+- **First publish.** npm's trusted publishing can only be configured for a package that already
+  exists. Either add a repository secret `NPM_TOKEN`, a granular token allowed to publish
+  `@mcurcio/patchbay` with two-factor bypass enabled (a token without the bypass fails in CI with
+  `EOTP`), or publish the first version by hand from its tag:
 
   ```bash
   git checkout v<version>
@@ -104,18 +105,18 @@ the first commit `v0.0.0` as the baseline, so the first release is 0.1.0.
 
 - **Then a trusted publisher.** On npmjs.com, under the package's settings, add a trusted publisher:
   GitHub Actions, repository `mcurcio/patchbay`, workflow `ci.yml`, no environment. Every later
-  release publishes through OIDC, with provenance, and needs no token. (`release-npm.sh` still uses
-  an `NPM_TOKEN` secret if one is set, for a token that can publish without a one-time password.)
+  release publishes through OIDC, with provenance, and the `NPM_TOKEN` secret can be deleted.
 - The job pushes the `CHANGELOG.md` commit and the tag to `main` with the workflow's token, so branch
   protection on `main` must let GitHub Actions push.
 
 ### When a publish fails after the tag
 
-semantic-release tags the release before it publishes, so a failed publish leaves the tag, the
-`CHANGELOG.md` commit and no package or GitHub Release; re-running the job releases nothing. Publish
-that tag's build by hand as above, then make its GitHub Release from the tag with its section of
-`CHANGELOG.md` (`gh release create v<version> --verify-tag --notes-file <notes>`), attaching the
-tarball.
+semantic-release tags the release before it publishes, so a failed publish leaves the tag and the
+`CHANGELOG.md` commit with no package or GitHub Release, and re-running the job releases nothing.
+Fix the cause, then run the CI workflow by hand with that tag (Actions, CI, Run workflow, `tag`:
+`v<version>`): its `publish-tag` job builds the tag, publishes it to npm unless npm already has that
+version, and makes the GitHub Release from the tag's section of `CHANGELOG.md` unless it exists. It
+is safe to run again.
 
 ### Checking a release locally
 
