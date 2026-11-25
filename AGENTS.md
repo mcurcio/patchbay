@@ -78,8 +78,9 @@ pnpm test-storybook            # Vitest's "storybook" project: every story in he
   installed (`pnpm exec playwright install chromium`; CI adds `--with-deps`).
 - **pnpm's release-age policy** refuses a package published in the last day; `pnpm install` picks
   the newest older one. Build scripts are allowed per package in `pnpm-workspace.yaml`.
-- CI (`.github/workflows/ci.yml`) runs on every push and pull request: `check`, and `storybook`
-  (`build-storybook`, then `test-storybook`).
+- CI (`.github/workflows/ci.yml`) runs on every push and pull request: `check`, `storybook`
+  (`build-storybook`, then `test-storybook`) and `release-dry-run`; on a push to `main`, once they
+  pass, `release` publishes. How releases work: [`CONTRIBUTING.md`](CONTRIBUTING.md#releases).
 
 ## Landing work
 

@@ -1,0 +1,12 @@
+{
+  "name": "patchbay-release-tooling",
+  "private": true,
+  "description": "Pinned semantic-release tooling for the release job of .github/workflows/ci.yml. Not part of patchbay.",
+  "devDependencies": {
+    "@semantic-release/changelog": "7.0.0",
+    "@semantic-release/exec": "7.1.0",
+    "@semantic-release/git": "11.0.1",
+    "conventional-changelog-conventionalcommits": "9.3.1",
+    "semantic-release": "25.0.9"
+  }
+}

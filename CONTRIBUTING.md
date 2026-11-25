@@ -74,4 +74,39 @@ it; merging is the release.
 
 ## Releases
 
-<!-- releases -->
+Merging a pull request into `main` is the release; there is no release PR, and nobody tags or edits a
+version by hand. The release job in `.github/workflows/ci.yml` runs after every check passes on that
+push and is never cancelled. semantic-release (`.releaserc.json`, its tooling pinned with a lockfile in
+`.github/release/`) reads the Conventional Commits since the last `v*` tag: `fix` releases a patch,
+`feat` a minor, and a breaking change (`!` or `BREAKING CHANGE:`) a minor while patchbay is 0.x (a major
+from 1.0); other types release nothing. A squash-merge counts only its title, so the PR title must be a
+Conventional Commit.
+
+The job appends the notes to `CHANGELOG.md` and commits only that file as
+`chore(release): <version> [skip ci]`, tags that commit `v<version>`, publishes the package to npmjs.org
+with provenance, and makes the GitHub Release with the notes and the packed `.tgz`. The version lives in
+the tag, the GitHub Release and `CHANGELOG.md`: `package.json` stays at `0.0.0`, and
+`.github/release-build.sh` stamps the version into a temporary copy for the build. The first run tags
+the first commit `v0.0.0` as the baseline, so the first release is 0.1.0.
+
+### One-time setup on npmjs.com
+
+- **First publish:** npm's trusted publishing can only be configured for a package that already exists.
+  Add a repository secret `NPM_TOKEN` (a granular access token allowed to publish `@mcurcio/patchbay`)
+  before the first release; the job uses it when it is set.
+- **Afterwards:** on npmjs.com, under the package's settings, add a trusted publisher: GitHub Actions,
+  repository `mcurcio/patchbay`, workflow `ci.yml`, no environment. Releases then publish through OIDC
+  and the `NPM_TOKEN` secret can be deleted.
+- The job pushes the `CHANGELOG.md` commit and the tag to `main` with the workflow's token, so branch
+  protection on `main` must let GitHub Actions push.
+
+### Checking a release locally
+
+CI's `release-dry-run` job does this on every push and pull request; to run it yourself, with any
+version:
+
+```bash
+pnpm install
+bash .github/release-build.sh 1.2.3            # pack/mcurcio-patchbay-1.2.3.tgz, checked
+bash .github/release-npm.sh 1.2.3 --dry-run    # npm publish --dry-run: sends nothing, needs no login
+```

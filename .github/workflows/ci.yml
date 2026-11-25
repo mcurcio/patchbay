@@ -41,3 +41,73 @@ jobs:
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm build-storybook
       - run: pnpm test-storybook
+
+  # What a release would publish, on every push and pull request, with no secrets: the package built with a made-up
+  # version stamped into a copy of package.json (.github/release-build.sh checks the tarball's name, version and
+  # export targets), then `npm publish --dry-run` of that tarball. The release job below runs the same two scripts.
+  release-dry-run:
+    runs-on: ubuntu-24.04
+    env:
+      VERSION: 1.2.3
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - run: bash .github/release-build.sh "$VERSION"
+      # The build stamps a copy, never the tree: nothing tracked may change.
+      - run: |
+          changed=$(git status --porcelain --untracked-files=no)
+          [ -z "$changed" ] || { echo "::error::release-build.sh changed tracked files:"; echo "$changed"; exit 1; }
+      - run: bash .github/release-npm.sh "$VERSION" --dry-run
+
+  # Merging to main is the release. semantic-release (.releaserc.json, its tooling pinned in .github/release/) reads
+  # the Conventional Commits since the last v* tag: fix a patch, feat a minor, a breaking change a minor while the
+  # version is 0.x (the rule to remove at 1.0), other types nothing. It appends the notes to CHANGELOG.md, commits only
+  # that file as `chore(release): <version> [skip ci]` and pushes it to main, tags that commit v<version>, publishes
+  # the package to npmjs.org (.github/release-npm.sh: trusted publishing, or the NPM_TOKEN secret if set, with
+  # provenance) and makes the GitHub Release with the notes and the .tgz. The version is never committed to
+  # package.json. Never cancelled: a release stopped halfway can leave a tag without its package.
+  release:
+    needs: [check, storybook, release-dry-run]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    concurrency:
+      group: release
+      cancel-in-progress: false
+    permissions:
+      contents: write # the CHANGELOG.md commit, the tag and the GitHub Release
+      id-token: write # npm trusted publishing and provenance
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # every commit and tag, to find the last release
+      # With no v* tag semantic-release would release 1.0.0. The baseline tag v0.0.0 on the first commit makes the
+      # first release 0.1.0 (a feat) or 0.0.1 (only fixes), counting every commit since. It is made once, here.
+      - name: Baseline tag v0.0.0
+        run: |
+          if [ -n "$(git tag --list 'v*')" ]; then
+            echo "A v* tag exists; no baseline needed."
+            exit 0
+          fi
+          root=$(git rev-list --max-parents=0 HEAD | tail -n 1)
+          git tag v0.0.0 "$root"
+          if git push origin v0.0.0; then
+            echo "::notice title=Baseline tag::Tagged the first commit $root as v0.0.0"
+          else
+            echo "::error title=Baseline tag::Could not push v0.0.0. Push it once by hand: git tag v0.0.0 $root && git push origin v0.0.0"
+            exit 1
+          fi
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - run: npm ci --prefix .github/release --no-audit --no-fund
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }} # optional: only the first publish needs it (CONTRIBUTING.md, Releases)
+        run: .github/release/node_modules/.bin/semantic-release
