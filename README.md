@@ -17,6 +17,6 @@ the rest is designed in [`docs/design/patchbay.md`](docs/design/patchbay.md).
 
 ## Development
 
-Node 24 and pnpm through corepack: `corepack pnpm install`, then `corepack pnpm check` (typecheck,
-lint, format, tests, build) and `corepack pnpm storybook`. [`AGENTS.md`](AGENTS.md#build-and-test)
+Node 24 and pnpm through corepack: `corepack enable`, `pnpm install`, then `pnpm check` (typecheck,
+lint, format, tests, build) and `pnpm storybook`. [`AGENTS.md`](AGENTS.md#build-and-test)
 lists every command.

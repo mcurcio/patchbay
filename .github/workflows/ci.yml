@@ -22,9 +22,10 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
-      # pnpm at the version package.json's packageManager names.
-      - run: corepack pnpm install --frozen-lockfile
-      - run: corepack pnpm check
+      # The pnpm command, at packageManager's version: package.json's scripts call `pnpm` themselves.
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check
 
   storybook:
     runs-on: ubuntu-24.04
@@ -33,8 +34,10 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
-      - run: corepack pnpm install --frozen-lockfile
+      # The pnpm command, at packageManager's version: package.json's scripts call `pnpm` themselves.
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
       # Chromium for the Playwright version the lockfile pins, with its system libraries.
-      - run: corepack pnpm exec playwright install --with-deps chromium
-      - run: corepack pnpm build-storybook
-      - run: corepack pnpm test-storybook
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm build-storybook
+      - run: pnpm test-storybook

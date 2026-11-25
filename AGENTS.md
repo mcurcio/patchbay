@@ -43,16 +43,17 @@ Node 24 (`.nvmrc`; run `nvm use` first) and pnpm through corepack, at the versio
 in `package.json` names. From the repository root:
 
 ```bash
-corepack pnpm install          # --frozen-lockfile in CI
-corepack pnpm check            # typecheck, lint, format:check, test, build: what CI's check job runs
-corepack pnpm test             # Vitest's "unit" project: src/**/*.test.ts(x) in jsdom
-corepack pnpm typecheck        # tsc, strict, no emit
-corepack pnpm lint             # ESLint (typescript-eslint type-checked, react-hooks, storybook)
-corepack pnpm format           # Prettier, 120 columns (format:check fails on a file it would change)
-corepack pnpm build            # Vite library mode into dist/, then tsc's .d.ts into dist/types/
-corepack pnpm storybook        # Storybook on http://localhost:6006
-corepack pnpm build-storybook  # into storybook-static/
-corepack pnpm test-storybook   # Vitest's "storybook" project: every story in headless Chromium
+corepack enable                # once: puts `pnpm` on PATH, which the scripts call
+pnpm install                   # --frozen-lockfile in CI
+pnpm check                     # typecheck, lint, format:check, test, build: what CI's check job runs
+pnpm test                      # Vitest's "unit" project: src/**/*.test.ts(x) in jsdom
+pnpm typecheck                 # tsc, strict, no emit
+pnpm lint                      # ESLint (typescript-eslint type-checked, react-hooks, storybook)
+pnpm format                    # Prettier, 120 columns (format:check fails on a file it would change)
+pnpm build                     # Vite library mode into dist/, then tsc's .d.ts into dist/types/
+pnpm storybook                 # Storybook on http://localhost:6006
+pnpm build-storybook           # into storybook-static/
+pnpm test-storybook            # Vitest's "storybook" project: every story in headless Chromium
                                # (its play function, and the a11y check, which fails on a violation)
 ```
 
@@ -69,7 +70,7 @@ corepack pnpm test-storybook   # Vitest's "storybook" project: every story in he
 - **CSS in tests.** Vitest blanks stylesheets by default; the unit project reads every CSS file
   under `src/` as text (`import css from "./Name.css?raw"`), for the token tests.
 - **Storybook's tests** run on the Playwright that `package.json` pins exactly. Its Chromium must be
-  installed (`corepack pnpm exec playwright install chromium`; CI adds `--with-deps`).
+  installed (`pnpm exec playwright install chromium`; CI adds `--with-deps`).
 - **pnpm's release-age policy** refuses a package published in the last day; `pnpm install` picks
   the newest older one. Build scripts are allowed per package in `pnpm-workspace.yaml`.
 - CI (`.github/workflows/ci.yml`) runs on every push and pull request: `check`, and `storybook`
