@@ -4,11 +4,14 @@ Instructions for every AI coding agent in this repo. `CLAUDE.md` is a symlink to
 
 ## What this repo is
 
-patchbay is the React component library behind the graph editors of ear (mcurcio/ear, `web/`) and
-rasl (mcurcio/rasl, `js/packages/web`): design tokens, themes and each app's brand, primitives,
-composites, the app shell, graph components on React Flow, and UI-only hooks. It is a library, not
-a framework: it draws and handles interaction; each app keeps its protocol, its data and its
-editing model.
+patchbay is an open-source React component library for apps that draw and edit a live graph:
+design tokens, themes and the brand mechanism, primitives, composites, the app shell, graph
+components on React Flow, and UI-only hooks. It is a library, not a framework: it draws and handles
+interaction; each app keeps its protocol, its data, its brand and its editing model.
+
+It is a public, standalone project: nothing in it may name or assume a particular app, deployment,
+machine or person's setup. Examples use neutral data; anything that varies between apps is a prop,
+a token or a brand. `README.md` is for users, `CONTRIBUTING.md` for contributors.
 
 The tokens, the primitives and the first hooks are built; [`docs/README.md`](docs/README.md) indexes
 their docs. The design for the rest is [`docs/design/patchbay.md`](docs/design/patchbay.md); read
@@ -16,12 +19,14 @@ both before any change.
 
 ## Rules of the repo
 
-- **Components only draw.** No fetching, no protocol types, no knobly parsing; data in, callbacks
+- **Components only draw.** No fetching, no protocol types, no parsing; data in, callbacks
   out. The full list of component rules is in
   [`docs/components.md`](docs/components.md#rules-every-component-keeps).
-- **Tokens only.** No colour, radius, shadow or duration outside the token and brand files.
-- **No app's words or types.** Nothing in patchbay names an ear or rasl type; an app maps its data
-  onto patchbay's props.
+- **Tokens only.** No colour, radius, shadow or duration outside the token files (and the example
+  brands).
+- **No app's words or types.** Nothing in patchbay names a particular app's types or domain; an app
+  maps its data onto patchbay's props. Brands belong to the apps; `examples/brands/` holds neutral
+  examples only.
 - **Dependencies:** React, React DOM, `@xyflow/react` and `knobly` are peer dependencies, never
   bundled. Adding any other runtime dependency needs the owner's yes.
 
@@ -57,13 +62,13 @@ pnpm test-storybook            # Vitest's "storybook" project: every story in he
                                # (its play function, and the a11y check, which fails on a violation)
 ```
 
-- **Layout.** One folder per layer under `src/` (`tokens`, `brands`, `primitives`, `composites`,
+- **Layout.** One folder per layer under `src/` (`tokens`, `primitives`, `composites`,
   `shell`, `graph`, `hooks`), each JS layer with its `index.ts` entry. A component is four files
   beside each other: `Name.tsx`, `Name.css` (tokens only, classes prefixed `pb-`),
   `Name.stories.tsx` (its states) and `Name.test.tsx` (its behaviour).
 - **The package.** `vite.config.ts` builds one ES module per layer (`dist/<layer>.js`) with its CSS
-  beside it (`dist/<layer>.css`, which the module imports itself), and copies `tokens.css`, `base.css` and
-  `brands/*.css` as written. Peer dependencies (React, React DOM, `@xyflow/react`, `knobly`) are
+  beside it (`dist/<layer>.css`, which the module imports itself), and copies `tokens.css` and
+  `base.css` as written. Peer dependencies (React, React DOM, `@xyflow/react`, `knobly`) are
   never bundled. `package.json`'s `exports` names each subpath.
 - **Tokens, themes and brands:** [`docs/tokens.md`](docs/tokens.md) (the token test is
   `src/tokens/tokens.test.ts`).
