@@ -1,3 +1,11 @@
+## [0.3.0](https://github.com/mcurcio/patchbay/compare/v0.2.0...v0.3.0) (2026-11-25)
+
+### Features
+
+* **composites:** Banner and StatusWords ([c2969fc](https://github.com/mcurcio/patchbay/commit/c2969fcfb757d74939f74529eed2d8caf89a182b))
+* **composites:** DiffView ([33c3efe](https://github.com/mcurcio/patchbay/commit/33c3efeb50415b6a631d314308948399f757830f))
+* **primitives:** RadioGroup ([439893a](https://github.com/mcurcio/patchbay/commit/439893a714868bf17b5c175b38c77ee442cadb3b))
+
 ## [0.2.0](https://github.com/mcurcio/patchbay/compare/v0.1.0...v0.2.0) (2026-11-25)
 
 ### Features
