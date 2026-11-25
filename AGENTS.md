@@ -30,6 +30,8 @@ before any change.
 - **Design docs are for unbuilt work only.** `docs/design/` holds them; when a part is built, its
   design text is deleted in the same change and what lasts moves into the library docs. Code
   comments never cite a design page's section numbers for built work.
+- The logo (`docs/assets/logo.svg`, `logo-dark.svg`, `icon.svg`) is drawn by `tools/logo.py`; edit the
+  script and rerun it (`python3 tools/logo.py`), never the SVGs.
 - Storybook is the catalogue: every component has stories for its states, under each brand and
   theme.
 
