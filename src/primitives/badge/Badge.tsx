@@ -1,4 +1,4 @@
-// A badge: a short word or count in a rounded chip, tinted by its tone (a count of dropouts, a "not ready"). A tone it
+// A badge: a short word or count in a rounded chip, tinted by its tone (a count of retries, a "not ready"). A tone it
 // does not know is drawn neutrally.
 import type { ReactNode } from "react";
 import "./Badge.css";

@@ -47,12 +47,12 @@ export const InlineForm: Story = {
   render: () => (
     <div style={{ display: "grid", gap: "8px" }}>
       <Field label="Id" layout="inline" error="Already taken">
-        <TextInput font="code" defaultValue="white" />
+        <TextInput font="code" defaultValue="ingest" />
       </Field>
-      <Field label="Rate" layout="inline">
-        <Select defaultValue="48000">
-          <option value="44100">44.1 kHz</option>
-          <option value="48000">48 kHz</option>
+      <Field label="Interval" layout="inline">
+        <Select defaultValue="30">
+          <option value="15">15 s</option>
+          <option value="30">30 s</option>
         </Select>
       </Field>
       <Field label="Enabled" layout="inline">
@@ -64,17 +64,17 @@ export const InlineForm: Story = {
 
 export const WithSelect: Story = {
   args: {
-    label: "Rate",
-    error: "The card does not support it",
+    label: "Interval",
+    error: "The worker does not support it",
     children: (
-      <Select defaultValue="96000">
-        <option value="48000">48 kHz</option>
-        <option value="96000">96 kHz</option>
+      <Select defaultValue="60">
+        <option value="30">30 s</option>
+        <option value="60">60 s</option>
       </Select>
     ),
   },
   play: async ({ canvas }) => {
-    await expect(canvas.getByRole("combobox", { name: "Rate" })).toHaveAttribute("aria-invalid", "true");
+    await expect(canvas.getByRole("combobox", { name: "Interval" })).toHaveAttribute("aria-invalid", "true");
   },
 };
 

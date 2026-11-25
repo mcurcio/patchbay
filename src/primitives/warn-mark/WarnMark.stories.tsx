@@ -21,13 +21,13 @@ export const Default: Story = {
 };
 
 /** Its meaning on hover. */
-export const WithTitle: Story = { args: { title: "Dropouts rose in the last minute" } };
+export const WithTitle: Story = { args: { title: "Retries rose in the last minute" } };
 
 /** Beside the words it marks, as it sits in text. */
 export const InText: Story = {
   render: (args) => (
     <span>
-      Dropouts <WarnMark {...args} /> 3
+      Retries <WarnMark {...args} /> 3
     </span>
   ),
 };

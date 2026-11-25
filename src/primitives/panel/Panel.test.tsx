@@ -43,11 +43,11 @@ describe("Panel", () => {
     const { container, rerender } = render(<Panel aria-label="Plain">x</Panel>);
     expect(container.querySelector(".pb-panel-header")).toBeNull();
     rerender(
-      <Panel title="Inspector" aria-label="Inspector: gain">
+      <Panel title="Inspector" aria-label="Inspector: transform">
         x
       </Panel>,
     );
-    expect(screen.getByRole("region", { name: "Inspector: gain" })).not.toHaveAttribute("aria-labelledby");
+    expect(screen.getByRole("region", { name: "Inspector: transform" })).not.toHaveAttribute("aria-labelledby");
   });
 
   it("scrolls its body alone", () => {

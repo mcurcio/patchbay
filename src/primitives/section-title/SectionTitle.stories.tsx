@@ -46,4 +46,4 @@ export const LongTitle: Story = {
   ],
 };
 
-export const Level2: Story = { args: { level: 2, children: "Engine" } };
+export const Level2: Story = { args: { level: 2, children: "Service" } };

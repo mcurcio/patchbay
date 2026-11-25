@@ -4,11 +4,11 @@ import { WarnMark } from "./WarnMark";
 
 describe("WarnMark", () => {
   it("shows the glyph to the eye and its words to screen readers", () => {
-    const { container } = render(<WarnMark label="dropouts rose in the last minute" />);
+    const { container } = render(<WarnMark label="retries rose in the last minute" />);
     const glyph = container.querySelector(".pb-warn-mark");
     expect(glyph).toHaveTextContent("!");
     expect(glyph).toHaveAttribute("aria-hidden", "true");
-    expect(screen.getByText("dropouts rose in the last minute")).toHaveClass("pb-warn-mark-text");
+    expect(screen.getByText("retries rose in the last minute")).toHaveClass("pb-warn-mark-text");
   });
 
   it("puts its title on the glyph, and none unless given", () => {

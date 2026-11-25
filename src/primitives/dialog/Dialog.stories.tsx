@@ -37,7 +37,7 @@ export const WithActions: Story = {
   args: {
     children: (
       <Field label="Name">
-        <TextInput defaultValue="gain_1" />
+        <TextInput defaultValue="transform_1" />
       </Field>
     ),
     actions: (

@@ -1,15 +1,20 @@
 // The tokens, themes and brands (docs/tokens.md): tokens.css's three sets (light, the system's dark, the chosen dark)
-// and each brand's, every text, tone, on-strong and code pair at 4.5:1 for every brand and theme, and no colour,
+// and each example brand's (examples/brands/, which hold a brand to the rules an app's own brand must keep), every
+// text, tone, on-strong and code pair at 4.5:1 for the base and each example brand in each theme, and no colour,
 // duration, radius or shadow of its own in a component.
 import { describe, expect, it } from "vitest";
 import tokensCss from "./tokens.css?raw";
 import baseCss from "./base.css?raw";
 
-const brandFiles = import.meta.glob<string>("../brands/*.css", { query: "?raw", import: "default", eager: true });
+const brandFiles = import.meta.glob<string>("../../examples/brands/*.css", {
+  query: "?raw",
+  import: "default",
+  eager: true,
+});
 
-// Every stylesheet and component under src/ but the token and brand files (stories and tests may show any colour).
+// Every stylesheet and component under src/ but the token files (stories and tests may show any colour).
 const componentFiles = import.meta.glob<string>(
-  ["../**/*.css", "../**/*.tsx", "!../tokens/**", "!../brands/**", "!../**/*.stories.tsx", "!../**/*.test.tsx"],
+  ["../**/*.css", "../**/*.tsx", "!../tokens/**", "!../**/*.stories.tsx", "!../**/*.test.tsx"],
   { query: "?raw", import: "default", eager: true },
 );
 
@@ -77,7 +82,7 @@ const brands = Object.entries(brandFiles).map(([file, css]) => {
   return { name, ...sets(css, `:root[data-brand="${name}"]`) };
 });
 
-/** The tokens in force for a brand (or the base alone) in a theme, in the cascade's order: tokens.css, then the brand. */
+/** The tokens in force for an example brand (or the base alone) in a theme, in the cascade's order: tokens.css, then the brand. */
 function theme(brand: (typeof brands)[number] | null, name: "light" | "dark"): Map<string, string> {
   const layers = [tokensOf(base.light)];
   if (name === "dark") layers.push(tokensOf(base.chosenDark));
@@ -207,9 +212,9 @@ describe("the tokens", () => {
   });
 });
 
-describe("the brands", () => {
-  it("has ear and rasl", () => {
-    expect(brands.map((brand) => brand.name).sort()).toEqual(["ear", "rasl"]);
+describe("the example brands", () => {
+  it("has ember and harbor", () => {
+    expect(brands.map((brand) => brand.name).sort()).toEqual(["ember", "harbor"]);
   });
 
   it.each(brands)("$name overrides only tokens.css's tokens, under its own data-brand", (brand) => {

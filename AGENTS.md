@@ -92,7 +92,7 @@ pnpm test-storybook            # Vitest's "storybook" project: every story in he
 ## Task tracking: beads
 
 All planned work is tracked in beads (`bd`, prefix `pb-`). Agents manage beads themselves
-(owner, 2026-10-21, in rasl: "I want to use beads, and want you to auto manage it").
+(owner, 2026-10-21: "I want to use beads, and want you to auto manage it").
 
 - **Before work:** `bd ready`, `bd show <id>`, `bd update <id> --claim`.
 - **During work:** file a bead for every follow-up, bug or open question; record decided rules in

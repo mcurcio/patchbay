@@ -83,6 +83,6 @@ export const Vertical: Story = {
   ),
 };
 
-export const PressedRaslDark: Story = { ...Pressed, globals: { brand: "rasl", theme: "dark" } };
+export const PressedHarborDark: Story = { ...Pressed, globals: { brand: "harbor", theme: "dark" } };
 
-export const PressedEarLight: Story = { ...Pressed, globals: { brand: "ear", theme: "light" } };
+export const PressedEmberLight: Story = { ...Pressed, globals: { brand: "ember", theme: "light" } };

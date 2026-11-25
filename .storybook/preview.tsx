@@ -1,12 +1,13 @@
 // Every story is drawn under the brand and theme the toolbar picks, set as data-brand and data-theme
-// on the preview's <html>, as an app sets them on its own page.
+// on the preview's <html>, as an app sets them on its own page. "none" is the base theme alone; the
+// others are the example brands in examples/brands/, which the package does not ship.
 import type { Decorator, Preview } from "@storybook/react-vite";
 import "../src/tokens/tokens.css";
-import "../src/brands/ear.css";
-import "../src/brands/rasl.css";
+import "../examples/brands/ember.css";
+import "../examples/brands/harbor.css";
 import "../src/tokens/base.css";
 
-const brands = ["ear", "rasl"] as const;
+const brands = ["none", "ember", "harbor"] as const;
 const themes = ["system", "light", "dark"] as const;
 
 /** Applies the toolbar's brand and theme to the document before the story draws. */
@@ -14,7 +15,9 @@ const withBrandAndTheme: Decorator = (Story, context) => {
   const root = document.documentElement;
   const brand: unknown = context.globals["brand"];
   const theme: unknown = context.globals["theme"];
-  root.dataset["brand"] = typeof brand === "string" ? brand : brands[0];
+  // "none" is no attribute at all: the base tokens alone.
+  if (typeof brand === "string" && brand !== "none") root.dataset["brand"] = brand;
+  else delete root.dataset["brand"];
   // "system" is no attribute at all: the theme follows prefers-color-scheme.
   if (theme === "light" || theme === "dark") root.dataset["theme"] = theme;
   else delete root.dataset["theme"];
@@ -24,7 +27,7 @@ const withBrandAndTheme: Decorator = (Story, context) => {
 const preview: Preview = {
   globalTypes: {
     brand: {
-      description: "The app's brand (data-brand on <html>)",
+      description: "An example brand (data-brand on <html>; none is the base theme)",
       toolbar: { title: "Brand", icon: "paintbrush", items: [...brands], dynamicTitle: true },
     },
     theme: {
@@ -32,7 +35,7 @@ const preview: Preview = {
       toolbar: { title: "Theme", icon: "contrast", items: [...themes], dynamicTitle: true },
     },
   },
-  initialGlobals: { brand: "ear", theme: "system" },
+  initialGlobals: { brand: "none", theme: "system" },
   decorators: [withBrandAndTheme],
   parameters: {
     // The shell's three widths (wide, narrow below 760 px, phone below 600 px).

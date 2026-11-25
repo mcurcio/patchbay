@@ -8,15 +8,15 @@ describe("KeyValue", () => {
     const { container } = render(
       <KeyValue
         rows={[
-          { key: "Rate", value: "48 kHz" },
-          { key: "Block", value: 256 },
+          { key: "Interval", value: "30 s" },
+          { key: "Batch", value: 256 },
         ]}
       />,
     );
     const list = container.querySelector("dl");
     expect(list).toHaveClass("pb-key-value");
-    expect([...container.querySelectorAll("dt")].map((dt) => dt.textContent)).toEqual(["Rate", "Block"]);
-    expect([...container.querySelectorAll("dd")].map((dd) => dd.textContent)).toEqual(["48 kHz", "256"]);
+    expect([...container.querySelectorAll("dt")].map((dt) => dt.textContent)).toEqual(["Interval", "Batch"]);
+    expect([...container.querySelectorAll("dd")].map((dd) => dd.textContent)).toEqual(["30 s", "256"]);
     // Each pair is wrapped in a div, which a <dl> allows, so a row can carry its tone.
     for (const row of container.querySelectorAll("dl > div")) {
       expect(row.children[0]?.tagName).toBe("DT");
@@ -25,15 +25,15 @@ describe("KeyValue", () => {
   });
 
   it("takes any content as a value", () => {
-    render(<KeyValue rows={[{ key: "Node", value: <a href="#node">white</a> }]} />);
-    expect(screen.getByRole("link", { name: "white" })).toBeInTheDocument();
+    render(<KeyValue rows={[{ key: "Node", value: <a href="#node">ingest</a> }]} />);
+    expect(screen.getByRole("link", { name: "ingest" })).toBeInTheDocument();
   });
 
   it("puts a row's tone on the row and its title on the key", () => {
     const { container } = render(
       <KeyValue
         rows={[
-          { key: "Realtime", value: "no", tone: "err", title: "Needs CAP_SYS_NICE" },
+          { key: "Synced", value: "no", tone: "err", title: "Needs an access token" },
           { key: "Seen", value: "yes" },
           { key: "Odd", value: "?", tone: "unheard-of" },
         ]}
@@ -43,7 +43,7 @@ describe("KeyValue", () => {
     expect(rows[0]).toHaveAttribute("data-tone", "err");
     expect(rows[1]).not.toHaveAttribute("data-tone");
     expect(rows[2]).toHaveAttribute("data-tone", "unheard-of");
-    expect(screen.getByText("Realtime")).toHaveAttribute("title", "Needs CAP_SYS_NICE");
+    expect(screen.getByText("Synced")).toHaveAttribute("title", "Needs an access token");
   });
 
   it("keeps two rows with the same key", () => {
@@ -59,8 +59,8 @@ describe("KeyValue", () => {
   });
 
   it("is named by its label", () => {
-    render(<KeyValue label="Engine" rows={[{ key: "Rate", value: "48 kHz" }]} />);
-    expect(within(screen.getByLabelText("Engine")).getByText("48 kHz")).toBeInTheDocument();
+    render(<KeyValue label="Service" rows={[{ key: "Interval", value: "30 s" }]} />);
+    expect(within(screen.getByLabelText("Service")).getByText("30 s")).toBeInTheDocument();
   });
 
   it("draws an empty list for no rows", () => {

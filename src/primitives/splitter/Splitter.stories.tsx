@@ -128,6 +128,6 @@ export const Focused: Story = {
   },
 };
 
-export const FocusedRaslDark: Story = { ...Focused, globals: { brand: "rasl", theme: "dark" } };
+export const FocusedHarborDark: Story = { ...Focused, globals: { brand: "harbor", theme: "dark" } };
 
-export const FocusedEarLight: Story = { ...Focused, globals: { brand: "ear", theme: "light" } };
+export const FocusedEmberLight: Story = { ...Focused, globals: { brand: "ember", theme: "light" } };

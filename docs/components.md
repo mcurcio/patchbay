@@ -1,8 +1,9 @@
 # Components
 
 What patchbay has built, layer by layer: what each component is for, its props, and how it behaves
-from the keyboard and on touch. Storybook shows every state of each under both brands and themes;
-the props' own doc comments (in each `Name.tsx`) are the reference for every field.
+from the keyboard and on touch. Storybook shows every state of each under the base theme and the
+example brands, light and dark; the props' own doc comments (in each `Name.tsx`) are the reference
+for every field.
 
 ```ts
 import { Button, Field, TextInput } from "@mcurcio/patchbay/primitives";
@@ -10,8 +11,8 @@ import { usePersistentState, useTheme } from "@mcurcio/patchbay/hooks";
 ```
 
 Importing a layer loads its stylesheet (`dist/primitives.css`); an app loads the tokens and its
-brand first ([`tokens.md`](tokens.md)). Components set their own box, type and focus ring, so none
-needs `base.css`.
+brand first ([`tokens.md`](tokens.md#writing-a-brand)). Components set their own box, type and
+focus ring, so none needs `base.css`.
 
 ## Rules every component keeps
 

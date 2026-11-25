@@ -16,8 +16,8 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Ok: Story = {};
-export const Warn: Story = { args: { tone: "warn", children: "3 dropouts" } };
-export const Err: Story = { args: { tone: "err", children: "not realtime" } };
+export const Warn: Story = { args: { tone: "warn", children: "3 retries" } };
+export const Err: Story = { args: { tone: "err", children: "failing" } };
 export const Quiet: Story = { args: { tone: "quiet", children: "idle" } };
 export const Off: Story = { args: { tone: "off", children: "off" } };
 
@@ -26,19 +26,19 @@ export const UnknownTone: Story = { args: { tone: "mystery", children: "new" } }
 
 /** Its meaning on hover. */
 export const WithTitle: Story = {
-  args: { tone: "warn", children: "3 dropouts", title: "Dropouts in the last minute" },
+  args: { tone: "warn", children: "3 retries", title: "Retries in the last minute" },
   play: async ({ canvasElement }) => {
-    await expect(within(canvasElement).getByText("3 dropouts")).toHaveAttribute("title", "Dropouts in the last minute");
+    await expect(within(canvasElement).getByText("3 retries")).toHaveAttribute("title", "Retries in the last minute");
   },
 };
 
-/** A warning mark inside, as ear's dropouts badge carries one. */
+/** A warning mark inside, as a count that rose lately carries one. */
 export const WithWarnMark: Story = {
   args: {
     tone: "warn",
     children: (
       <>
-        <WarnMark label="rose lately" />3 dropouts
+        <WarnMark label="rose lately" />3 retries
       </>
     ),
   },
@@ -49,8 +49,8 @@ export const AllTones: Story = {
   render: () => (
     <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
       <Badge tone="ok">live</Badge>
-      <Badge tone="warn">3 dropouts</Badge>
-      <Badge tone="err">not realtime</Badge>
+      <Badge tone="warn">3 retries</Badge>
+      <Badge tone="err">failing</Badge>
       <Badge tone="quiet">idle</Badge>
       <Badge tone="off">off</Badge>
       <Badge tone="mystery">new</Badge>

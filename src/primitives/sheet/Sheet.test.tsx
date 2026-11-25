@@ -17,11 +17,11 @@ describe("Sheet", () => {
 
   it("is a dialog that is not modal, named by its title, in place", () => {
     const { container } = render(
-      <Sheet open onClose={() => undefined} title="gain_1">
+      <Sheet open onClose={() => undefined} title="transform_1">
         <p>Settings</p>
       </Sheet>,
     );
-    const sheet = screen.getByRole("dialog", { name: "gain_1" });
+    const sheet = screen.getByRole("dialog", { name: "transform_1" });
     expect(sheet).not.toHaveAttribute("aria-modal", "true");
     expect(container.contains(sheet)).toBe(true);
     expect(sheet).toHaveTextContent("Settings");

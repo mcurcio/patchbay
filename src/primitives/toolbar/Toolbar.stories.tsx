@@ -50,7 +50,7 @@ export const WithTextField: Story = {
   render: (args) => (
     <Toolbar {...args}>
       <Button>Previous</Button>
-      <TextInput aria-label="Find" defaultValue="gain" />
+      <TextInput aria-label="Find" defaultValue="transform" />
       <Button>Next</Button>
     </Toolbar>
   ),
@@ -63,6 +63,6 @@ export const WithTextField: Story = {
   },
 };
 
-export const HorizontalRaslDark: Story = { ...Horizontal, globals: { brand: "rasl", theme: "dark" } };
+export const HorizontalHarborDark: Story = { ...Horizontal, globals: { brand: "harbor", theme: "dark" } };
 
-export const HorizontalEarLight: Story = { ...Horizontal, globals: { brand: "ear", theme: "light" } };
+export const HorizontalEmberLight: Story = { ...Horizontal, globals: { brand: "ember", theme: "light" } };

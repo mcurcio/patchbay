@@ -70,9 +70,9 @@ export const Row: Story = {
   ),
 };
 
-/** Every tone and state together, under rasl's brand in dark, so the accessibility check covers its contrast. */
-export const AllRaslDark: Story = {
-  globals: { brand: "rasl", theme: "dark" },
+/** Every tone and state together, under the example harbor brand in dark, so the accessibility check covers its contrast. */
+export const AllHarborDark: Story = {
+  globals: { brand: "harbor", theme: "dark" },
   render: (args) => (
     <div style={{ display: "flex", gap: "8px" }}>
       <IconButton {...args} />

@@ -5,8 +5,8 @@ import badgeCss from "./Badge.css?raw";
 
 describe("Badge", () => {
   it("shows its children in a chip of its tone", () => {
-    render(<Badge tone="warn">3 dropouts</Badge>);
-    const badge = screen.getByText("3 dropouts");
+    render(<Badge tone="warn">3 retries</Badge>);
+    const badge = screen.getByText("3 retries");
     expect(badge).toHaveClass("pb-badge");
     expect(badge).toHaveAttribute("data-tone", "warn");
   });
@@ -14,11 +14,11 @@ describe("Badge", () => {
   it("takes any content as children", () => {
     render(
       <Badge tone="err">
-        <strong>not</strong> realtime
+        <strong>not</strong> ready
       </Badge>,
     );
     expect(screen.getByText("not").tagName).toBe("STRONG");
-    expect(screen.getByText(/realtime/)).toHaveClass("pb-badge");
+    expect(screen.getByText(/ready/)).toHaveClass("pb-badge");
   });
 
   it("draws a tone it does not know neutrally", () => {
@@ -33,10 +33,10 @@ describe("Badge", () => {
     const { rerender } = render(<Badge tone="ok">live</Badge>);
     expect(screen.getByText("live")).not.toHaveAttribute("title");
     rerender(
-      <Badge tone="ok" title="Receiving audio">
+      <Badge tone="ok" title="Receiving data">
         live
       </Badge>,
     );
-    expect(screen.getByText("live")).toHaveAttribute("title", "Receiving audio");
+    expect(screen.getByText("live")).toHaveAttribute("title", "Receiving data");
   });
 });

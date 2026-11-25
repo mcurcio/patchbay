@@ -4,8 +4,10 @@ import { Meta } from "@storybook/addon-docs/blocks";
 
 # patchbay
 
-The React component library behind the graph editors of ear and rasl. Components only draw: data
-comes in as props, and what the person does goes out as callbacks.
+A React component library for graph-based editors and live dashboards: design tokens and themes,
+primitives, and graph components on React Flow. Components only draw: data comes in as props, and
+what the person does goes out as callbacks.
 
-The toolbar switches the **brand** (`data-brand` on `<html>`: ear, rasl) and the **theme**
-(`data-theme`: system, light, dark); the viewport switch covers the shell's three widths.
+The toolbar switches the **brand** (`data-brand` on `<html>`: none, the base theme, or one of the
+example brands in `examples/brands/`) and the **theme** (`data-theme`: system, light, dark); the
+viewport switch covers the shell's three widths.

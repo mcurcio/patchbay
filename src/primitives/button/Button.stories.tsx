@@ -86,8 +86,8 @@ export const All: Story = {
   ),
 };
 
-/** The same set under rasl's brand in dark, so the accessibility check covers its contrast too. */
-export const AllRaslDark: Story = { ...All, globals: { brand: "rasl", theme: "dark" } };
+/** The same set under the example harbor brand in dark, so the accessibility check covers its contrast too. */
+export const AllHarborDark: Story = { ...All, globals: { brand: "harbor", theme: "dark" } };
 
-/** And under ear's brand in light. */
-export const AllEarLight: Story = { ...All, globals: { brand: "ear", theme: "light" } };
+/** And under the example ember brand in light. */
+export const AllEmberLight: Story = { ...All, globals: { brand: "ember", theme: "light" } };

@@ -7,24 +7,24 @@ import css from "./Checkbox.css?raw";
 
 describe("Checkbox", () => {
   it("is a bare checkbox without a label", () => {
-    const { container } = render(<Checkbox aria-label="Mute" className="mine" />);
-    const box = screen.getByRole("checkbox", { name: "Mute" });
+    const { container } = render(<Checkbox aria-label="Notify me" className="mine" />);
+    const box = screen.getByRole("checkbox", { name: "Notify me" });
     expect(container.firstElementChild).toBe(box);
     expect(box).toHaveClass("pb-checkbox", "mine");
   });
 
   it("is named by its label, which ticks it too", async () => {
     const onChange = vi.fn();
-    const { container } = render(<Checkbox label="Mute" className="mine" onChange={onChange} />);
+    const { container } = render(<Checkbox label="Notify me" className="mine" onChange={onChange} />);
     expect(container.firstElementChild).toHaveClass("pb-checkbox-row", "mine");
-    const box = screen.getByRole("checkbox", { name: "Mute" });
-    await userEvent.click(screen.getByText("Mute"));
+    const box = screen.getByRole("checkbox", { name: "Notify me" });
+    await userEvent.click(screen.getByText("Notify me"));
     expect(onChange).toHaveBeenCalledOnce();
     expect(box).toBeChecked();
   });
 
   it("ticks by the space key", async () => {
-    render(<Checkbox label="Mute" />);
+    render(<Checkbox label="Notify me" />);
     const box = screen.getByRole("checkbox");
     box.focus();
     await userEvent.keyboard(" ");
@@ -33,7 +33,7 @@ describe("Checkbox", () => {
 
   it("passes id and aria props to the input, and the ref", () => {
     const ref = createRef<HTMLInputElement>();
-    render(<Checkbox ref={ref} label="Mute" id="m" aria-invalid="true" aria-describedby="x" />);
+    render(<Checkbox ref={ref} label="Notify me" id="m" aria-invalid="true" aria-describedby="x" />);
     const box = screen.getByRole("checkbox");
     expect(ref.current).toBe(box);
     expect(box).toHaveAttribute("id", "m");
@@ -43,7 +43,7 @@ describe("Checkbox", () => {
 
   it("calls a callback ref", () => {
     const ref = vi.fn();
-    render(<Checkbox ref={ref} aria-label="Mute" />);
+    render(<Checkbox ref={ref} aria-label="Notify me" />);
     expect(ref).toHaveBeenCalledWith(screen.getByRole("checkbox"));
   });
 
@@ -56,8 +56,8 @@ describe("Checkbox", () => {
 
   it("takes no tick while disabled, and marks its row", async () => {
     const onChange = vi.fn();
-    const { container } = render(<Checkbox label="Mute" disabled onChange={onChange} />);
-    await userEvent.click(screen.getByText("Mute"));
+    const { container } = render(<Checkbox label="Notify me" disabled onChange={onChange} />);
+    await userEvent.click(screen.getByText("Notify me"));
     expect(onChange).not.toHaveBeenCalled();
     expect(container.firstElementChild).toHaveAttribute("data-disabled", "true");
   });

@@ -20,7 +20,7 @@ const meta = {
   args: {
     open: true,
     onClose: fn(),
-    title: "gain_1",
+    title: "transform_1",
     children: <p style={{ margin: 0 }}>The selected node&apos;s settings.</p>,
   },
   argTypes: { side: { control: "inline-radio", options: ["right", "bottom"] } },
@@ -92,7 +92,7 @@ export const OpenAndClose: Story = {
             setOpen(false);
           }}
         >
-          <TextInput aria-label="Gain" defaultValue="-6" />
+          <TextInput aria-label="Timeout" defaultValue="30" />
         </Sheet>
       </>
     );
@@ -105,7 +105,7 @@ export const OpenAndClose: Story = {
     await userEvent.tab();
     await userEvent.tab();
     await userEvent.tab();
-    await expect(canvas.getByRole("textbox", { name: "Gain" })).toHaveFocus();
+    await expect(canvas.getByRole("textbox", { name: "Timeout" })).toHaveFocus();
     await userEvent.keyboard("{Escape}");
     await expect(canvas.queryByRole("dialog")).toBeNull();
     await expect(opener).toHaveFocus();

@@ -103,6 +103,6 @@ export const DockedAndResized: Story = {
   },
 };
 
-export const WithActionsRaslDark: Story = { ...WithActions, globals: { brand: "rasl", theme: "dark" } };
+export const WithActionsHarborDark: Story = { ...WithActions, globals: { brand: "harbor", theme: "dark" } };
 
-export const WithActionsEarLight: Story = { ...WithActions, globals: { brand: "ear", theme: "light" } };
+export const WithActionsEmberLight: Story = { ...WithActions, globals: { brand: "ember", theme: "light" } };

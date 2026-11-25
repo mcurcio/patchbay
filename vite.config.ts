@@ -1,7 +1,7 @@
 // Vite builds the library into dist/ (one ES module per layer, its CSS beside it, the token and
-// brand stylesheets copied as written); Vitest runs two projects: "unit" (jsdom, src/**/*.test.ts(x))
+// base stylesheets copied as written); Vitest runs two projects: "unit" (jsdom, src/**/*.test.ts(x))
 // and "storybook" (every story as a test in Chromium, with its play function and the a11y check).
-import { readdirSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { posix } from "node:path";
 import { fileURLToPath } from "node:url";
 import { storybookTest } from "@storybook/addon-vitest/vitest-plugin";
@@ -21,8 +21,9 @@ const peers = Object.keys(pkg.peerDependencies);
 const external = (id: string) => peers.some((peer) => id === peer || id.startsWith(`${peer}/`));
 
 /**
- * The token, base and brand stylesheets ship as written, not bundled: an app loads tokens.css, then
- * its brand (then base.css if it wants it), then its own CSS, and a brand's selectors must reach the browser unchanged.
+ * The token and base stylesheets ship as written, not bundled: an app loads tokens.css, then its own
+ * brand stylesheet (docs/tokens.md#writing-a-brand), then base.css if it wants it, then its own CSS,
+ * so the cascade's order is the app's to set.
  */
 function copyStylesheets(): Plugin {
   return {
@@ -31,13 +32,6 @@ function copyStylesheets(): Plugin {
     generateBundle() {
       for (const file of ["tokens.css", "base.css"]) {
         this.emitFile({ type: "asset", fileName: file, source: readFileSync(src(`tokens/${file}`), "utf8") });
-      }
-      for (const file of readdirSync(src("brands")).filter((name) => name.endsWith(".css"))) {
-        this.emitFile({
-          type: "asset",
-          fileName: `brands/${file}`,
-          source: readFileSync(src(`brands/${file}`), "utf8"),
-        });
       }
     },
   };
@@ -97,8 +91,8 @@ export default defineConfig({
           include: ["src/**/*.test.{ts,tsx}"],
           setupFiles: ["src/test/setup.ts"],
           // Vitest blanks every stylesheet by default, even one imported "?raw"; the token tests
-          // read the token, brand and component stylesheets as text.
-          css: { include: [/\/src\/.*\.css/] },
+          // read the token, component and example brand stylesheets as text.
+          css: { include: [/\/src\/.*\.css/, /\/examples\/brands\/.*\.css/] },
         },
       },
       {

@@ -8,8 +8,8 @@ import css from "./Select.css?raw";
 function Options() {
   return (
     <>
-      <option value="44100">44.1 kHz</option>
-      <option value="48000">48 kHz</option>
+      <option value="15">15 s</option>
+      <option value="30">30 s</option>
     </>
   );
 }
@@ -17,11 +17,11 @@ function Options() {
 describe("Select", () => {
   it("is a combobox of its options with the library's class", () => {
     render(
-      <Select aria-label="Rate">
+      <Select aria-label="Interval">
         <Options />
       </Select>,
     );
-    const select = screen.getByRole("combobox", { name: "Rate" });
+    const select = screen.getByRole("combobox", { name: "Interval" });
     expect(select).toHaveClass("pb-select");
     expect(select).toHaveAttribute("data-font", "ui");
     expect(screen.getAllByRole("option")).toHaveLength(2);
@@ -30,7 +30,7 @@ describe("Select", () => {
   it("passes native props, the ref and its own class", () => {
     const ref = createRef<HTMLSelectElement>();
     render(
-      <Select ref={ref} aria-label="Rate" className="mine" font="code" defaultValue="48000">
+      <Select ref={ref} aria-label="Interval" className="mine" font="code" defaultValue="30">
         <Options />
       </Select>,
     );
@@ -38,19 +38,19 @@ describe("Select", () => {
     expect(ref.current).toBe(select);
     expect(select).toHaveClass("pb-select", "mine");
     expect(select).toHaveAttribute("data-font", "code");
-    expect(select).toHaveValue("48000");
+    expect(select).toHaveValue("30");
   });
 
   it("reports a choice", async () => {
     const onChange = vi.fn();
     render(
-      <Select aria-label="Rate" onChange={onChange}>
+      <Select aria-label="Interval" onChange={onChange}>
         <Options />
       </Select>,
     );
-    await userEvent.selectOptions(screen.getByRole("combobox"), "48000");
+    await userEvent.selectOptions(screen.getByRole("combobox"), "30");
     expect(onChange).toHaveBeenCalledOnce();
-    expect(screen.getByRole("combobox")).toHaveValue("48000");
+    expect(screen.getByRole("combobox")).toHaveValue("30");
   });
 
   it("is 16 px on a touch screen", () => {

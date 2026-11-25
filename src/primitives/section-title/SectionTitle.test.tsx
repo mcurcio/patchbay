@@ -9,8 +9,8 @@ describe("SectionTitle", () => {
   });
 
   it("takes the level it is given", () => {
-    render(<SectionTitle level={2}>Engine</SectionTitle>);
-    expect(screen.getByRole("heading", { level: 2, name: "Engine" })).toBeInTheDocument();
+    render(<SectionTitle level={2}>Service</SectionTitle>);
+    expect(screen.getByRole("heading", { level: 2, name: "Service" })).toBeInTheDocument();
   });
 
   it("draws its actions after the heading, outside it", () => {

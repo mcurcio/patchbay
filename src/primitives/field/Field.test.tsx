@@ -73,9 +73,9 @@ describe("Field", () => {
   it("wires a Select and a Checkbox", () => {
     render(
       <>
-        <Field label="Rate" error="Unsupported">
+        <Field label="Interval" error="Unsupported">
           <Select>
-            <option>48000</option>
+            <option>30</option>
           </Select>
         </Field>
         <Field label="Enabled">
@@ -83,7 +83,7 @@ describe("Field", () => {
         </Field>
       </>,
     );
-    expect(screen.getByRole("combobox", { name: "Rate" })).toHaveAttribute("aria-invalid", "true");
+    expect(screen.getByRole("combobox", { name: "Interval" })).toHaveAttribute("aria-invalid", "true");
     expect(screen.getByRole("checkbox", { name: "Enabled" })).toBeInTheDocument();
   });
 

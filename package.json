@@ -1,15 +1,32 @@
 {
   "name": "@mcurcio/patchbay",
   "version": "0.0.0",
-  "description": "The React component library behind the graph editors of ear and rasl",
+  "description": "A React component library for graph-based editors and live dashboards: design tokens and themes, primitives, and React Flow graph components",
+  "keywords": [
+    "react",
+    "components",
+    "design-tokens",
+    "theming",
+    "react-flow",
+    "graph-editor",
+    "node-editor",
+    "accessibility"
+  ],
+  "license": "MIT",
+  "author": "Matt Curcio",
+  "homepage": "https://github.com/mcurcio/patchbay#readme",
+  "bugs": {
+    "url": "https://github.com/mcurcio/patchbay/issues"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mcurcio/patchbay.git"
   },
   "type": "module",
   "private": false,
-  "engines": {
-    "node": ">=24"
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   },
   "packageManager": "pnpm@12.15.0",
   "files": [
@@ -21,8 +38,6 @@
   "exports": {
     "./tokens.css": "./dist/tokens.css",
     "./base.css": "./dist/base.css",
-    "./brands/ear.css": "./dist/brands/ear.css",
-    "./brands/rasl.css": "./dist/brands/rasl.css",
     "./primitives": {
       "types": "./dist/types/primitives/index.d.ts",
       "default": "./dist/primitives.js"

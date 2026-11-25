@@ -8,9 +8,9 @@ const meta = {
   args: {
     label: "Facts",
     rows: [
-      { key: "Rate", value: "48 kHz" },
-      { key: "Block", value: "256 frames" },
-      { key: "Latency", value: "5.3 ms" },
+      { key: "Interval", value: "30 s" },
+      { key: "Batch", value: "256 items" },
+      { key: "Latency", value: "42 ms" },
     ],
   },
 } satisfies Meta<typeof KeyValue>;
@@ -31,10 +31,10 @@ export const Tones: Story = {
   args: {
     rows: [
       { key: "Healthy", value: "yes", tone: "ok" },
-      { key: "Dropouts", value: "3 in the last minute", tone: "warn" },
-      { key: "Realtime", value: "no", tone: "err", title: "Hover: why it matters" },
+      { key: "Retries", value: "3 in the last minute", tone: "warn" },
+      { key: "Synced", value: "no", tone: "err", title: "Hover: why it matters" },
       { key: "Idle", value: "since 12:04", tone: "quiet" },
-      { key: "Output", value: "off", tone: "off" },
+      { key: "Schedule", value: "off", tone: "off" },
       { key: "Mystery", value: "plain", tone: "unheard-of" },
     ],
   },
@@ -44,7 +44,7 @@ export const Tones: Story = {
 export const LongValues: Story = {
   args: {
     rows: [
-      { key: "Path", value: "/var/lib/some/very/long/path/that/keeps/going/and/going/without/a/space.conf" },
+      { key: "Path", value: "/var/lib/some/very/long/path/that/keeps/going/and/going/without/a/space.json" },
       { key: "Note", value: "A value long enough to wrap onto a second line in a narrow panel, which it does." },
     ],
   },
