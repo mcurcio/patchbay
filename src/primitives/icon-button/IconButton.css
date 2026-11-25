@@ -26,7 +26,7 @@
 }
 
 .pb-button.pb-icon-button[data-tone="primary"]:hover:not(:disabled, [aria-busy="true"]) {
-  background: color-mix(in srgb, var(--pb-accent) 85%, var(--pb-text));
+  background: var(--pb-accent-hover);
 }
 
 .pb-button.pb-icon-button[data-tone="danger"]:hover:not(:disabled, [aria-busy="true"]) {

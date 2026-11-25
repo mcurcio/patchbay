@@ -48,7 +48,7 @@
 }
 
 .pb-button[data-tone="primary"]:hover:not(:disabled, [aria-busy="true"]) {
-  background: color-mix(in srgb, var(--pb-accent) 85%, var(--pb-text));
+  background: var(--pb-accent-hover);
 }
 
 /* Danger: the words in the error tone, on the neutral face. */
