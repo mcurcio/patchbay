@@ -1,0 +1,15 @@
+/* A toolbar (Toolbar.tsx): its items in a row, or a column when vertical, a small gap apart. It draws no frame of its
+   own; ToolGroup is the framed one. */
+.pb-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pb-space-2);
+  box-sizing: border-box;
+}
+
+.pb-toolbar[aria-orientation="vertical"] {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: stretch;
+}

@@ -1,0 +1,49 @@
+/* An example brand, "harbor": not part of the package, a worked example of writing one (docs/tokens.md#writing-a-brand).
+   An app loads tokens.css, then its brand stylesheet, then base.css if it wants it, and sets data-brand="harbor" on
+   <html>. This one changes the accent to teal, gives dark a navy canvas, and loosens the density.
+
+   Every rule is under :root[data-brand="harbor"]. A colour set in the light block is set again in both dark blocks:
+   :root[data-brand] is as specific as the base's :root[data-theme="dark"] and loads after it, so a light-only colour
+   would win in dark too. Tokens that are not colours (density here) go in the light block alone. */
+:root[data-brand="harbor"] {
+  /* A teal accent, dark enough for 4.5:1 on every light surface and under white text. */
+  --pb-accent: #0f766e;
+
+  /* A roomier density: wider spacing steps, taller port rows and top bar. */
+  --pb-space-3: 10px;
+  --pb-space-4: 14px;
+  --pb-space-5: 20px;
+  --pb-row: 26px;
+  --pb-bar: 48px;
+}
+
+/* The system's dark, while no theme is chosen. */
+@media (prefers-color-scheme: dark) {
+  :root[data-brand="harbor"]:not([data-theme]) {
+    /* A navy canvas, panels and borders, with slate text. */
+    --pb-surface: #0b1220;
+    --pb-raised: #111a2e;
+    --pb-sunken: #0d1526;
+    --pb-line: #22314d;
+    --pb-line-strong: #34486d;
+    --pb-text: #e5e7eb;
+    --pb-muted: #94a3b8;
+    /* The accent, lightened for the dark canvas. */
+    --pb-accent: #2dd4bf;
+    /* Text on a filled chip is the canvas's colour. */
+    --pb-on-strong: #0b1220;
+  }
+}
+
+/* Dark chosen over any system: the same set, line for line. */
+:root[data-brand="harbor"][data-theme="dark"] {
+  --pb-surface: #0b1220;
+  --pb-raised: #111a2e;
+  --pb-sunken: #0d1526;
+  --pb-line: #22314d;
+  --pb-line-strong: #34486d;
+  --pb-text: #e5e7eb;
+  --pb-muted: #94a3b8;
+  --pb-accent: #2dd4bf;
+  --pb-on-strong: #0b1220;
+}

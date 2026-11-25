@@ -1,0 +1,36 @@
+/* A labelled form control (Field.tsx): the label, then the control with its hint and error under it. Stacked puts
+   the label above; inline puts it in a column to the left. A layout it does not know stacks. */
+.pb-field {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--pb-space-2);
+  font-family: var(--pb-font-ui);
+  font-size: var(--pb-text-md);
+  color: var(--pb-text);
+}
+
+.pb-field[data-layout="inline"] {
+  grid-template-columns: 130px minmax(0, 1fr);
+  column-gap: var(--pb-space-4);
+  align-items: baseline;
+}
+
+.pb-field-label {
+  color: var(--pb-text);
+}
+
+.pb-field-control {
+  display: grid;
+  gap: var(--pb-space-2);
+  min-width: 0;
+}
+
+.pb-field-hint {
+  font-size: var(--pb-text-sm);
+  color: var(--pb-muted);
+}
+
+.pb-field-error {
+  font-size: var(--pb-text-sm);
+  color: var(--pb-err);
+}

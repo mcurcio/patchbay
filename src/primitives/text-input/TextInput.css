@@ -1,0 +1,65 @@
+/* A one-line text field (TextInput.tsx): a raised box edged in the strong line, the error tone while invalid. It sets
+   its own box, type and focus ring, so it needs no base stylesheet. */
+.pb-text-input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 28px;
+  margin: 0;
+  padding: var(--pb-space-2) var(--pb-space-3);
+  font-family: var(--pb-font-ui);
+  font-size: var(--pb-text-md);
+  line-height: 1.2;
+  color: var(--pb-text);
+  background: var(--pb-raised);
+  border: 1px solid var(--pb-line-strong);
+  border-radius: var(--pb-radius-control);
+  transition: border-color var(--pb-motion-fast);
+}
+
+.pb-text-input[data-font="code"] {
+  font-family: var(--pb-font-code);
+}
+
+.pb-text-input::placeholder {
+  color: var(--pb-muted);
+  opacity: 1;
+}
+
+.pb-text-input:focus-visible {
+  outline: 2px solid var(--pb-accent);
+  outline-offset: 1px;
+}
+
+.pb-text-input[aria-invalid="true"] {
+  border-color: var(--pb-err);
+}
+
+/* Disabled and read-only: the sunken face; disabled also mutes the words. */
+.pb-text-input:disabled,
+.pb-text-input:read-only {
+  background: var(--pb-sunken);
+}
+
+.pb-text-input:disabled {
+  color: var(--pb-muted);
+  border-color: var(--pb-line);
+  cursor: default;
+}
+
+/* A finger: 16 px text (iOS Safari zooms on focusing a smaller field) and a target at least 36 px tall. */
+@media (hover: none) and (pointer: coarse) {
+  .pb-text-input {
+    min-height: 36px;
+    font-size: 16px;
+  }
+}
+
+@media (forced-colors: active) {
+  .pb-text-input {
+    border-color: FieldText;
+  }
+
+  .pb-text-input:disabled {
+    border-color: GrayText;
+  }
+}

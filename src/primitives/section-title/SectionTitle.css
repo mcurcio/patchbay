@@ -1,0 +1,27 @@
+/* A section's title: the heading on the left, its actions pushed to the right; a long title wraps before the actions
+   shrink. */
+.pb-section-title {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: var(--pb-space-3);
+  margin: var(--pb-space-3) 0;
+  color: var(--pb-text);
+  font-family: var(--pb-font-ui);
+}
+
+.pb-section-title-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  font-size: var(--pb-text-md);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.pb-section-title-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--pb-space-2);
+}

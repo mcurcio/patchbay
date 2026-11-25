@@ -1,0 +1,67 @@
+/* A state pill: the dot and the word in the state's tone on the sunken surface; a tone it does not know is muted. */
+.pb-pill {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pb-space-2);
+  padding: 0 7px 0 5px;
+  border-radius: var(--pb-radius-pill);
+  background: var(--pb-sunken);
+  color: var(--pb-muted);
+  font-family: var(--pb-font-ui);
+  font-size: var(--pb-text-sm);
+  font-weight: 600;
+  line-height: 18px;
+  white-space: nowrap;
+}
+
+.pb-pill-dot {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: var(--pb-radius-pill);
+  background: currentColor;
+}
+
+.pb-pill[data-tone="ok"] {
+  color: var(--pb-ok);
+}
+
+.pb-pill[data-tone="warn"] {
+  color: var(--pb-warn);
+}
+
+.pb-pill[data-tone="err"] {
+  color: var(--pb-err);
+}
+
+.pb-pill[data-tone="quiet"] {
+  color: var(--pb-quiet);
+}
+
+.pb-pill[data-tone="off"] {
+  color: var(--pb-off);
+}
+
+.pb-pill-detail {
+  font-family: var(--pb-font-code);
+  font-weight: normal;
+}
+
+/* The pulse is the dot's only, never the word's. */
+.pb-pill[data-pulse] .pb-pill-dot {
+  animation: pb-pill-pulse var(--pb-motion-pulse) ease-in-out infinite;
+}
+
+@keyframes pb-pill-pulse {
+  50% {
+    opacity: 0.4;
+  }
+}
+
+/* An infinite animation at 0 s would churn rather than stop, so reduced motion stops it here (docs/tokens.md). */
+@media (prefers-reduced-motion: reduce) {
+  .pb-pill[data-pulse] .pb-pill-dot {
+    animation: none;
+  }
+}

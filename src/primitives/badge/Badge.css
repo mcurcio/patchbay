@@ -1,0 +1,44 @@
+/* A badge: text and border in its tone; warn and err on their soft surfaces, the rest on the sunken one. A tone it
+   does not know is muted with a plain line. */
+.pb-badge {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pb-space-2);
+  padding: 0 6px;
+  border: 1px solid var(--pb-line);
+  border-radius: var(--pb-radius-pill);
+  background: var(--pb-sunken);
+  color: var(--pb-muted);
+  font-family: var(--pb-font-ui);
+  font-size: var(--pb-text-sm);
+  font-weight: 600;
+  line-height: 18px;
+  white-space: nowrap;
+}
+
+.pb-badge[data-tone="ok"] {
+  border-color: currentColor;
+  color: var(--pb-ok);
+}
+
+.pb-badge[data-tone="warn"] {
+  border-color: currentColor;
+  background: var(--pb-warn-soft);
+  color: var(--pb-warn);
+}
+
+.pb-badge[data-tone="err"] {
+  border-color: currentColor;
+  background: var(--pb-err-soft);
+  color: var(--pb-err);
+}
+
+.pb-badge[data-tone="quiet"] {
+  border-color: currentColor;
+  color: var(--pb-quiet);
+}
+
+.pb-badge[data-tone="off"] {
+  color: var(--pb-off);
+}

@@ -1,0 +1,212 @@
+/* patchbay's design tokens (@mcurcio/patchbay/tokens.css): every colour, radius, shadow, duration, space and type
+   size a component draws with, as --pb-* custom properties on :root, in a light and a dark theme (docs/tokens.md).
+   Component stylesheets use only these, and tokens.test.ts checks it.
+
+   The theme follows the system until data-theme on <html> chooses one: no attribute is the system's choice,
+   data-theme="light" or "dark" overrides it. The dark set is therefore written twice, once for a dark system with no
+   choice made and once for a chosen dark, and tokens.test.ts holds the two equal. CSS's light-dark() is not used
+   because a CSS minifier may rewrite it for older browsers. */
+:root {
+  color-scheme: light;
+
+  /* Surfaces: the canvas, boxes and controls, tracks and read-only text. */
+  --pb-surface: #f6f7f9;
+  --pb-raised: #ffffff;
+  --pb-sunken: #eef0f3;
+
+  /* Lines: borders, the canvas's dot grid. */
+  --pb-line: #d9dde3;
+  --pb-line-strong: #aeb5bf;
+
+  /* Text: body, secondary, selection and focus, text on a filled chip. */
+  --pb-text: #16181d;
+  --pb-muted: #5b6270;
+  --pb-accent: #3b5bdb;
+  --pb-on-strong: #ffffff;
+
+  /* Tones: what a state is drawn in, and the soft surfaces under a warning or an error. */
+  --pb-ok: #26773a;
+  --pb-warn: #a35200;
+  --pb-err: #c92a2a;
+  --pb-quiet: #4058d6;
+  --pb-off: #646b78;
+  --pb-warn-soft: #fff4e6;
+  --pb-err-soft: #ffe3e3;
+
+  /* Changes: an edit not yet applied (added, removed, renamed). */
+  --pb-added: #157a3a;
+  --pb-removed: #c42020;
+  --pb-renamed: #7c3aed;
+
+  /* Meters: the bar's three zones and the peak tick. */
+  --pb-meter-low: #40c057;
+  --pb-meter-mid: #fab005;
+  --pb-meter-hot: #fa5252;
+  --pb-meter-peak: #2b8a3e;
+
+  /* Code: a code box and its highlighter's token colours. */
+  --pb-code-surface: var(--pb-raised);
+  --pb-code-surface-readonly: var(--pb-sunken);
+  --pb-code-border: var(--pb-line-strong);
+  --pb-code-text: var(--pb-text);
+  --pb-code-directive: #1864ab;
+  --pb-code-keyword: #a35200;
+  --pb-code-variable: #8a6100;
+  --pb-code-number: #2b7a3a;
+  --pb-code-string: #a61e1e;
+  --pb-code-comment: #666666;
+  --pb-code-punctuation: #495057;
+  --pb-code-error: #c92a2a;
+  --pb-code-error-surface: var(--pb-err-soft);
+
+  /* Shape. */
+  --pb-radius-box: 8px;
+  --pb-radius-control: 6px;
+  --pb-radius-pill: 999px;
+  --pb-shadow: 0 1px 2px rgb(16 24 40 / 0.08);
+  --pb-shadow-lifted: 0 4px 12px rgb(16 24 40 / 0.14);
+
+  /* Motion: hover and selection, what slides, a pulsing dot, a wire's flow, the busy spinner's turn. The last three
+     drive infinite animations, which a component stops under reduced motion rather than running at 0 s. */
+  --pb-motion-fast: 120ms;
+  --pb-motion-slow: 180ms;
+  --pb-motion-pulse: 2s;
+  --pb-motion-flow: 1s;
+  --pb-motion-spin: 0.8s;
+
+  /* Density: the spacing steps, a port row's height, the top bar's height. */
+  --pb-space-1: 2px;
+  --pb-space-2: 4px;
+  --pb-space-3: 8px;
+  --pb-space-4: 12px;
+  --pb-space-5: 16px;
+  --pb-row: 22px;
+  --pb-bar: 44px;
+
+  /* Type: the faces, the two text sizes, and the code boxes' size (shared by a textarea, its highlighted copy and a
+     gutter, so their glyphs line up). */
+  --pb-font-ui: system-ui, sans-serif;
+  --pb-font-code: ui-monospace, monospace;
+  --pb-text-sm: 12px;
+  --pb-text-md: 13px;
+  --pb-code-size: 12px;
+}
+
+/* The system's dark, while no theme is chosen. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --pb-surface: #0f1115;
+    --pb-raised: #181b21;
+    --pb-sunken: #12151a;
+    --pb-line: #2a2f38;
+    --pb-line-strong: #3d4450;
+    --pb-text: #e6e8ec;
+    --pb-muted: #9aa2b1;
+    --pb-accent: #7c94ff;
+    --pb-on-strong: #0f1115;
+    --pb-ok: #51cf66;
+    --pb-warn: #ffa94d;
+    --pb-err: #ff6b6b;
+    --pb-quiet: #91a7ff;
+    --pb-off: #808999;
+    --pb-warn-soft: #2e2414;
+    --pb-err-soft: #361b1d;
+    --pb-added: #4ade80;
+    --pb-removed: #f87171;
+    --pb-renamed: #c084fc;
+    --pb-meter-low: #51cf66;
+    --pb-meter-mid: #ffd43b;
+    --pb-meter-hot: #ff8787;
+    --pb-meter-peak: #b2f2bb;
+    --pb-shadow: 0 1px 2px rgb(0 0 0 / 0.5);
+    --pb-shadow-lifted: 0 4px 12px rgb(0 0 0 / 0.6);
+    --pb-code-directive: #74c0fc;
+    --pb-code-keyword: #ffa94d;
+    --pb-code-variable: #ffd43b;
+    --pb-code-number: #69db7c;
+    --pb-code-string: #ff8787;
+    --pb-code-comment: #8c929c;
+    --pb-code-punctuation: #adb5bd;
+    --pb-code-error: #ff6b6b;
+  }
+}
+
+/* Dark chosen over any system: the same set, line for line. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --pb-surface: #0f1115;
+  --pb-raised: #181b21;
+  --pb-sunken: #12151a;
+  --pb-line: #2a2f38;
+  --pb-line-strong: #3d4450;
+  --pb-text: #e6e8ec;
+  --pb-muted: #9aa2b1;
+  --pb-accent: #7c94ff;
+  --pb-on-strong: #0f1115;
+  --pb-ok: #51cf66;
+  --pb-warn: #ffa94d;
+  --pb-err: #ff6b6b;
+  --pb-quiet: #91a7ff;
+  --pb-off: #808999;
+  --pb-warn-soft: #2e2414;
+  --pb-err-soft: #361b1d;
+  --pb-added: #4ade80;
+  --pb-removed: #f87171;
+  --pb-renamed: #c084fc;
+  --pb-meter-low: #51cf66;
+  --pb-meter-mid: #ffd43b;
+  --pb-meter-hot: #ff8787;
+  --pb-meter-peak: #b2f2bb;
+  --pb-shadow: 0 1px 2px rgb(0 0 0 / 0.5);
+  --pb-shadow-lifted: 0 4px 12px rgb(0 0 0 / 0.6);
+  --pb-code-directive: #74c0fc;
+  --pb-code-keyword: #ffa94d;
+  --pb-code-variable: #ffd43b;
+  --pb-code-number: #69db7c;
+  --pb-code-string: #ff8787;
+  --pb-code-comment: #8c929c;
+  --pb-code-punctuation: #adb5bd;
+  --pb-code-error: #ff6b6b;
+}
+
+/* A finger: every text field is 16 px, code boxes included, as iOS Safari zooms the page when a smaller field takes
+   the focus. */
+@media (hover: none) and (pointer: coarse) {
+  :root {
+    --pb-code-size: 16px;
+  }
+}
+
+/* No motion for those who ask for none. The pulse, the flow and the spin keep their durations: a component stops those
+   infinite animations instead, since one at 0 s would churn rather than stop. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --pb-motion-fast: 0ms;
+    --pb-motion-slow: 0ms;
+  }
+}
+
+/* React Flow's own variables point at the tokens, so its canvas, dot grid, wires, handles and minimap follow the
+   theme and the brand. Its colorMode prop is not used: it would fight data-theme. Set on .react-flow, so each var()
+   resolves where React Flow reads it. */
+.react-flow {
+  --xy-background-color: var(--pb-surface);
+  --xy-background-pattern-color: var(--pb-line);
+  --xy-node-color: var(--pb-text);
+  --xy-edge-stroke: var(--pb-muted);
+  --xy-edge-stroke-selected: var(--pb-accent);
+  --xy-connectionline-stroke: var(--pb-muted);
+  --xy-handle-background-color: var(--pb-text);
+  --xy-handle-border-color: var(--pb-raised);
+  --xy-selection-background-color: color-mix(in srgb, var(--pb-accent) 8%, transparent);
+  --xy-selection-border: 1px dotted var(--pb-accent);
+  --xy-attribution-background-color: color-mix(in srgb, var(--pb-raised) 60%, transparent);
+  --xy-controls-button-background-color: var(--pb-raised);
+  --xy-controls-button-color: var(--pb-text);
+  --xy-minimap-background-color: var(--pb-raised);
+  --xy-minimap-mask-background-color: color-mix(in srgb, var(--pb-surface) 65%, transparent);
+  --xy-minimap-mask-stroke-color: var(--pb-accent);
+  --xy-minimap-node-background-color: var(--pb-sunken);
+  --xy-minimap-node-stroke-color: var(--pb-line-strong);
+}

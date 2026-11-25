@@ -1,0 +1,4 @@
+# pnpm reads its settings for this package here (there is one package, no workspace).
+allowBuilds:
+  # esbuild's install script checks its platform binary; Storybook's builder runs esbuild.
+  esbuild: true

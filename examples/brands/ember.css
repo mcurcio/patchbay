@@ -1,0 +1,28 @@
+/* An example brand, "ember": not part of the package, a worked example of writing one (docs/tokens.md#writing-a-brand).
+   An app loads tokens.css, then its brand stylesheet, then base.css if it wants it, and sets data-brand="ember" on
+   <html>. This one changes only the accent, to a warm orange, and the type; the base's surfaces stay.
+
+   Every rule is under :root[data-brand="ember"], and the accent, a colour, is set for light and again in both dark
+   blocks (see examples/brands/harbor.css for why). The type is not a colour, so it goes in the light block alone. */
+:root[data-brand="ember"] {
+  /* A burnt-orange accent, dark enough for 4.5:1 on every light surface and under white text. */
+  --pb-accent: #c2410c;
+
+  /* A humanist face where the system has one, and a point larger text. */
+  --pb-font-ui: "Segoe UI", "Helvetica Neue", system-ui, sans-serif;
+  --pb-text-sm: 13px;
+  --pb-text-md: 14px;
+}
+
+/* The system's dark, while no theme is chosen. */
+@media (prefers-color-scheme: dark) {
+  :root[data-brand="ember"]:not([data-theme]) {
+    /* The accent, lightened for the dark canvas; the base's dark on-strong stays legible on it. */
+    --pb-accent: #fb923c;
+  }
+}
+
+/* Dark chosen over any system: the same set, line for line. */
+:root[data-brand="ember"][data-theme="dark"] {
+  --pb-accent: #fb923c;
+}
