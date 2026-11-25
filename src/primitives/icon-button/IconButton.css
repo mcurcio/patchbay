@@ -1,0 +1,71 @@
+/* A square glyph button (IconButton.tsx) on Button's rules: no face or edge until hovered, pressed or given a tone,
+   as in a tool group. */
+.pb-button.pb-icon-button {
+  width: 28px;
+  min-width: 28px;
+  height: 28px;
+  padding: 0;
+  background: transparent;
+  border-color: transparent;
+}
+
+.pb-button.pb-icon-button[data-size="sm"] {
+  width: var(--pb-row);
+  min-width: var(--pb-row);
+  height: var(--pb-row);
+}
+
+.pb-button.pb-icon-button:hover:not(:disabled, [aria-busy="true"]),
+.pb-button.pb-icon-button[aria-pressed="true"] {
+  background: var(--pb-sunken);
+}
+
+.pb-button.pb-icon-button[data-tone="primary"] {
+  background: var(--pb-accent);
+  border-color: var(--pb-accent);
+}
+
+.pb-button.pb-icon-button[data-tone="primary"]:hover:not(:disabled, [aria-busy="true"]) {
+  background: color-mix(in srgb, var(--pb-accent) 85%, var(--pb-text));
+}
+
+.pb-button.pb-icon-button[data-tone="danger"]:hover:not(:disabled, [aria-busy="true"]) {
+  background: var(--pb-err-soft);
+  border-color: var(--pb-err);
+}
+
+.pb-button.pb-icon-button:disabled {
+  background: transparent;
+  border-color: transparent;
+}
+
+/* The glyph a little larger than the text, centred on one line. */
+.pb-icon-button-glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15em;
+  line-height: 1;
+}
+
+/* Touch: a 36 px target whatever the size (a tool group makes its own 40). */
+@media (hover: none) and (pointer: coarse) {
+  .pb-button.pb-icon-button,
+  .pb-button.pb-icon-button[data-size="sm"] {
+    width: 36px;
+    min-width: 36px;
+    height: 36px;
+  }
+}
+
+/* Forced colours: no edge, as elsewhere, but a pressed one is edged in the system's highlight, since its sunken face is
+   not drawn there. */
+@media (forced-colors: active) {
+  .pb-button.pb-icon-button {
+    border-color: transparent;
+  }
+
+  .pb-button.pb-icon-button[aria-pressed="true"] {
+    border-color: Highlight;
+  }
+}

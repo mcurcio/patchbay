@@ -1,0 +1,4 @@
+/* The ear brand (@mcurcio/patchbay/brands/ear.css), applied by data-brand="ear" on <html> (docs/tokens.md#brands).
+   It overrides nothing: patchbay's base tokens are ear's editor palette, type and density, carried over unchanged, so
+   ear keeps its look. A change to ear's look is a token override here, under :root[data-brand="ear"], with its dark
+   values written under both dark selectors as brands/rasl.css shows. */

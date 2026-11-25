@@ -1,0 +1,46 @@
+/* Facts: keys in muted text, values beside them, in one grid so the values line up. */
+.pb-key-value {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: var(--pb-space-1) var(--pb-space-4);
+  margin: 0;
+  color: var(--pb-text);
+  font-family: var(--pb-font-ui);
+  font-size: var(--pb-text-sm);
+}
+
+.pb-key-value-row {
+  display: contents;
+}
+
+.pb-key-value dt {
+  color: var(--pb-muted);
+}
+
+.pb-key-value dd {
+  margin: 0;
+  min-width: 0;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.pb-key-value-row[data-tone="ok"] dd {
+  color: var(--pb-ok);
+}
+
+.pb-key-value-row[data-tone="warn"] dd {
+  color: var(--pb-warn);
+}
+
+.pb-key-value-row[data-tone="err"] dd {
+  color: var(--pb-err);
+}
+
+.pb-key-value-row[data-tone="quiet"] dd {
+  color: var(--pb-quiet);
+}
+
+.pb-key-value-row[data-tone="off"] dd {
+  color: var(--pb-off);
+}

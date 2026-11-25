@@ -12,4 +12,11 @@ that both editors draw with.
 
 patchbay draws and handles interaction; each app keeps its own protocol, data and editing model.
 
-Status: in design. See [`docs/design/patchbay.md`](docs/design/patchbay.md).
+Status: early. The tokens, primitives and first hooks are built ([`docs/README.md`](docs/README.md));
+the rest is designed in [`docs/design/patchbay.md`](docs/design/patchbay.md).
+
+## Development
+
+Node 24 and pnpm through corepack: `corepack pnpm install`, then `corepack pnpm check` (typecheck,
+lint, format, tests, build) and `corepack pnpm storybook`. [`AGENTS.md`](AGENTS.md#build-and-test)
+lists every command.

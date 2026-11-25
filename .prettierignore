@@ -1,0 +1,12 @@
+# Built output and generated files.
+dist
+storybook-static
+coverage
+pnpm-lock.yaml
+# Hand-written prose (wrapped at 100 columns by hand) and other tools' state.
+*.md
+docs
+.beads
+.agents
+.claude
+.codex

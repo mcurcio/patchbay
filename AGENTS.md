@@ -10,13 +10,15 @@ composites, the app shell, graph components on React Flow, and UI-only hooks. It
 a framework: it draws and handles interaction; each app keeps its protocol, its data and its
 editing model.
 
-Nothing is built yet. The design is [`docs/design/patchbay.md`](docs/design/patchbay.md); read it
-before any change.
+The tokens, the primitives and the first hooks are built; [`docs/README.md`](docs/README.md) indexes
+their docs. The design for the rest is [`docs/design/patchbay.md`](docs/design/patchbay.md); read
+both before any change.
 
 ## Rules of the repo
 
 - **Components only draw.** No fetching, no protocol types, no knobly parsing; data in, callbacks
-  out. The full list of component rules is in the design (§2) until it moves into the library docs.
+  out. The full list of component rules is in
+  [`docs/components.md`](docs/components.md#rules-every-component-keeps).
 - **Tokens only.** No colour, radius, shadow or duration outside the token and brand files.
 - **No app's words or types.** Nothing in patchbay names an ear or rasl type; an app maps its data
   onto patchbay's props.
@@ -37,8 +39,41 @@ before any change.
 
 ## Build and test
 
-Not set up yet (the design's §6: Node 24, pnpm through corepack, TypeScript, Vitest, Storybook and
-its Playwright test runner). This section gets the commands with the first code.
+Node 24 (`.nvmrc`; run `nvm use` first) and pnpm through corepack, at the version `packageManager`
+in `package.json` names. From the repository root:
+
+```bash
+corepack pnpm install          # --frozen-lockfile in CI
+corepack pnpm check            # typecheck, lint, format:check, test, build: what CI's check job runs
+corepack pnpm test             # Vitest's "unit" project: src/**/*.test.ts(x) in jsdom
+corepack pnpm typecheck        # tsc, strict, no emit
+corepack pnpm lint             # ESLint (typescript-eslint type-checked, react-hooks, storybook)
+corepack pnpm format           # Prettier, 120 columns (format:check fails on a file it would change)
+corepack pnpm build            # Vite library mode into dist/, then tsc's .d.ts into dist/types/
+corepack pnpm storybook        # Storybook on http://localhost:6006
+corepack pnpm build-storybook  # into storybook-static/
+corepack pnpm test-storybook   # Vitest's "storybook" project: every story in headless Chromium
+                               # (its play function, and the a11y check, which fails on a violation)
+```
+
+- **Layout.** One folder per layer under `src/` (`tokens`, `brands`, `primitives`, `composites`,
+  `shell`, `graph`, `hooks`), each JS layer with its `index.ts` entry. A component is four files
+  beside each other: `Name.tsx`, `Name.css` (tokens only, classes prefixed `pb-`),
+  `Name.stories.tsx` (its states) and `Name.test.tsx` (its behaviour).
+- **The package.** `vite.config.ts` builds one ES module per layer (`dist/<layer>.js`) with its CSS
+  beside it (`dist/<layer>.css`, which the module imports itself), and copies `tokens.css`, `base.css` and
+  `brands/*.css` as written. Peer dependencies (React, React DOM, `@xyflow/react`, `knobly`) are
+  never bundled. `package.json`'s `exports` names each subpath.
+- **Tokens, themes and brands:** [`docs/tokens.md`](docs/tokens.md) (the token test is
+  `src/tokens/tokens.test.ts`).
+- **CSS in tests.** Vitest blanks stylesheets by default; the unit project reads every CSS file
+  under `src/` as text (`import css from "./Name.css?raw"`), for the token tests.
+- **Storybook's tests** run on the Playwright that `package.json` pins exactly. Its Chromium must be
+  installed (`corepack pnpm exec playwright install chromium`; CI adds `--with-deps`).
+- **pnpm's release-age policy** refuses a package published in the last day; `pnpm install` picks
+  the newest older one. Build scripts are allowed per package in `pnpm-workspace.yaml`.
+- CI (`.github/workflows/ci.yml`) runs on every push and pull request: `check`, and `storybook`
+  (`build-storybook`, then `test-storybook`).
 
 ## Landing work
 

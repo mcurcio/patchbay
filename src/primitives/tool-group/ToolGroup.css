@@ -1,0 +1,76 @@
+/* A tool group (ToolGroup.tsx): a raised, edged, shadowed frame around square, borderless buttons; a pressed one is
+   drawn in the accent on the sunken surface. */
+.pb-toolbar.pb-tool-group {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  gap: var(--pb-space-1);
+  padding: 3px;
+  background: var(--pb-raised);
+  border: 1px solid var(--pb-line);
+  border-radius: var(--pb-radius-box);
+  box-shadow: var(--pb-shadow);
+}
+
+.pb-tool-group button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  padding: 0;
+  font-family: var(--pb-font-ui);
+  font-size: 15px;
+  line-height: 1;
+  color: var(--pb-text);
+  background: transparent;
+  border: none;
+  border-radius: var(--pb-radius-control);
+  cursor: pointer;
+  transition:
+    background-color var(--pb-motion-fast),
+    color var(--pb-motion-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pb-tool-group button:focus-visible {
+  outline: 2px solid var(--pb-accent);
+  outline-offset: 1px;
+}
+
+.pb-tool-group button:hover:not(:disabled),
+.pb-tool-group button[aria-pressed="true"] {
+  background: var(--pb-sunken);
+}
+
+.pb-tool-group button[aria-pressed="true"] {
+  color: var(--pb-accent);
+}
+
+.pb-tool-group button:disabled {
+  color: var(--pb-muted);
+  cursor: default;
+}
+
+/* Touch: tool buttons are 40 px, past the 36 px of other targets, as a group packs them edge to edge. */
+@media (hover: none) and (pointer: coarse) {
+  .pb-tool-group button,
+  .pb-tool-group .pb-button.pb-icon-button,
+  .pb-tool-group .pb-button.pb-icon-button[data-size="sm"] {
+    min-width: 40px;
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* Forced colours: the frame and a pressed button stay visible. */
+@media (forced-colors: active) {
+  .pb-toolbar.pb-tool-group {
+    border-color: CanvasText;
+  }
+
+  .pb-tool-group button[aria-pressed="true"] {
+    outline: 1px solid Highlight;
+  }
+}

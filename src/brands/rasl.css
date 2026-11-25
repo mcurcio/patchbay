@@ -1,0 +1,41 @@
+/* The rasl brand (@mcurcio/patchbay/brands/rasl.css), applied by data-brand="rasl" on <html>
+   (docs/tokens.md#brands). It overrides only where rasl's own editor looks different from ear's: a sky-blue accent
+   instead of ear's indigo, and in dark a navy canvas instead of ear's neutral grey. Load it after tokens.css.
+
+   A colour set in the light block must also be set in both dark blocks: :root[data-brand] is as specific as the base's
+   :root[data-theme="dark"] and comes later, so a light-only value would leak into dark. tokens.test.ts checks it. */
+:root[data-brand="rasl"] {
+  /* rasl's accent (sky), darkened from its #0284c7 to reach 4.5:1 on every surface and under white text. */
+  --pb-accent: #0272ad;
+}
+
+/* The system's dark, while no theme is chosen. */
+@media (prefers-color-scheme: dark) {
+  :root[data-brand="rasl"]:not([data-theme]) {
+    /* rasl's dark is navy: its canvas, panels and borders, and its slate text. */
+    --pb-surface: #0b1220;
+    --pb-raised: #111a2e;
+    --pb-sunken: #0d1526;
+    --pb-line: #22314d;
+    --pb-line-strong: #34486d;
+    --pb-text: #e5e7eb;
+    --pb-muted: #94a3b8;
+    /* rasl's accent in dark, as it is today. */
+    --pb-accent: #38bdf8;
+    /* Text on a filled chip is the canvas's colour. */
+    --pb-on-strong: #0b1220;
+  }
+}
+
+/* Dark chosen over any system: the same set, line for line. */
+:root[data-brand="rasl"][data-theme="dark"] {
+  --pb-surface: #0b1220;
+  --pb-raised: #111a2e;
+  --pb-sunken: #0d1526;
+  --pb-line: #22314d;
+  --pb-line-strong: #34486d;
+  --pb-text: #e5e7eb;
+  --pb-muted: #94a3b8;
+  --pb-accent: #38bdf8;
+  --pb-on-strong: #0b1220;
+}

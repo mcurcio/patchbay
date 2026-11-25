@@ -1,0 +1,40 @@
+# Every push and pull request: the library's checks (typecheck, lint, format, unit tests, build),
+# and Storybook's build and its stories run as tests in Chromium (interactions and the a11y check).
+name: CI
+
+on:
+  push:
+  pull_request:
+
+# A newer push to a pull request cancels its older run; runs on branches each finish.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+      # pnpm at the version package.json's packageManager names.
+      - run: corepack pnpm install --frozen-lockfile
+      - run: corepack pnpm check
+
+  storybook:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+      - run: corepack pnpm install --frozen-lockfile
+      # Chromium for the Playwright version the lockfile pins, with its system libraries.
+      - run: corepack pnpm exec playwright install --with-deps chromium
+      - run: corepack pnpm build-storybook
+      - run: corepack pnpm test-storybook

@@ -1,7 +1,7 @@
 # patchbay: design
 
-Status: **proposed**, for the owner's review. Nothing here is built. This page is the design for
-the first version; when a part is built, what lasts of it moves into the library docs and is
+Status: **proposed**, for the owner's review. This page is the design for the first version's
+unbuilt parts; when a part is built, what lasts of it moves into the library docs and is
 deleted from here (the rule in [`AGENTS.md`](../../AGENTS.md#docs)).
 
 ## 1. What patchbay is
@@ -27,85 +27,15 @@ lifecycle) is exactly what a framework would have to own, so it would end up as 
 
 **Similar look and feel, each app its own variation** (owner, 2026-11-25). One structure and one
 set of interactions; each app's brand changes the accent, the state hues where it needs to, the
-density and the type ([§3.2](#32-brands)).
+density and the type ([`docs/tokens.md`](../tokens.md#brands)).
 
 ## 2. Rules every component keeps
 
-These carry over from ear's editor (`ear/docs/editor.md#its-rules`), where they were proven:
-
-1. **Components only draw.** No fetching, no protocol types, no knobly parsing, no global state.
-   Data comes in as props; what the person does goes out as callbacks.
-2. **Every enum is open.** A tone, status or kind the component does not know is drawn neutrally,
-   by its own word, never a failure. Types are written `"ok" | "warn" | (string & {})`.
-3. **Slots over flags.** What one app has and the other lacks goes in a slot (`ReactNode`), never in
-   a boolean prop per feature.
-4. **Tokens only.** No colour, radius, shadow or duration is written outside the token files; a
-   test fails on one ([§3.3](#33-tests-on-the-tokens)).
-5. **Controlled by default.** Selection, open state and sizes are props with change callbacks; a
-   component keeps state of its own only where the app never needs it (a meter's peak hold, a
-   splitter's drag in progress).
-6. **Hot values stay out of React state.** Anything updated many times a second (levels, metrics)
-   is read through a subscription and painted through refs ([§4.4](#44-graph)).
-7. **Keyboard, touch and reduced motion are part of each component**, not an app's job: focus is
-   visible, every action has a keyboard path, touch targets are at least 36 px (40 px for tool
-   groups), text fields are 16 px on touch (iOS zooms smaller ones), and motion tokens are 0 under
-   `prefers-reduced-motion`. Shortcuts never take a text field's keys.
-8. **No app's words.** A component takes its labels as props; the few defaults it has ("Close",
-   "Cancel") can be replaced through one `PatchbayProvider` `words` object.
+Built: [`docs/components.md`](../components.md#rules-every-component-keeps).
 
 ## 3. Tokens, themes and brands
 
-### 3.1 Tokens
-
-CSS custom properties, in `tokens.css`, starting from ear's set (`ear/web/src/theme.css`), which
-already covers the editor end to end. Groups:
-
-| Group | Tokens |
-|---|---|
-| Surfaces | `--pb-surface` (the canvas), `--pb-raised` (boxes, panels, controls), `--pb-sunken` (tracks, badges, read-only text) |
-| Lines | `--pb-line`, `--pb-line-strong` |
-| Text | `--pb-text`, `--pb-muted`, `--pb-accent` (selection, focus), `--pb-on-strong` (text on a filled chip) |
-| Tones | `--pb-ok`, `--pb-warn`, `--pb-err`, `--pb-quiet`, `--pb-off`, with `--pb-warn-soft`, `--pb-err-soft` |
-| Changes | `--pb-added`, `--pb-removed`, `--pb-renamed` (new: rasl's queued edits; ear has no use yet) |
-| Meters | `--pb-meter-low`, `--pb-meter-mid`, `--pb-meter-hot`, `--pb-meter-peak` |
-| Code | `--pb-code-*` (the knobly token colours, `--pb-code-size`) |
-| Shape | `--pb-radius-box` (8 px), `--pb-radius-control` (6 px), `--pb-radius-pill`, `--pb-shadow`, `--pb-shadow-lifted` |
-| Motion | `--pb-motion-fast` (120 ms), `--pb-motion-slow` (180 ms), `--pb-motion-pulse`, `--pb-motion-flow`, `--pb-motion-spin` |
-| Density (new) | `--pb-space-1` … `--pb-space-5`, `--pb-row` (a port row, 22 px), `--pb-bar` (the top bar, 44 px) |
-| Type (new) | `--pb-font-ui`, `--pb-font-code`, `--pb-text-sm`, `--pb-text-md` |
-
-Every token is prefixed `--pb-` so an app's own properties never collide. React Flow's own
-variables (`--xy-*`) are pointed at these in `tokens.css`, so its canvas, dot grid and minimap
-follow the theme without its `colorMode` prop (which fights `data-theme`). rasl sets `--xy-*`
-today and ear's canvas does not, so this also fixes the one place the two disagree.
-
-**The theme** is ear's: `system` by default; `data-theme="light"` or `"dark"` on `<html>` chooses
-one; the dark set is written twice (under `prefers-color-scheme: dark` for `:root:not([data-theme])`
-and under `[data-theme="dark"]`) rather than with `light-dark()`, which minifiers may rewrite.
-
-### 3.2 Brands
-
-A brand is a stylesheet that overrides tokens, scoped by `data-brand` on `<html>`:
-
-```css
-:root[data-brand="ear"] { --pb-accent: …; --pb-font-ui: …; }
-:root[data-brand="ear"][data-theme="dark"] { --pb-accent: …; }
-@media (prefers-color-scheme: dark) { :root[data-brand="ear"]:not([data-theme]) { --pb-accent: …; } }
-```
-
-- A brand may override any token, but is expected to touch few: the accent, the type, the density,
-  and a state hue only where its domain needs one.
-- Brands live in patchbay (`brands/ear.css`, `brands/rasl.css`), so the contrast test and Storybook
-  cover each brand in each theme. An app loads `tokens.css`, then its brand, then its own CSS.
-- *Why an attribute and not just load order:* Storybook switches brands at run time, and one page
-  could in principle show two.
-
-### 3.3 Tests on the tokens
-
-ear's `theme.test.ts` becomes patchbay's and runs for every brand × theme pair: it fails naming
-the brand, theme and pair when any text, tone, on-strong or code token falls below 4.5:1 on a
-surface it is drawn on; when the two copies of a dark set differ; when a colour lacks its dark
-value; or when a component's CSS holds a colour of its own.
+Built: [`docs/tokens.md`](../tokens.md).
 
 ## 4. The components
 
@@ -114,20 +44,7 @@ lands with its stories and its tests, and the final names are settled there.
 
 ### 4.1 Primitives (`/primitives`)
 
-| Component | Props (sketch) | From |
-|---|---|---|
-| `Button`, `IconButton` | `tone?`, `busy?` (spinner, keeps width), `size?`, native button props | both |
-| `Field` | `label`, `error?`, `hint?`, `children` (the control) | rasl `field`, `field-error` |
-| `TextInput`, `Select`, `Checkbox` | native props; 16 px on touch | both |
-| `KeyValue` | `rows: { key, value }[]` | rasl `kv`, ear `EngineFacts` |
-| `SectionTitle` | `children`, `actions?` | rasl |
-| `Pill` | `tone`, `label`, `pulse?` | ear `StatePill` without `GraphNode` |
-| `Badge`, `WarnMark` | `tone`, `children`, `title?` | ear |
-| `Spinner` | `label?` | ear |
-| `Splitter` | `orientation`, `value`, `min`, `max`, `onChange`; arrow keys, Home and End | ear |
-| `Panel`, `Dialog`, `Sheet` | `title?`, `open`, `onClose`, `children` | ear inspector sheet, rasl add-node dialog |
-| `ThemeSwitch` | `choice`, `onChoose` | ear |
-| `Toolbar`, `ToolGroup` | `children`; roving focus | ear `CanvasTools` |
+Built: [`docs/components.md`](../components.md#primitives-primitives).
 
 ### 4.2 Composites (`/composites`)
 
@@ -169,7 +86,7 @@ and a drawer along the bottom. It is ear's (`ear/docs/editor.md#the-shell`), gen
   palette and the shortcut sheet.
 - **The whole screen:** `100dvh`, padded by the safe-area insets (`viewport-fit=cover`).
 - The shell keeps no data. Its sizes and open states are props; `usePersistentState`
-  ([§4.5](#45-hooks)) is how an app keeps them.
+  ([`docs/components.md`](../components.md#usepersistentstate)) is how an app keeps them.
 
 ### 4.4 Graph (`/graph`)
 
@@ -196,12 +113,13 @@ out and handles the events.
 
 ### 4.5 Hooks (`/hooks`)
 
+`useTheme` and `usePersistentState` are built: [`docs/components.md`](../components.md#hooks-hooks).
+Still to build:
+
 | Hook | What it does |
 |---|---|
-| `useTheme()` | `[choice, setChoice]`; writes `data-theme`; applies the kept choice before first render (with a tiny inline script the app's `index.html` includes) |
 | `useShortcuts(map)` | Key bindings, Cmd on macOS and Ctrl elsewhere, never inside a text field |
 | `useToasts()` | `show({ tone, text, action? })`, where `action: { label, run }` |
-| `usePersistentState(key, initial, check)` | `localStorage` per app prefix; every read and write in `try`; a value that fails `check` is ignored |
 | `useLiveValue(subscribe, read)` | For hot values outside React state; what `Meter` uses |
 | `useMediaBreakpoint()` | The shell's three widths (wide, narrow, phone) and touch |
 
@@ -213,12 +131,18 @@ Storybook (owner, 2026-11-25) is the catalogue, the documentation and the test s
   **theme** (light, dark), and a viewport switch covers the shell's three widths.
 - Stories double as tests through Storybook's test runner on Playwright: interaction tests
   (`play`), the accessibility check, and screenshot comparison per brand × theme.
+  *As built:* the runner is Storybook's Vitest addon (`@storybook/addon-vitest`, Vitest's browser
+  mode on Playwright's Chromium) rather than the standalone `@storybook/test-runner`: it runs the
+  stories straight from source with no Storybook server, and shares Vitest with the unit tests.
+  Interaction tests and the accessibility check (a violation fails the story) are built; screenshot
+  comparison is not yet (baselines must come from one pinned browser and font set, or CI and a
+  laptop disagree on every pixel of text).
 - It is built and published to GitHub Pages from `main`.
 
 ## 6. Packaging and releases
 
 - **One package**, `patchbay` (name to confirm: [§8](#8-open-questions)), ES modules with
-  `.d.ts`, built with Vite's library mode. Subpath exports: `patchbay/tokens.css`,
+  `.d.ts`, built with Vite's library mode. Subpath exports: `patchbay/tokens.css`, `patchbay/base.css`,
   `patchbay/brands/ear.css`, `patchbay/brands/rasl.css`, `patchbay/primitives`,
   `patchbay/composites`, `patchbay/shell`, `patchbay/graph`, `patchbay/hooks`. Each layer's CSS is
   a file of its own beside its JS.

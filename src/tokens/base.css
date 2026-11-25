@@ -1,0 +1,22 @@
+/* patchbay's base stylesheet (@mcurcio/patchbay/base.css), optional: the page drawn from the tokens, for an app that
+   wants the library's defaults on its whole page (docs/tokens.md#the-base-stylesheet). Load it after tokens.css and
+   the brand. Components do not depend on it: each sets its own box sizing, type and focus ring. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--pb-surface);
+  color: var(--pb-text);
+  font-family: var(--pb-font-ui);
+  font-size: var(--pb-text-md);
+}
+
+/* Focus is always visible from the keyboard, in the accent. */
+:focus-visible {
+  outline: 2px solid var(--pb-accent);
+  outline-offset: 2px;
+}
