@@ -1,3 +1,9 @@
+## [0.2.0](https://github.com/mcurcio/patchbay/compare/v0.1.0...v0.2.0) (2026-11-25)
+
+### Features
+
+* **tokens:** add --pb-scrim and --pb-accent-hover ([ebf5389](https://github.com/mcurcio/patchbay/commit/ebf53893662cc41bcc392cd5a2d839c61ef3dc47))
+
 ## [0.1.0](https://github.com/mcurcio/patchbay/compare/v0.0.0...v0.1.0) (2026-11-25)
 
 ### ⚠ BREAKING CHANGES
