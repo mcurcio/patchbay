@@ -47,6 +47,9 @@ Built: [`docs/components.md`](../components.md#primitives-primitives).
 
 ### 4.2 Composites (`/composites`)
 
+`Banner` and `StatusWords` are built: [`docs/components.md`](../components.md#composites-composites).
+Still to build:
+
 | Component | Props (sketch) |
 |---|---|
 | `CommandPalette` | `open`, `onClose`, `commands: { id, label, group, keys?, run, disabled? }[]`, `placeholder?` |
@@ -56,8 +59,6 @@ Built: [`docs/components.md`](../components.md#primitives-primitives).
 | `CodeText` | `value`, `language?` or `highlight?` (read-only, highlighted) |
 | `DiffView` | `diff` (unified text) or `files: { path, diff }[]` |
 | `SchemaForm` | `schema` (JSON Schema subset), `value`, `onChange`, `errors?`, `fieldSlot?` |
-| `Banner` | `tone`, `children`, `actions?` |
-| `StatusWords` | `items: { tone, label }[]` (most urgent first) |
 
 **Highlighting.** `CodeEditor` and `CodeText` highlight [knobly](https://github.com/mcurcio/knobly)
 configuration text built in (`language: "knobly"`), through the optional `knobly` peer dependency,

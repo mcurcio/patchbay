@@ -213,6 +213,33 @@ held to 280–560 px and 48 px short of its container; 360 by default), `closeLa
 - It is placed absolutely, so its container (the app's workspace) is positioned. The app chooses
   the side (the right below 760 px, the bottom below 600 px).
 
+## Composites (`/composites`)
+
+Composites are drawn with primitives: importing `/composites` loads `/primitives` and its
+stylesheet too. Their few default words ("Dismiss") are props, as the primitives' are.
+
+### News and state
+
+**`Banner`**: a line of news across a pane or page (a conflict, a lost connection, a refused edit),
+on a raised surface with a stripe in its tone at the start (warn and err on their soft surfaces).
+`tone: "ok" | "warn" | "err" | "quiet" | "off"` (open; one it does not know keeps a plain stripe),
+`children` (the news), `actions?` (a slot at its end: the buttons that act on it), `onDismiss?`
+(shows a close button that calls it), `dismissLabel?` ("Dismiss"), plus native `div` props.
+
+- An `err` banner is `role="alert"`, read at once; every other tone is `role="status"`, read when
+  the screen reader is free. The role is the banner's own.
+- The words wrap and the actions drop under them in a narrow pane. The close button is an
+  `IconButton`, so it keeps a 36 px target on touch.
+
+**`StatusWords`**: a short row of states, each a word in its tone, a dot between each two (a pane's
+"2 errors · 1 warning · saved"). `items: { tone, label, title? }[]` (tones as `Pill`'s, open),
+drawn in the order given, which is most urgent first, plus native `ul` props (name it with
+`aria-label`).
+
+- The list is one `aria-live="polite"` region (an app may pass another `aria-live`), so a screen
+  reader reads a change when it is free; it stays in the page while empty, ready for the next
+  change. The dots are drawn, not read.
+
 ## Hooks (`/hooks`)
 
 ### `usePersistentState`

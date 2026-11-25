@@ -1,0 +1,63 @@
+/* A banner (Banner.tsx): the news on a raised surface with a stripe in its tone at the start; warn and err on their
+   soft surfaces. A tone it does not know keeps the plain line as its stripe. */
+.pb-banner {
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pb-space-3);
+  padding: var(--pb-space-3) var(--pb-space-4);
+  border: 1px solid var(--pb-line);
+  border-inline-start: 3px solid var(--pb-line-strong);
+  border-radius: var(--pb-radius-control);
+  background: var(--pb-raised);
+  color: var(--pb-text);
+  font-family: var(--pb-font-ui);
+  font-size: var(--pb-text-md);
+}
+
+.pb-banner[data-tone="ok"] {
+  border-inline-start-color: var(--pb-ok);
+}
+
+.pb-banner[data-tone="warn"] {
+  border-inline-start-color: var(--pb-warn);
+  background: var(--pb-warn-soft);
+}
+
+.pb-banner[data-tone="err"] {
+  border-inline-start-color: var(--pb-err);
+  background: var(--pb-err-soft);
+}
+
+.pb-banner[data-tone="quiet"] {
+  border-inline-start-color: var(--pb-quiet);
+}
+
+.pb-banner[data-tone="off"] {
+  border-inline-start-color: var(--pb-off);
+}
+
+.pb-banner-text {
+  flex: 1 1 12em;
+  min-width: 0;
+}
+
+.pb-banner-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pb-space-3);
+}
+
+.pb-button.pb-banner-dismiss {
+  flex: none;
+  margin-inline-start: auto;
+  color: var(--pb-text);
+}
+
+/* Forced colours drop the surfaces; the stripe stays as the system's text colour, the words carry the news. */
+@media (forced-colors: active) {
+  .pb-banner {
+    border-inline-start-color: CanvasText;
+  }
+}
