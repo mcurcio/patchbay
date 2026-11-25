@@ -52,8 +52,8 @@ Common prop names mean the same everywhere:
 | `className` | Added to the component's own `pb-` class, never replacing it |
 
 Components built on a native element (`Button`, `TextInput`, `Select`, `Checkbox`, `Field`,
-`Splitter`, `Toolbar`, `Panel`, `Spinner`, `ThemeSwitch`) pass every other native prop through,
-`ref` included (React 19's `ref` as a prop).
+`Splitter`, `Toolbar`, `Panel`, `Spinner`, `ThemeSwitch`, and `RadioGroup` to its fieldset) pass
+every other native prop through, `ref` included (React 19's `ref` as a prop).
 
 ## Primitives (`/primitives`)
 
@@ -131,6 +131,22 @@ a press on the words ticks it; without one, name it by a `Field` or `aria-label`
 `indeterminate?` (read as "mixed") is a prop, since HTML has it only as a DOM property. On touch the
 row is at least 36 px tall, with a 20 px box and 16 px words.
 
+**`RadioGroup`**: a choice of one, as native radios under a legend in one `<fieldset
+role="radiogroup">`. `legend` (its name), `legendHidden?` (the legend kept for screen readers
+only), `options: { value, label, title?, disabled? }[]`, `value` (the picked option's value; one
+no option has picks none), `onChange(value)`, `name?` (the radios' shared name; its own by
+default), `layout?: "stacked" | "inline"` (one option a row, or side by side and wrapping; others
+stack), `hint?`, `error?`.
+
+- **Controlled:** a press asks `onChange` and changes nothing until the app passes the new
+  `value`.
+- **Keyboard:** the browser's own: the group is one tab stop, and the arrow keys move the pick.
+- The hint and error are wired as `Field` wires a control's: `aria-describedby` names them (after
+  any ids it already has) and `aria-invalid` marks the group while there is an error ("" counts as
+  none). The radios are picked in the accent, and edged in the error tone while invalid.
+- `disabled` on the group disables every option. On touch each row is at least 36 px tall, with a
+  20 px radio and 16 px words.
+
 ### Layout
 
 **`Panel`**: a region with an optional header (its `title?` and `actions?`) over a body that
@@ -196,6 +212,52 @@ held to 280–560 px and 48 px short of its container; 360 by default), `closeLa
   by the bottom safe-area inset.
 - It is placed absolutely, so its container (the app's workspace) is positioned. The app chooses
   the side (the right below 760 px, the bottom below 600 px).
+
+## Composites (`/composites`)
+
+Composites are drawn with primitives: importing `/composites` loads `/primitives` and its
+stylesheet too. Their few default words ("Dismiss") are props, as the primitives' are.
+
+### News and state
+
+**`Banner`**: a line of news across a pane or page (a conflict, a lost connection, a refused edit),
+on a raised surface with a stripe in its tone at the start (warn and err on their soft surfaces).
+`tone: "ok" | "warn" | "err" | "quiet" | "off"` (open; one it does not know keeps a plain stripe),
+`children` (the news), `actions?` (a slot at its end: the buttons that act on it), `onDismiss?`
+(shows a close button that calls it), `dismissLabel?` ("Dismiss"), plus native `div` props.
+
+- An `err` banner is `role="alert"`, read at once; every other tone is `role="status"`, read when
+  the screen reader is free. The role is the banner's own.
+- The words wrap and the actions drop under them in a narrow pane. The close button is an
+  `IconButton`, so it keeps a 36 px target on touch.
+
+**`StatusWords`**: a short row of states, each a word in its tone, a dot between each two (a pane's
+"2 errors · 1 warning · saved"). `items: { tone, label, title? }[]` (tones as `Pill`'s, open),
+drawn in the order given, which is most urgent first, plus native `ul` props (name it with
+`aria-label`).
+
+- The list is one `aria-live="polite"` region (an app may pass another `aria-live`), so a screen
+  reader reads a change when it is free; it stays in the page while empty, ready for the next
+  change. The dots are drawn, not read.
+
+### Code
+
+**`DiffView`**: unified diff text, drawn line by line in code type on the code surface. Either
+`diff` (one diff, drawn whole without a heading) or `files: { path, diff }[]` (one section per
+file, in order), plus `level?` (the files' headings, h2 to h6, h3 by default), `collapsed?` (the
+paths folded away), `onToggle?(path, open)`, and native `div` props.
+
+- **Lines:** each keeps its `+` or `-`, so a change never rests on colour alone. Added lines are in
+  `--pb-added` and removed ones in `--pb-removed`, each with a bar of its tone at the start; hunk
+  headers (`@@`) are in `--pb-code-directive`; git's header lines (`diff --git`, `index`, `---`,
+  `+++`) and `\ No newline at end of file` in `--pb-code-comment`. CRLF reads as LF.
+- **Files:** each is a heading holding a button labelled by the file's name (the path's last part),
+  with the whole path as its title. The button folds the file (`aria-expanded`, `aria-controls`).
+  With `collapsed` the app holds the fold and a press only calls `onToggle`; without it the view
+  keeps its own, every file open at first, and still calls `onToggle`.
+- A wide diff scrolls sideways; each diff body is a tab stop, so it scrolls from the keyboard too.
+  On touch the heading buttons are at least 36 px tall with 16 px words. The chevron turns on
+  `--pb-motion-fast`, so it is still under reduced motion.
 
 ## Hooks (`/hooks`)
 

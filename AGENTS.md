@@ -69,7 +69,10 @@ pnpm test-storybook            # Vitest's "storybook" project: every story in he
 - **The package.** `vite.config.ts` builds one ES module per layer (`dist/<layer>.js`) with its CSS
   beside it (`dist/<layer>.css`, which the module imports itself), and copies `tokens.css` and
   `base.css` as written. Peer dependencies (React, React DOM, `@xyflow/react`, `knobly`) are
-  never bundled. `package.json`'s `exports` names each subpath.
+  never bundled. `package.json`'s `exports` names each subpath. A layer that uses another imports
+  it through that layer's index (`import { IconButton } from "../../primitives"`), which the build
+  keeps an import of `./primitives.js`, so each component ships once; reaching past another
+  layer's index fails the build.
 - **Tokens, themes and brands:** [`docs/tokens.md`](docs/tokens.md) (the token test is
   `src/tokens/tokens.test.ts`).
 - **CSS in tests.** Vitest blanks stylesheets by default; the unit project reads every CSS file

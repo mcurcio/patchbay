@@ -1,0 +1,105 @@
+/* A choice of one (RadioGroup.tsx): a legend over the platform's own radios, picked in the accent, with a hint and an
+   error under them. Stacked puts one option a row; inline puts them side by side. A layout it does not know stacks. */
+.pb-radio-group {
+  display: grid;
+  gap: var(--pb-space-2);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-family: var(--pb-font-ui);
+  font-size: var(--pb-text-md);
+  color: var(--pb-text);
+}
+
+.pb-radio-group-legend {
+  float: left;
+  width: 100%;
+  margin-bottom: var(--pb-space-2);
+  padding: 0;
+  color: var(--pb-text);
+}
+
+/* For screen readers only. */
+.pb-radio-group-legend[data-hidden] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.pb-radio-group-options {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  clear: both;
+}
+
+.pb-radio-group[data-layout="inline"] .pb-radio-group-options {
+  flex-direction: row;
+  flex-wrap: wrap;
+  column-gap: var(--pb-space-5);
+}
+
+.pb-radio-row {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pb-space-3);
+  min-height: 28px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pb-radio-row[data-disabled] {
+  color: var(--pb-muted);
+  cursor: default;
+}
+
+.pb-radio {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--pb-accent);
+  cursor: pointer;
+}
+
+.pb-radio:focus-visible {
+  outline: 2px solid var(--pb-accent);
+  outline-offset: 2px;
+}
+
+.pb-radio-group[aria-invalid="true"] .pb-radio:not(:focus-visible) {
+  outline: 1px solid var(--pb-err);
+  outline-offset: 1px;
+}
+
+.pb-radio:disabled {
+  cursor: default;
+}
+
+.pb-radio-group-hint {
+  font-size: var(--pb-text-sm);
+  color: var(--pb-muted);
+}
+
+.pb-radio-group-error {
+  font-size: var(--pb-text-sm);
+  color: var(--pb-err);
+}
+
+/* A finger: a bigger radio, and rows at least 36 px tall with 16 px words. */
+@media (hover: none) and (pointer: coarse) {
+  .pb-radio {
+    width: 20px;
+    height: 20px;
+  }
+
+  .pb-radio-row {
+    min-height: 36px;
+    font-size: 16px;
+  }
+}

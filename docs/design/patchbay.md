@@ -47,6 +47,9 @@ Built: [`docs/components.md`](../components.md#primitives-primitives).
 
 ### 4.2 Composites (`/composites`)
 
+`Banner`, `StatusWords` and `DiffView` are built:
+[`docs/components.md`](../components.md#composites-composites). Still to build:
+
 | Component | Props (sketch) |
 |---|---|
 | `CommandPalette` | `open`, `onClose`, `commands: { id, label, group, keys?, run, disabled? }[]`, `placeholder?` |
@@ -54,10 +57,7 @@ Built: [`docs/components.md`](../components.md#primitives-primitives).
 | `Toaster` | (provider) |
 | `CodeEditor` | `value`, `onChange`, `language?: "knobly"`, `highlight?: (text) => spans`, `diagnostics?: { line, column?, severity, message }[]`, `readOnly?`, `onCaret?` |
 | `CodeText` | `value`, `language?` or `highlight?` (read-only, highlighted) |
-| `DiffView` | `diff` (unified text) or `files: { path, diff }[]` |
 | `SchemaForm` | `schema` (JSON Schema subset), `value`, `onChange`, `errors?`, `fieldSlot?` |
-| `Banner` | `tone`, `children`, `actions?` |
-| `StatusWords` | `items: { tone, label }[]` (most urgent first) |
 
 **Highlighting.** `CodeEditor` and `CodeText` highlight [knobly](https://github.com/mcurcio/knobly)
 configuration text built in (`language: "knobly"`), through the optional `knobly` peer dependency,
@@ -92,12 +92,15 @@ and a drawer along the bottom:
 ### 4.4 Graph (`/graph`)
 
 On React Flow 12 (a peer dependency of `/graph` only). patchbay provides the node and edge
-components and a thin canvas; the app turns its graph into React Flow nodes and edges, lays them
-out and handles the events.
+components and sugar for the canvas, not a wrapper around it: the app renders React Flow's own
+`<ReactFlow>`, so every React Flow prop and future feature stays within reach, turns its graph into
+React Flow nodes and edges, lays them out and handles the events.
 
 | Component | Props (sketch) |
 |---|---|
-| `GraphCanvas` | React Flow's props, plus `tools` (the floating `ToolGroup`: zoom, fit, tidy, minimap), `onAddAt(point, from?)` (double-click on empty canvas, or a wire dropped there), `followFit` (fit again on changes until the person moves the view) |
+| `CanvasTools` | The floating `ToolGroup` for a React Flow `<Panel>`: zoom, fit, tidy, minimap (the minimap's node class from the app) |
+| `useAddAt` | `onAddAt(point, from?)`: a double-click on empty canvas, or a wire dropped there |
+| `useFollowFit` | Fit again on changes until the person moves the view; `onFitted` when a fit lands |
 | `NodeBox` | `title`, `subtitle?` (type), `tone?` (the stripe), `status?` (slot: a `Pill`), `line?` (why it is silent), `inputs`, `outputs`, `footer?` (slot: badges), `selected`, `change?: "added" \| "removed" \| "renamed" \| "changed"` |
 | `PortRow` | `id`, `label`, `typeLabel?`, `side`, `hint?: "ok" \| "no" \| null` (while a wire is dragged), `problem?`, `trailing?` (slot: a meter) |
 | `Wire` (edge type) | `tone` (`ok`, `pending`, `refused`, `added`, `removed`, open), `emphasis?: 0..1` (thickness and brightness), `dashed?`, `flow?`, `label?` (at the midpoint) |
@@ -154,9 +157,6 @@ Storybook is the catalogue, the documentation and the test surface.
 
 ## 7. Open questions
 
-1. **`GraphCanvas` or only node and edge types.** A thin wrapper gives the shared tools, fit
-   behaviour and add-at-point; leaving React Flow wholly to each app keeps patchbay smaller.
-   Proposal: the wrapper.
-2. **A headless graph-overlay helper**: pure functions that lay edits not yet confirmed over the
+1. **A headless graph-overlay helper**: pure functions that lay edits not yet confirmed over the
    app's confirmed graph (requests on their way, or edits queued until a save). Not in the first
    version; revisit once `/graph` is in use.

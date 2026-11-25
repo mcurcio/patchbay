@@ -60,8 +60,40 @@ function importOwnCss(): Plugin {
   };
 }
 
+/**
+ * A layer that uses another (a composite drawn with primitives) imports it through that layer's index
+ * ("../../primitives"), and the build keeps that an import of the other layer's module ("./primitives.js"), so each
+ * component's code and CSS ship once, in its own layer's files. Reaching past another layer's index would copy its
+ * code into a shared chunk, so the build refuses it.
+ */
+function layersImportLayers(): Plugin {
+  const layerOf = (file: string) => {
+    const match = /\/src\/([^/]+)\//.exec(file.replaceAll("\\", "/"));
+    return match !== null && (layers as readonly string[]).includes(match[1] ?? "") ? match[1] : undefined;
+  };
+  return {
+    name: "patchbay:layers-import-layers",
+    apply: "build",
+    // Before Vite's own resolver, which would otherwise resolve the import to the other layer's source.
+    enforce: "pre",
+    async resolveId(source, importer, options) {
+      if (importer === undefined || !source.startsWith(".")) return null;
+      const from = layerOf(importer);
+      if (from === undefined) return null;
+      const resolved = await this.resolve(source, importer, { ...options, skipSelf: true });
+      if (resolved === null || resolved.external) return resolved;
+      const to = layerOf(resolved.id);
+      if (to === undefined || to === from) return resolved;
+      if (resolved.id.replaceAll("\\", "/") !== src(`${to}/index.ts`).replaceAll("\\", "/")) {
+        this.error(`${importer} reaches into the ${to} layer (${source}); import it from "../../${to}" instead`);
+      }
+      return { id: `./${to}.js`, external: true };
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [react(), copyStylesheets(), importOwnCss()],
+  plugins: [react(), copyStylesheets(), importOwnCss(), layersImportLayers()],
   build: {
     target: "es2022",
     sourcemap: true,

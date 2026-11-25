@@ -1,0 +1,46 @@
+/* Status words (StatusWords.tsx): words in their tones in a row, a dot between each two. A tone it does not know is
+   muted. */
+.pb-status-words {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--pb-font-ui);
+  font-size: var(--pb-text-sm);
+}
+
+.pb-status-word {
+  color: var(--pb-muted);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* The dot is drawn, not read: a screen reader reads the list's items. */
+.pb-status-word + .pb-status-word::before {
+  content: "·" / "";
+  padding: 0 var(--pb-space-2);
+  color: var(--pb-muted);
+  font-weight: normal;
+}
+
+.pb-status-word[data-tone="ok"] {
+  color: var(--pb-ok);
+}
+
+.pb-status-word[data-tone="warn"] {
+  color: var(--pb-warn);
+}
+
+.pb-status-word[data-tone="err"] {
+  color: var(--pb-err);
+}
+
+.pb-status-word[data-tone="quiet"] {
+  color: var(--pb-quiet);
+}
+
+.pb-status-word[data-tone="off"] {
+  color: var(--pb-off);
+}
