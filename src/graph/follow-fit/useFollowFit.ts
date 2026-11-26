@@ -1,6 +1,6 @@
 // Keeping the whole graph in view until the person takes the view over (docs/graph.md#usefollowfit). While following,
 // the view fits again when the app's key changes or the canvas changes size, each time once every node is measured;
-// a move the person makes (one that changes the viewport, not a press that moves nothing) stops it, as does stop(),
+// a move the person makes (once it changes the viewport, not a press that moves nothing) stops it, as does stop(),
 // and fit() fits and follows again. onFitted comes in the frame after each fit lands.
 import {
   type FitViewOptions,
@@ -25,7 +25,7 @@ export type FollowFitOptions<NodeType extends Node = Node> = {
 };
 
 /** The props `useFollowFit` gives `<ReactFlow>`. */
-export type FollowFitFlowProps = { onMoveStart: OnMove; onMoveEnd: OnMove };
+export type FollowFitFlowProps = { onMoveStart: OnMove; onMove: OnMove; onMoveEnd: OnMove };
 
 export type FollowFit = {
   /** Whether the view fits again on its own: true from the start, false once the person moves the view. */
@@ -99,25 +99,30 @@ export function useFollowFit<NodeType extends Node = Node>({
   }, []);
 
   // Where the person's move began. React Flow starts a move on every press on the pane, also one that moves nothing (a
-  // click to deselect, a double-click to add), so following stops only when the move ends somewhere else.
+  // click to deselect, a double-click to add), so following stops only once the person's move has changed the view.
+  // Each step of the move counts, not only its end: d3-zoom folds a move by code that lands during the person's (a
+  // fit landing mid-wheel) into the person's gesture, so the gesture can end where it began, the person's zoom undone
+  // by the fit. A step or an end that changed nothing leaves the start in place: when the wheel interrupts a fit's
+  // transition, d3-zoom ends the fit's move with the wheel as its event, after the wheel's own start (React Flow defers
+  // each end a task). Each start with an event sets it afresh.
   const movedFrom = useRef<Viewport | null>(null);
-  const flowProps = useMemo<FollowFitFlowProps>(
-    () => ({
-      // A move made by code (a fit, a zoom from a tool) has no event; only the person's own move counts.
-      // A move by code that starts or ends during the person's (a fit landing mid-wheel) leaves theirs as it was.
+  const flowProps = useMemo<FollowFitFlowProps>(() => {
+    // A move made by code (a fit, a zoom from a tool) has no event; only the person's own move counts.
+    const moved: OnMove = (event, viewport) => {
+      const from = movedFrom.current;
+      if (event === null || from === null) return;
+      if (from.x === viewport.x && from.y === viewport.y && from.zoom === viewport.zoom) return;
+      movedFrom.current = null;
+      setFollowing(false);
+    };
+    return {
       onMoveStart: (event, viewport) => {
         if (event !== null) movedFrom.current = viewport;
       },
-      onMoveEnd: (event, viewport) => {
-        if (event === null) return;
-        const from = movedFrom.current;
-        movedFrom.current = null;
-        if (from === null) return;
-        if (from.x !== viewport.x || from.y !== viewport.y || from.zoom !== viewport.zoom) setFollowing(false);
-      },
-    }),
-    [],
-  );
+      onMove: moved,
+      onMoveEnd: moved,
+    };
+  }, []);
 
   return { following, fit, stop, flowProps };
 }

@@ -159,6 +159,63 @@ describe("useFollowFit", () => {
     expect(follow(seen).following).toBe(false);
   });
 
+  it("stops following when the person's wheel interrupts a fit by code that was moving", async () => {
+    const onFitted = vi.fn<(viewport: Viewport) => void>();
+    const seen: Seen = { current: null };
+    render(draw(1, one, onFitted, seen));
+    await waitFor(() => {
+      expect(onFitted).toHaveBeenCalledOnce();
+    });
+    act(() => {
+      const { onMoveStart, onMoveEnd } = follow(seen).flowProps;
+      // d3-zoom's order: the fit's transition starts (no event); the wheel interrupts it, ending the fit's move with
+      // the wheel as its event, and starts its own; React Flow defers each end a task, so the fit's end, unchanged,
+      // comes after the wheel's start, and the wheel's own end, changed, last.
+      onMoveStart(null, { x: 0, y: 0, zoom: 1 });
+      onMoveStart(new WheelEvent("wheel"), { x: 5, y: 0, zoom: 1 });
+      onMoveEnd(new WheelEvent("wheel"), { x: 5, y: 0, zoom: 1 });
+      onMoveEnd(new WheelEvent("wheel"), { x: 5, y: 0, zoom: 1.5 });
+    });
+    expect(follow(seen).following).toBe(false);
+  });
+
+  it("stops following when a fit by code folded into the person's wheel brings the view back to where it began", async () => {
+    const onFitted = vi.fn<(viewport: Viewport) => void>();
+    const seen: Seen = { current: null };
+    render(draw(1, one, onFitted, seen));
+    await waitFor(() => {
+      expect(onFitted).toHaveBeenCalledOnce();
+    });
+    act(() => {
+      const { onMoveStart, onMove, onMoveEnd } = follow(seen).flowProps;
+      // d3-zoom folds the fit into the wheel's gesture: the fit's step carries the wheel as its event, and the
+      // gesture ends where it began.
+      const wheel = new WheelEvent("wheel");
+      onMoveStart(wheel, { x: 0, y: 0, zoom: 1 });
+      onMove(wheel, { x: -20, y: -10, zoom: 1.7 });
+      onMove(wheel, { x: 0, y: 0, zoom: 1 });
+      onMoveEnd(wheel, { x: 0, y: 0, zoom: 1 });
+    });
+    expect(follow(seen).following).toBe(false);
+  });
+
+  it("keeps following through a press whose steps move nothing", async () => {
+    const onFitted = vi.fn<(viewport: Viewport) => void>();
+    const seen: Seen = { current: null };
+    render(draw(1, one, onFitted, seen));
+    await waitFor(() => {
+      expect(onFitted).toHaveBeenCalledOnce();
+    });
+    act(() => {
+      const { onMoveStart, onMove, onMoveEnd } = follow(seen).flowProps;
+      onMoveStart(new MouseEvent("mousedown"), { x: 0, y: 0, zoom: 1 });
+      onMove(new MouseEvent("mousemove"), { x: 0, y: 0, zoom: 1 });
+      onMove(null, { x: 30, y: 0, zoom: 1 });
+      onMoveEnd(new MouseEvent("mouseup"), { x: 0, y: 0, zoom: 1 });
+    });
+    expect(follow(seen).following).toBe(true);
+  });
+
   it("stops following at stop(), as for an app that moves the view itself", async () => {
     const onFitted = vi.fn<(viewport: Viewport) => void>();
     const seen: Seen = { current: null };
