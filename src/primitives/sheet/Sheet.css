@@ -1,10 +1,8 @@
 /* The sheet (Sheet.tsx): over its container's inline end (or start) edge, the full height, or rising from its bottom,
    the full width and at most 62 % of the height. Its sides are logical, so in right-to-left text the end is the left
-   edge, and it slides in from the edge it is on. It sets its own box, type and focus ring, so it needs no base
+   edge, and it slides in from the edge it is on (its keyframes move the logical inset). It sets its own box, type and focus ring, so it needs no base
    stylesheet. Its container is positioned (the app's workspace). */
 .pb-sheet {
-  /* Where the entrance starts, across the inline axis: from the end, outward is +x in left-to-right text. */
-  --pb-sheet-from: var(--pb-space-5);
   position: absolute;
   inset-block: 0;
   inset-inline-end: 0;
@@ -19,22 +17,14 @@
   background: var(--pb-raised);
   border-inline-start: 1px solid var(--pb-line);
   box-shadow: var(--pb-shadow-lifted);
-  animation: pb-sheet-from-inline var(--pb-motion-slow) ease-out;
-}
-
-.pb-sheet:dir(rtl) {
-  --pb-sheet-from: calc(-1 * var(--pb-space-5));
+  animation: pb-sheet-from-end var(--pb-motion-slow) ease-out;
 }
 
 .pb-sheet[data-side="start"] {
-  --pb-sheet-from: calc(-1 * var(--pb-space-5));
   inset-inline: 0 auto;
   border-inline-start: none;
   border-inline-end: 1px solid var(--pb-line);
-}
-
-.pb-sheet[data-side="start"]:dir(rtl) {
-  --pb-sheet-from: var(--pb-space-5);
+  animation-name: pb-sheet-from-start;
 }
 
 .pb-sheet[data-side="bottom"] {
@@ -97,9 +87,18 @@
   outline-offset: -2px;
 }
 
-@keyframes pb-sheet-from-inline {
+/* The inline entrances move the logical inset, not a transform, so they follow the text's direction with no
+   direction selector. */
+@keyframes pb-sheet-from-end {
   from {
-    transform: translateX(var(--pb-sheet-from));
+    inset-inline-end: calc(-1 * var(--pb-space-5));
+    opacity: 0;
+  }
+}
+
+@keyframes pb-sheet-from-start {
+  from {
+    inset-inline-start: calc(-1 * var(--pb-space-5));
     opacity: 0;
   }
 }

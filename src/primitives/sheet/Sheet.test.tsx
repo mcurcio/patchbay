@@ -65,9 +65,12 @@ describe("Sheet", () => {
     expect(rule('.pb-sheet[data-side="bottom"]')).toMatch(/inset-inline: 0/);
     expect(css).not.toMatch(/(^|[\s;{])(left|right):/m);
     expect(css).not.toMatch(/border-(left|right)|padding-(left|right)/);
-    // The entrance's offset turns with the text and the side: an end sheet in right-to-left text comes from the left.
-    expect(rule(".pb-sheet:dir(rtl)")).toMatch(/--pb-sheet-from: calc\(-1 \* var\(--pb-space-5\)\)/);
-    expect(rule('.pb-sheet[data-side="start"]:dir(rtl)')).toMatch(/--pb-sheet-from: var\(--pb-space-5\)/);
+    // The entrance moves the logical inset of its own edge, so it turns with the text without a direction selector
+    // (a build may rewrite :dir() into a list of languages, which a page that sets only dir would not match).
+    expect(rule("@keyframes pb-sheet-from-end")).toMatch(/inset-inline-end: calc\(-1 \* var\(--pb-space-5\)\)/);
+    expect(rule("@keyframes pb-sheet-from-start")).toMatch(/inset-inline-start: calc\(-1 \* var\(--pb-space-5\)\)/);
+    expect(rule('.pb-sheet[data-side="start"]')).toMatch(/animation-name: pb-sheet-from-start/);
+    expect(css).not.toMatch(/:dir\(|translateX/);
   });
 
   it("draws its actions in the header row, after the title and before the close button", () => {
