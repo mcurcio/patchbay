@@ -16,6 +16,16 @@
   vertical-align: middle;
 }
 
+/* Forced colours replace the circle's fill with the canvas, leaving a bare "!"; the circle stays, in the system's text
+   colour with the "!" in the canvas's. */
+@media (forced-colors: active) {
+  .pb-warn-mark {
+    forced-color-adjust: none;
+    background: CanvasText;
+    color: Canvas;
+  }
+}
+
 /* The mark's words, for screen readers only. */
 .pb-warn-mark-text {
   position: absolute;

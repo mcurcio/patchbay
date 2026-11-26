@@ -95,7 +95,8 @@ Every rule is under the brand's attribute, in up to three blocks that mirror the
   4.5:1 on each surface it is drawn on, in light and in dark, with the brand's values in force
   ([The tests](#the-tests) lists the pairs). An accent dark enough for 4.5:1 on the light surfaces
   must also keep `--pb-on-strong` legible on it, as a filled chip or primary button draws one on
-  the other.
+  the other; the same holds for every tone, change and `--pb-muted`, which a filled badge fills
+  with.
 - *Why an attribute and not load order:* a page can switch brands at run time, as Storybook's
   toolbar does, and can show two.
 

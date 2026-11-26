@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import "./Pill.css";
 
 /** The tones a pill draws; any other string is drawn neutrally. */
-export type PillTone = "ok" | "warn" | "err" | "quiet" | "off" | (string & {});
+export type PillTone = "ok" | "warn" | "err" | "quiet" | "off" | "accent" | "muted" | (string & {});
 
 export type PillProps = {
   /** The state's tone: the dot's and the word's colour. */

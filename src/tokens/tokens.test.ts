@@ -138,14 +138,30 @@ function ratio(a: Rgb, b: Rgb): number {
 const pairs: { fg: string[]; on: string[] }[] = [
   { fg: ["--pb-text", "--pb-muted"], on: ["--pb-surface", "--pb-raised", "--pb-sunken"] },
   { fg: ["--pb-text"], on: ["--pb-warn-soft", "--pb-err-soft"] },
-  { fg: ["--pb-accent"], on: ["--pb-surface", "--pb-raised"] },
+  // The sunken surface is under an accent pill or badge.
+  { fg: ["--pb-accent"], on: ["--pb-surface", "--pb-raised", "--pb-sunken"] },
   {
     fg: ["--pb-ok", "--pb-warn", "--pb-err", "--pb-quiet", "--pb-off", "--pb-added", "--pb-removed", "--pb-renamed"],
     on: ["--pb-surface", "--pb-raised", "--pb-sunken"],
   },
   { fg: ["--pb-warn"], on: ["--pb-warn-soft"] },
   { fg: ["--pb-err"], on: ["--pb-err-soft"] },
-  { fg: ["--pb-on-strong"], on: ["--pb-accent", "--pb-err", "--pb-warn"] },
+  // On-strong is the words on a filled button, mark or badge, so it is checked on every tone a badge fills with.
+  {
+    fg: ["--pb-on-strong"],
+    on: [
+      "--pb-accent",
+      "--pb-err",
+      "--pb-warn",
+      "--pb-ok",
+      "--pb-quiet",
+      "--pb-off",
+      "--pb-muted",
+      "--pb-added",
+      "--pb-removed",
+      "--pb-renamed",
+    ],
+  },
   {
     fg: [
       "--pb-code-text",
