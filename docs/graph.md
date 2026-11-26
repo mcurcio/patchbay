@@ -320,12 +320,14 @@ Adding a node at a place on the canvas: `useAddAt(onAddAt, options?)` → `{ flo
   handle or a panel; a drop counts only where no handle took it (React Flow's `toHandle` is none)
   and the pane is under the drop. A touch drop's point is read from `changedTouches`, and the
   element under it from the page, as a touch's end is on the element it began on.
-- **`flowProps`**: `onDoubleClick`, `onConnectStart`, `onConnectEnd` and `zoomOnDoubleClick:
-  false`, for `<ReactFlow>` (with others through [`mergeFlowProps`](#mergeflowprops)). React Flow's
-  zoom on double-click stays off, as the double-click is the add. The object is the same across
-  renders, and the newest `onAddAt` is called.
+- **`flowProps`**: `onDoubleClick`, `onConnectStart`, `onConnectEnd` and, while adding is on,
+  `zoomOnDoubleClick: false`, for `<ReactFlow>` (with others through
+  [`mergeFlowProps`](#mergeflowprops)). React Flow's zoom on double-click is off while adding is on,
+  as the double-click is the add. The object is the same across renders while `enabled` holds (its
+  handlers always), and the newest `onAddAt` is called.
 - **`options.enabled`** (`true`) switches adding off, as while the graph is read-only: neither a
-  double-click nor a drop adds, and a double-click does not zoom either.
+  double-click nor a drop adds, and `flowProps` leaves `zoomOnDoubleClick` out, so a double-click
+  zooms in as React Flow's own does (or as the app's own `zoomOnDoubleClick` says).
 - A double-click has no keyboard path; the app's own add command (a palette entry, a button) is
   that path.
 

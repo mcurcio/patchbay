@@ -12,16 +12,22 @@ export type FlowPoint = { x: number; y: number };
 /** Called with where to add, and the port a dropped wire came from (absent for a double-click). */
 export type OnAddAt = (point: FlowPoint, from?: PortRef & { side: PortSide }) => void;
 
-/** The props `useAddAt` gives `<ReactFlow>`. */
+/**
+ * The props `useAddAt` gives `<ReactFlow>`. `zoomOnDoubleClick` is false while adding is on, as the double-click is
+ * the add, and absent while it is off, so React Flow's own zoom on double-click (or the app's choice) holds.
+ */
 export type AddAtFlowProps = {
   onDoubleClick: (event: ReactMouseEvent<HTMLDivElement>) => void;
   onConnectStart: OnConnectStart;
   onConnectEnd: OnConnectEnd;
-  zoomOnDoubleClick: false;
+  zoomOnDoubleClick?: false;
 };
 
 export type AddAtOptions = {
-  /** false switches adding off (as while the graph is read-only); true by default. */
+  /**
+   * false switches adding off (as while the graph is read-only), and gives double-click back to React Flow's zoom;
+   * true by default.
+   */
   enabled?: boolean;
 };
 
@@ -44,8 +50,8 @@ const elementAt = ({ x, y }: { x: number; y: number }) =>
 
 /**
  * Calls `onAddAt` for a double-click on empty canvas and for a wire dropped there where no handle took it. Its
- * `flowProps` go to `<ReactFlow>` (through `mergeFlowProps` with others); it turns React Flow's zoom on double-click
- * off, as the double-click is the add.
+ * `flowProps` go to `<ReactFlow>` (through `mergeFlowProps` with others); while adding is on it turns React Flow's
+ * zoom on double-click off, as the double-click is the add.
  */
 export function useAddAt(onAddAt: OnAddAt, options: AddAtOptions = {}): { flowProps: AddAtFlowProps } {
   const enabled = options.enabled ?? true;
@@ -57,7 +63,7 @@ export function useAddAt(onAddAt: OnAddAt, options: AddAtOptions = {}): { flowPr
   // The handle the wire in progress began at; null outside a drag.
   const origin = useRef<(PortRef & { side: PortSide }) | null>(null);
 
-  const flowProps = useMemo<AddAtFlowProps>(
+  const handlers = useMemo<Omit<AddAtFlowProps, "zoomOnDoubleClick">>(
     () => ({
       onDoubleClick: (event) => {
         const { onAddAt: add, enabled: on, screenToFlowPosition: toFlow } = latest.current;
@@ -80,9 +86,13 @@ export function useAddAt(onAddAt: OnAddAt, options: AddAtOptions = {}): { flowPr
         if (!isPane(target)) return;
         add(toFlow(end), from);
       },
-      zoomOnDoubleClick: false,
     }),
     [],
+  );
+  // Off, the key is left out rather than set true: an app that turned the zoom off itself keeps it off.
+  const flowProps = useMemo<AddAtFlowProps>(
+    () => (enabled ? { ...handlers, zoomOnDoubleClick: false } : handlers),
+    [enabled, handlers],
   );
 
   return { flowProps };
