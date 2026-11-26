@@ -50,12 +50,12 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** At the workspace's bottom end, the newest nearest the edge; an err toast is an alert, the rest status. */
+/** At the workspace's bottom end, the newest nearest the edge; an err toast is said as an alert, the rest as status. */
 export const BottomEnd: Story = {
   play: async ({ canvas }) => {
     await expect(canvas.getByRole("region", { name: "Notifications" })).toBeVisible();
-    await expect(canvas.getByRole("alert")).toHaveTextContent("The edit was refused");
-    await expect(canvas.getAllByRole("status")).toHaveLength(2);
+    await waitFor(() => expect(canvas.getByRole("alert")).toHaveTextContent("The edit was refused"));
+    await expect(canvas.getByRole("status").children).toHaveLength(2);
   },
 };
 
@@ -97,9 +97,9 @@ export const Action: Story = {
 /** Hovering holds the stack, so the app stops its expiry. */
 export const Hold: Story = {
   play: async ({ args, canvas, userEvent }) => {
-    await userEvent.hover(canvas.getByRole("alert"));
+    await userEvent.hover(canvas.getAllByRole("listitem")[0] as HTMLElement);
     await waitFor(() => expect(args.onHold).toHaveBeenLastCalledWith(true));
-    await userEvent.unhover(canvas.getByRole("alert"));
+    await userEvent.unhover(canvas.getAllByRole("listitem")[0] as HTMLElement);
     await waitFor(() => expect(args.onHold).toHaveBeenLastCalledWith(false));
   },
 };
@@ -123,7 +123,7 @@ export const Escape: Story = {
     const dismiss = canvas.getAllByRole("button", { name: "Dismiss" });
     dismiss[2]?.focus();
     await userEvent.keyboard("{Escape}");
-    await expect(canvas.queryByRole("alert")).toBeNull();
+    await expect(canvas.getAllByRole("listitem")).toHaveLength(2);
     await expect(canvas.getAllByRole("listitem")[1]).toHaveFocus();
   },
 };

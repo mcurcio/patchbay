@@ -43,7 +43,8 @@ export const All: Story = {
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole("button", { name: "Save" }));
     for (let each = 0; each < 3; each += 1) await userEvent.click(canvas.getByRole("button", { name: "Refuse" }));
-    await expect(canvas.getByRole("alert")).toHaveTextContent("The edit was refused. ×3, 3 times");
+    await expect(canvas.getAllByRole("listitem")[1]).toHaveTextContent("The edit was refused. ×3, 3 times");
+    await waitFor(() => expect(canvas.getByRole("alert")).toHaveTextContent("The edit was refused., 3 times"));
     await expect(canvas.getAllByRole("listitem")).toHaveLength(2);
     await userEvent.click(canvas.getByRole("button", { name: "Clear" }));
     await expect(canvas.queryByRole("region", { name: "Notifications" })).toBeNull();
@@ -55,8 +56,8 @@ export const Expiry: Story = {
   args: { duration: 300 },
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole("button", { name: "Save" }));
-    await expect(canvas.getByRole("status")).toHaveTextContent("Saved.");
-    await waitFor(() => expect(canvas.queryByRole("status")).toBeNull());
+    await expect(canvas.getByRole("listitem")).toHaveTextContent("Saved.");
+    await waitFor(() => expect(canvas.queryByRole("listitem")).toBeNull());
   },
 };
 

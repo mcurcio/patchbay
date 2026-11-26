@@ -275,12 +275,17 @@ more"), `countLabel?(count)` ("n times"), plus native `section` props.
   `"inline"`, and a placement it does not know, draws it in the flow where the app put it (inside
   a canvas's own panel). The newest is nearest the edge: last at the bottom, first at the top,
   in the reading order as on screen, with "and n more" at the far end. It is at most 420 px wide,
-  and the container's width less the gutters on a phone. It draws nothing with no toasts.
+  and the container's width less the gutters on a phone. It draws nothing with no toasts but its
+  two empty live regions, so keep it mounted.
 - **Each toast** says its text, then `×n` when it was shown n times (read as ", n times"), then
   its action (a press runs it and dismisses the toast) and a Dismiss button, which the text
-  describes, so several read apart. The text is its own live region, without the buttons: an `err`
-  toast's is `role="alert"`, read at once, every other `role="status"`. The region is not a live
-  region, so nothing is read twice.
+  describes, so several read apart.
+- **What is read:** two visually hidden live regions beside the stack, there before any toast (a
+  region added with its words is not reliably read), say each toast's text (and ", n times") when
+  it first shows and again when its count goes up, without its buttons: an `err` toast's in a
+  `role="alert"` region, read at once, every other's in a `role="status"` one. A toast drawn again,
+  or coming back from "and n more", is not read again, and a toast's words leave the regions when
+  it goes. The toasts and the stack are not live regions, so nothing is read twice.
 - **Hold:** while a mouse or pen is over the stack, or the focus is in it, `onHold(true)`; leaving
   it, the focus going elsewhere, the stack emptying under the pointer or the focus, or the
   toaster unmounting calls `onHold(false)`. A touch over it does not hold it; a tap that focuses
@@ -481,9 +486,10 @@ returns and passes it to `onValue`, which paints it through refs (sets a text no
   coalesces.
 - **Expiry:** each toast lasts `duration` (8000 ms), or its own `duration` (`Infinity` keeps it until
   dismissed), on the monotonic clock (`performance.now`, or `now` in tests); one timer waits for the
-  soonest. While the `Toaster` holds the queue (hovered or focused) none expires; letting go moves
-  each expiry on by the time it was held (since the hold began, or since it was last shown if that
-  came later), so no toast goes while the person reads it.
+  soonest, and is set again if it fires before the clock says that toast is over. While the
+  `Toaster` holds the queue (hovered or focused) none expires; letting go moves each expiry on by
+  the time it was held (since the hold began, or since it was last shown if that came later), so no
+  toast goes while the person reads it.
 - **Shown:** the newest `visible` (4), oldest first, are `toasterProps.toasts`; the older ones are
   counted in `toasterProps.more` ("and n more") and still expire.
 - `toasts` is the whole queue, oldest first; `dismiss(id)` and `clear()` take toasts away. `show`,

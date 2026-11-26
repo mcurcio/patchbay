@@ -28,7 +28,7 @@ function Held({ initial, onHold }: { initial: ToasterToast[]; onHold?: (held: bo
 }
 
 describe("Toaster", () => {
-  it("is a named region of toasts, oldest first, each its own status or alert by tone", () => {
+  it("is a named region of toasts, oldest first, whose news is said as a status or an alert by tone", () => {
     render(<Toaster toasts={two} onDismiss={() => {}} className="mine" />);
     const region = screen.getByRole("region", { name: "Notifications" });
     expect(region).toHaveClass("pb-toaster", "mine");
@@ -36,18 +36,49 @@ describe("Toaster", () => {
     expect(region).not.toHaveAttribute("aria-live");
     expect(screen.getByRole("status")).toHaveTextContent("Slow to answer.");
     expect(screen.getByRole("alert")).toHaveTextContent("The edit was refused.");
+    expect(region).not.toContainElement(screen.getByRole("status"));
     const items = screen.getAllByRole("listitem");
     expect(items.map((item) => item.getAttribute("data-tone"))).toEqual(["warn", "err"]);
   });
 
-  it("draws nothing with no toasts", () => {
-    const { container } = render(<Toaster toasts={[]} onDismiss={() => {}} />);
-    expect(container).toBeEmptyDOMElement();
+  it("draws no toasts with none, but keeps its live regions there, empty, for the first", () => {
+    const { container, rerender } = render(<Toaster toasts={[]} onDismiss={() => {}} />);
+    expect(screen.queryByRole("region")).toBeNull();
+    const status = screen.getByRole("status");
+    const alert = screen.getByRole("alert");
+    expect(status).toBeEmptyDOMElement();
+    expect(alert).toBeEmptyDOMElement();
+    expect(container.querySelector(".pb-toaster-announce")).toContainElement(status);
+    rerender(<Toaster toasts={[{ id: 1, tone: "err", text: "Lost." }]} onDismiss={() => {}} />);
+    // The same regions, now holding the news.
+    expect(screen.getByRole("alert")).toBe(alert);
+    expect(alert).toHaveTextContent("Lost.");
+    expect(status).toBeEmptyDOMElement();
   });
 
-  it("draws a tone it does not know neutrally, as a status", () => {
+  it("says a toast once, again when its count goes up, and not when it is drawn again", () => {
+    const one = { id: 1, tone: "ok", text: "Saved." };
+    const { rerender } = render(<Toaster toasts={[one]} onDismiss={() => {}} />);
+    const status = screen.getByRole("status");
+    const first = status.firstElementChild;
+    rerender(<Toaster toasts={[{ ...one }]} onDismiss={() => {}} />);
+    expect(status.children).toHaveLength(1);
+    expect(status.firstElementChild).toBe(first);
+    rerender(<Toaster toasts={[{ ...one, count: 2 }]} onDismiss={() => {}} />);
+    expect(status.children).toHaveLength(1);
+    expect(status.firstElementChild).not.toBe(first);
+    expect(status).toHaveTextContent("Saved., 2 times");
+    // Folded away and back: not news again.
+    rerender(<Toaster toasts={[]} more={1} onDismiss={() => {}} />);
+    expect(status).toBeEmptyDOMElement();
+    rerender(<Toaster toasts={[{ ...one, count: 2 }]} onDismiss={() => {}} />);
+    expect(status).toBeEmptyDOMElement();
+  });
+
+  it("draws a tone it does not know neutrally, and says it as a status", () => {
     render(<Toaster toasts={[{ id: 1, tone: "sleeping", text: "Idle." }]} onDismiss={() => {}} />);
-    expect(screen.getByRole("status").closest("li")).toHaveAttribute("data-tone", "sleeping");
+    expect(screen.getByRole("status")).toHaveTextContent("Idle.");
+    expect(screen.getByRole("listitem")).toHaveAttribute("data-tone", "sleeping");
     const tones = new Set([...css.matchAll(/data-tone="([^"]+)"/g)].map((match) => match[1]));
     expect([...tones].sort()).toEqual(["err", "off", "ok", "quiet", "warn"]);
   });
@@ -71,9 +102,9 @@ describe("Toaster", () => {
 
   it("shows a count, and reads it in words", () => {
     render(<Toaster toasts={[{ id: 1, tone: "ok", text: "Saved.", count: 3 }]} onDismiss={() => {}} />);
-    const status = screen.getByRole("status");
-    expect(status).toHaveTextContent("Saved. ×3, 3 times");
+    expect(screen.getByRole("listitem")).toHaveTextContent("Saved. ×3, 3 times");
     expect(screen.getByText("×3", { exact: false })).toHaveAttribute("aria-hidden", "true");
+    expect(screen.getByRole("status")).toHaveTextContent("Saved., 3 times");
   });
 
   it("dismisses by its button, which the toast's words describe", async () => {
@@ -131,7 +162,7 @@ describe("Toaster", () => {
     await userEvent.keyboard("{Escape}");
     expect(outer.mock.calls.some(([event]) => (event as KeyboardEvent).key === "Escape")).toBe(false);
     expect(screen.queryByText("Slow to answer.")).toBeNull();
-    expect(screen.getByRole("alert").closest("li")).toHaveFocus();
+    expect(screen.getByRole("listitem")).toHaveFocus();
     await userEvent.keyboard("{Escape}");
     expect(screen.queryByRole("region")).toBeNull();
     expect(before).toHaveFocus();

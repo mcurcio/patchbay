@@ -111,8 +111,9 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* The count in words: for screen readers only, and out of the layout. */
-.pb-toast-hidden {
+/* The count in words, and the live regions that say the news: for screen readers only, and out of the layout. */
+.pb-toast-hidden,
+.pb-toaster-announce {
   position: absolute;
   width: 1px;
   height: 1px;
