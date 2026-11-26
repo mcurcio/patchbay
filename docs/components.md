@@ -46,7 +46,7 @@ Common prop names mean the same everywhere:
 | `tone` | What a state or action is, by colour; an open enum |
 | `size` | `md` (the default) or `sm`, the compact one for dense rows |
 | `label` | The accessible name, or the words a screen reader reads (`Pill`'s and `Checkbox`'s are also shown) |
-| `title` | On `Dialog`, `Sheet` and `Panel`, the heading that also names it; elsewhere the native hover tooltip |
+| `title` | On `Dialog`, `Sheet` and `Panel`, the heading that also names it; on `Meter`, a function that writes its tooltip from the level; elsewhere the native hover tooltip |
 | `actions` | A slot at the far end of a header, or the foot of a dialog |
 | `open`, `onClose` | Shown or not, held by the app; `onClose` asks the app to set `open` to false |
 | `className` | Added to the component's own `pb-` class, never replacing it |
@@ -82,8 +82,8 @@ primary per view), `size?`, `busy?`, `busyLabel?`, plus native button props.
 pressed). `label` (required) is its accessible name and, unless `title` is given, its tooltip;
 `children` is the glyph, hidden from screen readers. A glyph has no words to swap, so while busy a
 `busyLabel` becomes its name and (unless `title` is given) its tooltip, and is announced as on
-`Button`; the spinner covers the glyph as without one. 28 px (22 px when `sm`), borderless until hovered, pressed or
-toned; 36 px on touch, 40 px in a `ToolGroup`.
+`Button`; the spinner covers the glyph as without one. 28 px (22 px when `sm`), borderless until
+hovered, pressed or toned; 36 px on touch, 40 px in a `ToolGroup`.
 
 **`ThemeSwitch`**: one button that cycles system, light and dark. `choice`, `onChoose(next)`,
 `labels?` (a partial `ThemeSwitchLabels`: `theme`, `system`, `light`, `dark`, `systemHint`,

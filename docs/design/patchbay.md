@@ -54,7 +54,7 @@ Built: [`docs/components.md`](../components.md#primitives-primitives).
 |---|---|
 | `CodeEditor` | `value`, `onChange`, `language?: "knobly"`, `highlight?: (text) => spans`, `diagnostics?: { line, column?, severity, message }[]`, `readOnly?`, `onCaret?` |
 | `CodeText` | `value`, `language?` or `highlight?` (read-only, highlighted) |
-| `SchemaForm` | `schema` (JSON Schema subset), `value`, `onChange`, `errors?`, `fieldSlot?` |
+| `SchemaForm` | Deferred by the owner (2026-11-26), not in the first version. `schema` (JSON Schema subset), `value`, `onChange`, `errors?`, `fieldSlot?` |
 
 **Highlighting.** `CodeEditor` and `CodeText` highlight [knobly](https://github.com/mcurcio/knobly)
 configuration text built in (`language: "knobly"`), through the optional `knobly` peer dependency,
@@ -99,10 +99,12 @@ The props below are settled for build (owner, 2026-11-26: patchbay's model is th
 correct general model rather than one app's habits). Each part keeps the rules every component
 keeps (open enums drawn neutrally, slots over flags, tokens only, words as props with English
 defaults, keyboard, touch, reduced motion and forced colours); what is built moves to
-[`docs/graph.md`](../graph.md), where `Meter` already is. The props were checked against two neutral node shapes, which the stories draw:
+[`docs/graph.md`](../graph.md), where `Meter` already is. The props were checked against two
+neutral node shapes, which the stories draw:
 
 - **A level node**: title "Tone 1", subtitle "oscillator", a `Pill` status, two outputs ("left",
-  "right"), each with a [`Meter`](../graph.md#meter) as its trailing slot, and a footer of badges ("48 kHz", "2 ch").
+  "right"), each with a [`Meter`](../graph.md#meter) as its trailing slot, and a footer of badges
+  ("48 kHz", "2 ch").
 - **A staged-edit node**: title "mix-2", subtitle "mixer", `change: "added"`, typed ports
   ("in · audio", "side · control", "out · audio") with inputs and outputs side by side, one port
   with a problem, drawn while a wire is dragged (its ports' hints).
