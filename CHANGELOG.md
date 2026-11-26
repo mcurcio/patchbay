@@ -1,3 +1,16 @@
+## [0.7.0](https://github.com/mcurcio/patchbay/compare/v0.6.0...v0.7.0) (2026-11-26)
+
+### ⚠ BREAKING CHANGES
+
+* per-word props (closeLabel, dismissLabel, emptyLabel, noMatchLabel, orLabel, moreLabel, countLabel, NodeBox changeLabels, Meter title, and the palette's, toaster's and shortcut sheet's label/placeholder/title/keyNames) move into each component's `labels` prop; Splitter's `edge` follows the text direction.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01MtEdSTqe5tHiATcH6Si3jB
+
+### Features
+
+* labels prop for every component's words, a /testing brand contrast check, and a logical Splitter edge ([#11](https://github.com/mcurcio/patchbay/issues/11)) ([ea6ca49](https://github.com/mcurcio/patchbay/commit/ea6ca49e95170ad71dac7386b2b815f02f0fc610))
+
 ## [0.6.0](https://github.com/mcurcio/patchbay/compare/v0.5.0...v0.6.0) (2026-11-26)
 
 ### Features
