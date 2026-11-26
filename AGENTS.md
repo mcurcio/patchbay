@@ -13,9 +13,9 @@ It is a public, standalone project: nothing in it may name or assume a particula
 machine or person's setup. Examples use neutral data; anything that varies between apps is a prop,
 a token or a brand. `README.md` is for users, `CONTRIBUTING.md` for contributors.
 
-The tokens, the primitives and the first hooks are built; [`docs/README.md`](docs/README.md) indexes
-their docs. The design for the rest is [`docs/design/patchbay.md`](docs/design/patchbay.md); read
-both before any change.
+The tokens, the primitives, the first composites and hooks, and the graph layer's `Meter` are
+built; [`docs/README.md`](docs/README.md) indexes their docs. The design for the rest is
+[`docs/design/patchbay.md`](docs/design/patchbay.md); read both before any change.
 
 ## Rules of the repo
 

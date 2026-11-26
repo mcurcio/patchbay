@@ -1,0 +1,154 @@
+/* The toaster (Toaster.tsx): a stack of raised, shadowed toasts, each with a stripe in its tone at the start (warn and
+   err on their soft surfaces), placed at a corner or edge of its positioned container, or inline where the app put
+   it. A tone it does not know keeps the plain line as its stripe; a placement it does not know is drawn inline. */
+.pb-toaster {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pb-space-3);
+  width: min(420px, 100%);
+  font-family: var(--pb-font-ui);
+  font-size: var(--pb-text-md);
+  color: var(--pb-text);
+}
+
+.pb-toaster[data-placement^="top"],
+.pb-toaster[data-placement^="bottom"] {
+  position: absolute;
+  z-index: 20;
+  width: min(420px, calc(100% - 2 * var(--pb-space-4)));
+}
+
+.pb-toaster[data-placement^="top"] {
+  top: max(var(--pb-space-4), env(safe-area-inset-top));
+}
+
+.pb-toaster[data-placement^="bottom"] {
+  bottom: max(var(--pb-space-4), env(safe-area-inset-bottom));
+}
+
+.pb-toaster[data-placement$="-start"] {
+  inset-inline-start: var(--pb-space-4);
+}
+
+.pb-toaster[data-placement$="-end"] {
+  inset-inline-end: var(--pb-space-4);
+}
+
+.pb-toaster[data-placement="top"],
+.pb-toaster[data-placement="bottom"] {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.pb-toaster-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pb-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pb-toaster-more {
+  margin: 0;
+  color: var(--pb-muted);
+  font-size: var(--pb-text-sm);
+  text-align: end;
+}
+
+.pb-toast {
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--pb-space-3);
+  padding: var(--pb-space-3) var(--pb-space-4);
+  border: 1px solid var(--pb-line);
+  border-inline-start: 3px solid var(--pb-line-strong);
+  border-radius: var(--pb-radius-box);
+  background: var(--pb-raised);
+  box-shadow: var(--pb-shadow-lifted);
+  animation: pb-toast-in var(--pb-motion-slow) ease-out;
+}
+
+.pb-toast:focus-visible {
+  outline: 2px solid var(--pb-accent);
+  outline-offset: 2px;
+}
+
+.pb-toast[data-tone="ok"] {
+  border-inline-start-color: var(--pb-ok);
+}
+
+.pb-toast[data-tone="warn"] {
+  border-inline-start-color: var(--pb-warn);
+  background: var(--pb-warn-soft);
+}
+
+.pb-toast[data-tone="err"] {
+  border-inline-start-color: var(--pb-err);
+  background: var(--pb-err-soft);
+}
+
+.pb-toast[data-tone="quiet"] {
+  border-inline-start-color: var(--pb-quiet);
+}
+
+.pb-toast[data-tone="off"] {
+  border-inline-start-color: var(--pb-off);
+}
+
+.pb-toast-text {
+  flex: 1 1 12em;
+  min-width: 0;
+  align-self: center;
+  overflow-wrap: anywhere;
+}
+
+.pb-toast-count {
+  color: var(--pb-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The count in words, and the live regions that say the news: for screen readers only, and out of the layout. */
+.pb-toast-hidden,
+.pb-toaster-announce {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.pb-toast-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pb-space-2);
+  margin-inline-start: auto;
+}
+
+@keyframes pb-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--pb-space-3));
+  }
+}
+
+/* The rise is already 0 under reduced motion (its token is); nothing moves. */
+@media (prefers-reduced-motion: reduce) {
+  .pb-toast {
+    animation: none;
+  }
+}
+
+/* Forced colours drop the surfaces; the stripe stays as the system's text colour, the words carry the news. */
+@media (forced-colors: active) {
+  .pb-toast {
+    border-inline-start-color: CanvasText;
+  }
+}

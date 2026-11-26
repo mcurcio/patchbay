@@ -1,0 +1,62 @@
+/* The shortcut sheet (ShortcutSheet.tsx): inside a Dialog, one section per group, each a list of what a key does
+   beside the key in a key cap, in code type on the sunken surface. */
+.pb-shortcut-sheet-group + .pb-shortcut-sheet-group {
+  margin-top: var(--pb-space-4);
+}
+
+.pb-shortcut-sheet-heading {
+  margin: 0 0 var(--pb-space-2);
+  font-size: var(--pb-text-sm);
+  font-weight: 600;
+  color: var(--pb-muted);
+}
+
+.pb-shortcut-sheet-list {
+  margin: 0;
+}
+
+.pb-shortcut-sheet-line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--pb-space-4);
+  padding: var(--pb-space-1) 0;
+  border-bottom: 1px solid var(--pb-line);
+}
+
+.pb-shortcut-sheet-line dt {
+  min-width: 0;
+}
+
+.pb-shortcut-sheet-line dd {
+  flex: none;
+  margin: 0;
+  text-align: end;
+}
+
+.pb-shortcut-sheet-line kbd {
+  display: inline-block;
+  min-width: 1.5em;
+  padding: 0 var(--pb-space-1);
+  font-family: var(--pb-font-code);
+  font-size: var(--pb-text-sm);
+  text-align: center;
+  background: var(--pb-sunken);
+  border: 1px solid var(--pb-line-strong);
+  border-radius: var(--pb-radius-control);
+}
+
+.pb-shortcut-sheet-or {
+  font-size: var(--pb-text-sm);
+  color: var(--pb-muted);
+}
+
+.pb-shortcut-sheet-empty,
+.pb-shortcut-sheet-note {
+  margin: var(--pb-space-4) 0 0;
+  color: var(--pb-muted);
+}
+
+.pb-shortcut-sheet-empty:first-child {
+  margin-top: 0;
+}

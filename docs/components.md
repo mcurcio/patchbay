@@ -7,7 +7,7 @@ for every field.
 
 ```ts
 import { Button, Field, TextInput } from "@mcurcio/patchbay/primitives";
-import { usePersistentState, useTheme } from "@mcurcio/patchbay/hooks";
+import { useLiveValue, useMediaBreakpoint, usePersistentState, useShortcuts, useTheme, useToasts } from "@mcurcio/patchbay/hooks";
 ```
 
 Importing a layer loads its stylesheet (`dist/primitives.css`); an app loads the tokens and its
@@ -46,7 +46,7 @@ Common prop names mean the same everywhere:
 | `tone` | What a state or action is, by colour; an open enum |
 | `size` | `md` (the default) or `sm`, the compact one for dense rows |
 | `label` | The accessible name, or the words a screen reader reads (`Pill`'s and `Checkbox`'s are also shown) |
-| `title` | On `Dialog`, `Sheet` and `Panel`, the heading that also names it; elsewhere the native hover tooltip |
+| `title` | On `Dialog`, `Sheet` and `Panel`, the heading that also names it; on `Meter`, a function that writes its tooltip from the level; elsewhere the native hover tooltip |
 | `actions` | A slot at the far end of a header, or the foot of a dialog |
 | `open`, `onClose` | Shown or not, held by the app; `onClose` asks the app to set `open` to false |
 | `className` | Added to the component's own `pb-` class, never replacing it |
@@ -60,7 +60,7 @@ every other native prop through, `ref` included (React 19's `ref` as a prop).
 ### Actions
 
 **`Button`**: a push button. `tone?: "neutral" | "primary" | "danger"` (neutral by default; one
-primary per view), `size?`, `busy?`, plus native button props.
+primary per view), `size?`, `busy?`, `busyLabel?`, plus native button props.
 
 - `type` defaults to `"button"`, so a button in a form never submits it unless asked
   (`type="submit"`).
@@ -68,13 +68,22 @@ primary per view), `size?`, `busy?`, plus native button props.
   accessible name is kept. The button says `aria-busy` and `aria-disabled` and ignores presses (a
   busy submit button does not submit), but stays focusable, so focus is not lost while a request
   is on its way.
+- **`busyLabel`** (a string, such as "Saving") is shown beside the spinner while busy, in place of
+  the words, and names the button then. Both labels share one grid cell, the one not shown hidden
+  from sight and from the name, so the width is the wider label's and does not jump either way. A
+  polite live region beside the button, there from the start, says the busy words when it turns
+  busy and empties when it is done; the focus stays on the button throughout. Without it (or with
+  an empty one) nothing is announced and busy is as above. A button named by `aria-label` has no
+  words to swap, so the busy label names it while busy instead of being shown.
 - `aria-pressed` draws it in the accent on the sunken face: a toggle.
 - Disabled drops the tone. On touch it is at least 36 px tall.
 
-**`IconButton`**: a square glyph button on `Button`'s rules (`tone`, `size`, `busy`, pressed).
-`label` (required) is its accessible name and, unless `title` is given, its tooltip; `children` is
-the glyph, hidden from screen readers. 28 px (22 px when `sm`), borderless until hovered, pressed or
-toned; 36 px on touch, 40 px in a `ToolGroup`.
+**`IconButton`**: a square glyph button on `Button`'s rules (`tone`, `size`, `busy`, `busyLabel`,
+pressed). `label` (required) is its accessible name and, unless `title` is given, its tooltip;
+`children` is the glyph, hidden from screen readers. A glyph has no words to swap, so while busy a
+`busyLabel` becomes its name and (unless `title` is given) its tooltip, and is announced as on
+`Button`; the spinner covers the glyph as without one. 28 px (22 px when `sm`), borderless until
+hovered, pressed or toned; 36 px on touch, 40 px in a `ToolGroup`.
 
 **`ThemeSwitch`**: one button that cycles system, light and dark. `choice`, `onChoose(next)`,
 `labels?` (a partial `ThemeSwitchLabels`: `theme`, `system`, `light`, `dark`, `systemHint`,
@@ -250,6 +259,101 @@ props (name it with `aria-label`).
   reader reads a change when it is free; it stays in the page while empty, ready for the next
   change. The dots are drawn, not read.
 
+**`Toaster`**: a stack of toasts, short news that comes and goes (a refused edit, a lost connection,
+a saved file), each on a raised, shadowed surface with a stripe in its tone at the start, as
+`Banner`'s. The queue is the app's ([`useToasts`](#usetoasts) holds one, and its `toasterProps`
+are this component's props): `toasts: { id, tone, text, count?, action? }[]` (the shown ones,
+oldest first; tones `"ok" | "warn" | "err" | "quiet" | "off"`, open, one it does not know drawn
+with a plain stripe; `text` any node; `action: { label, run }`), `more?` (how many older ones are
+folded away), `onDismiss(id)`, `onHold?(held)`, `placement?`, and the words `label?`
+("Notifications", the region's name), `dismissLabel?` ("Dismiss"), `moreLabel?(more)` ("and n
+more"), `countLabel?(count)` ("n times"), plus native `section` props.
+
+- **Placement:** `"bottom-end"` (the default), `"bottom-start"`, `"bottom"`, `"top-end"`,
+  `"top-start"` or `"top"` sit at that corner or edge of the nearest positioned container (the
+  app's workspace), padded by the safe-area insets; start and end follow the text's direction.
+  `"inline"`, and a placement it does not know, draws it in the flow where the app put it (inside
+  a canvas's own panel). The newest is nearest the edge: last at the bottom, first at the top,
+  in the reading order as on screen, with "and n more" at the far end. It is at most 420 px wide,
+  and the container's width less the gutters on a phone. It draws nothing with no toasts but its
+  two empty live regions, so keep it mounted.
+- **Each toast** says its text, then `×n` when it was shown n times (read as ", n times"), then
+  its action (a press runs it and dismisses the toast) and a Dismiss button, which the text
+  describes, so several read apart.
+- **What is read:** two visually hidden live regions beside the stack, there before any toast (a
+  region added with its words is not reliably read), say each toast's text (and ", n times") when
+  it first shows and again when its count goes up, without its buttons: an `err` toast's in a
+  `role="alert"` region, read at once, every other's in a `role="status"` one. A toast drawn again,
+  or coming back from "and n more", is not read again, and a toast's words leave the regions when
+  it goes. The toasts and the stack are not live regions, so nothing is read twice.
+- **Hold:** while a mouse or pen is over the stack, or the focus is in it, `onHold(true)`; leaving
+  it, the focus going elsewhere, the stack emptying under the pointer or the focus, or the
+  toaster unmounting calls `onHold(false)`. A touch over it does not hold it; a tap that focuses
+  one of its buttons does, as any focus in it.
+- **Keyboard:** the buttons are in the Tab order. Escape on a focused toast dismisses it, and is
+  not passed on (so a sheet or dialog behind it stays open). After a toast that held the focus is
+  dismissed, the focus moves to the toast beside it, or back to where it came from into the stack
+  when none is left.
+- The buttons are `Button`s, so they keep a 36 px target on touch. A toast rises in over
+  `--pb-motion-slow`, still under reduced motion; under forced colours the stripe stays, in the
+  system's text colour.
+
+### Commands and keys
+
+**`CommandPalette`**: a search field over the app's commands, in a portal on `<body>`. `open`,
+`onClose`, `commands: { id, label, group, keys?, hint?, run, disabled? }[]`, `at?: { x, y }`, and
+the words `placeholder?` ("Type a command"), `label?` ("Commands", its name), `emptyLabel?` ("No
+commands"), `noMatchLabel?(query)` ("No command matches “query”"), plus `platform?` and
+`keyNames?` for the keys' labels, and `className?`.
+
+- **Commands.** Each is listed under its `group`, the groups in the order they first appear. `keys`
+  (a key string or several, as [`useShortcuts`](#useshortcuts) takes them) is drawn through
+  `keyLabel` and given as `aria-keyshortcuts`; the palette binds nothing. `hint` is a quieter
+  second line (what the command does, or what it acts on), shown but not matched. A `disabled`
+  command is listed, dimmed and `aria-disabled`; the keys skip it and a press on it does nothing.
+  An option's name is its words as shown: the label, the hint and the keys.
+- **Matching.** The query matches a label when its letters appear in it in order, in any case,
+  white space ignored ("adn" matches "Add a node"). The best way the letters can be found is kept:
+  the label's start and the start of a word (after a space or a mark, or a capital after a small
+  letter) score more, letters together score more, gaps and a late start less. Each group's
+  matches go best first and the groups by their best, ties in the order given; the matched letters
+  are drawn in `<mark>`, in the accent and bold (underlined under forced colours), so a match never
+  rests on colour alone. An empty query lists every command as given. `rankCommands(commands,
+  query)`, `matchSubsequence(text, query)` and `markRuns(label, indices)` are the same steps,
+  exported and pure.
+- **Keyboard.** The focus stays in the field, a `combobox` controlling the `listbox`; the active
+  command is its `aria-activedescendant`, the first enabled match after every keystroke and kept
+  by `id` while the commands change. The arrows move one (wrapping at the ends), Page Up and Page
+  Down a listful, Home and End to the first and last (Shift+Home and Shift+End stay with the
+  field, to select its text), and Enter runs the active one. Running a command asks to close
+  (`onClose`) and then calls `run`.
+- **Closing.** Escape (not passed on to the page), Tab (as a combobox's list closes), a press
+  outside the box, and the focus leaving it for another element call `onClose`. Opening focuses
+  the field; closing gives the focus back to what had it, unless it already went elsewhere.
+- **Placement.** Without `at` it is centred near the top over the scrim, 560 px wide at most (the
+  width less the gutters on a phone). With `at` (a point in the window, where a press happened) its
+  top-left corner sits there over a clear layer, 320 by 360 px at most, moved back inside the
+  window less an 8 px gutter where it would cross an edge, and smaller in a smaller window; it
+  follows the window as it resizes. `placePalette(at, window)` is that rule, and `PALETTE_WIDTH`,
+  `PALETTE_HEIGHT` and `PALETTE_GUTTER` its sizes.
+- **Empty and no match.** A `role="status"` line, there from the start so a screen reader hears
+  the change, says `emptyLabel` with no commands and `noMatchLabel(query)` when none match.
+- On touch the field has 16 px text and the rows are at least 40 px tall. It fades in over
+  `--pb-motion-fast`, still under reduced motion; under forced colours the active command keeps a
+  frame in the system's highlight.
+
+**`ShortcutSheet`**: the keys an app binds, listed in a [`Dialog`](#overlays). `open`, `onClose`,
+`shortcuts: { keys, label, group }[]`, `children?` (a note under the lists), and the words `title?`
+("Keyboard shortcuts"), `orLabel?` ("or"), `emptyLabel?` ("No shortcuts"), `closeLabel?`
+("Close"), plus `platform?`, `keyNames?` and `className?`.
+
+- One section per group, in the order the groups first appear, named by its heading (an `h3`);
+  each a `<dl>` of what a key does beside the key in a key cap, drawn through `keyLabel` and
+  given as `aria-keyshortcuts`. Several keys that do the same are joined by `orLabel`.
+  `groupShortcuts(shortcuts)` is the grouping, exported.
+- It binds nothing: the app's `useShortcuts` table is usually where the lines come from. The rest
+  (focus, Escape, the scrim, phone width) is `Dialog`'s.
+
 ### Code
 
 **`DiffView`**: unified diff text, drawn line by line in code type on the code surface. Either
@@ -299,3 +403,99 @@ changes).
 the kept choice before the first paint, so a dark page never flashes light. The helpers
 `nextTheme`, `checkTheme`, `applyTheme`, `themeChoices`, `defaultTheme` and `defaultThemeKey` are
 exported too.
+
+### `useShortcuts`
+
+`useShortcuts(bindings, { enabled?, platform? })` binds a table of keys on the window while the
+component is mounted. Each binding is `{ keys, run, inTextFields?, enabled?, repeat?,
+preventDefault? }`; the table may change every render, and the one listener always reads the latest.
+`enabled: false` turns the whole table off (while a dialog the keys must not reach is open, say).
+
+- **Key strings.** Modifiers then the key, joined by `+`: `"Mod+K"`, `"Mod+Shift+Z"`, `"Shift+?"`,
+  `"Delete"`, `"Escape"`. `Mod` is Cmd on Apple platforms (macOS, iOS, iPadOS) and Ctrl elsewhere;
+  `Ctrl`, `Alt`, `Shift` and `Meta` are those keys on every platform. The key is a `KeyboardEvent`
+  key name or the character it types, in any case; `Space`, `Esc` and `Plus` (or `"Mod++"`) are read
+  too. `keys` may be a list of strings that do the same (`["Delete", "Backspace"]`). The table is
+  also what a [`ShortcutSheet` or `CommandPalette`](#commands-and-keys) shows, through `keyLabel`.
+- **Matching.** A press matches when its key is the string's and its Ctrl, Meta, Alt and Shift are
+  exactly the ones named, except that a character Shift itself makes (`?`, `!`) need not name
+  Shift; a digit always does (`Shift+1` is not `1`). A letter or digit that Alt or the keyboard layout turned into another character is found
+  by its physical key (`event.code`), so `Alt+K` works on a Mac and `Mod+K` on a Cyrillic layout;
+  a Latin letter that differs is another key. A string naming a modifier it does not know never
+  matches.
+- **The first binding that matches runs**, and only it; the browser's own action for the key is
+  prevented unless the binding says `preventDefault: false`. A held key's auto-repeat acts only
+  with `repeat: true`. A press a component already handled (`defaultPrevented`, as `Dialog`'s and
+  `Sheet`'s Escape are) and a press inside an input method's composition are left alone.
+- **Text fields.** While focus is in a text field, single keys and Escape never act: the field
+  keeps them. A chord (a key with Mod, Ctrl, Alt or Meta) acts there only when its binding says
+  `inTextFields: true`, as a command palette's `Mod+K` does. `isTextTarget(target)` is the test: a
+  text-like `<input>` (not a checkbox, radio, range, button, colour or file input), a `<textarea>`,
+  a `<select>`, editable content, or anything inside an element with React Flow's `nokey` class,
+  which React Flow's own keys skip too. So the canvas's Delete and the app's never both act on one
+  press, and a control that keeps its own keys inside the canvas is marked `nokey` once for both.
+
+`keyLabel(keys, { platform?, names? })` writes a key string as people read it: `⌘K`, `⇧⌘Z`, `⌫`
+and `⌦` on Apple platforms (modifiers as symbols in the order ⌃⌥⇧⌘), `Ctrl+K`, `Ctrl+Shift+Z`,
+`Backspace` and `Delete` elsewhere; `Esc`, `Space`, arrows and `Page Up` on both. `names` replaces
+the words, keyed by key name (`Escape`, `Space`, `ArrowUp`) or modifier (`Ctrl`, `Alt`, `Shift`,
+`Meta`). A key with no word of its own (`F5`) is shown by its name, and a string it cannot read as
+written. `ariaKeyShortcuts(keys, platform?)` writes the same as an `aria-keyshortcuts` value
+(`Meta+K`, `Control+K`). `matchesKeys(event, keys, platform?)`, `findShortcut(event, bindings,
+platform?)` and `detectPlatform()` are the same steps outside React.
+
+### `useMediaBreakpoint`
+
+`useMediaBreakpoint()` returns `{ width, touch }`: `width` is `"wide"`, `"narrow"` below 760 px or
+`"phone"` below 600 px (the shell's three widths), and `touch` is true where the main pointer is
+coarse and cannot hover (`(hover: none) and (pointer: coarse)`, the query behind the components'
+touch sizes). It reads the media queries through `useSyncExternalStore`, so it follows the window
+as it resizes or a pointer changes, and returns the same object while the answer is unchanged.
+With no window to ask (on a server, before hydration, or with no `matchMedia`) it answers wide and
+not touch.
+
+`narrowBelow` (760), `phoneBelow` (600), `mediaQueries` (the three queries, for an app's own
+stylesheet or `matchMedia`), `widthOf(px)` and `readBreakpoint()` are exported too.
+
+### `useLiveValue`
+
+`useLiveValue(subscribe, read, onValue?)` reads a hot value (one that changes many times a second:
+a level, a rate) outside React state, so the component never re-renders for it. `subscribe(listener)`
+adds a listener that means a new value is ready and returns what removes it; `read()` returns the
+value. On subscribing, and on every call of the listener, it reads the value, keeps it in the ref it
+returns and passes it to `onValue`, which paints it through refs (sets a text node, a CSS variable).
+
+- It subscribes in a layout effect, so the first paint shows the value, and unsubscribes on
+  unmount; a call that comes after that is ignored.
+- `read` and `onValue` may change every render without subscribing again. A new `subscribe`
+  subscribes afresh and reads at once, so pass a stable one (a store's own method, or one kept in a
+  ref or memo).
+- It throttles nothing: `onValue` runs on every notification. A painter that needs a frame asks for
+  one itself, as [`Meter`](graph.md#meter) does.
+
+### `useToasts`
+
+`useToasts({ duration?, coalesceWindow?, visible?, now? })` holds a queue of toasts and returns
+`{ toasts, show, dismiss, clear, toasterProps }`; `<Toaster {...toasts.toasterProps} />` draws it
+([`Toaster`](#news-and-state)). The wording is the app's; the queue's mechanics are here.
+
+- **`show({ tone, text, key?, action?, duration? })`** adds a toast as the newest and returns its
+  id. `text` is any node. A toast shown under the same `key` within `coalesceWindow` (5000 ms) of
+  that key's last showing is the same toast: its count goes up (drawn `×n`), it takes the newest
+  tone, text and action, becomes the newest and starts its time afresh. Without a key a toast never
+  coalesces.
+- **Expiry:** each toast lasts `duration` (8000 ms), or its own `duration` (`Infinity` keeps it until
+  dismissed), on the monotonic clock (`performance.now`, or `now` in tests); one timer waits for the
+  soonest, and is set again if it fires before the clock says that toast is over. While the
+  `Toaster` holds the queue (hovered or focused) none expires; letting go moves each expiry on by
+  the time it was held (since the hold began, or since it was last shown if that came later), so no
+  toast goes while the person reads it.
+- **Shown:** the newest `visible` (4), oldest first, are `toasterProps.toasts`; the older ones are
+  counted in `toasterProps.more` ("and n more") and still expire.
+- `toasts` is the whole queue, oldest first; `dismiss(id)` and `clear()` take toasts away. `show`,
+  `dismiss`, `clear` and `toasterProps` keep their identity while nothing changes.
+
+The queue is pure and exported for use outside React: `addToast`, `dismissToast`, `clearToasts`,
+`holdToasts`, `expireToasts`, `nextToastExpiry` and `visibleToasts` each take the queue (from
+`emptyToastQueue`) and the time and return a new queue, and `toastDefaults` holds the three
+defaults.

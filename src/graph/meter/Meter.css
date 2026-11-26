@@ -1,0 +1,117 @@
+/* The level bar (Meter.tsx). Meter.tsx sets four fractions of the bar, 0 at the floor and 1 at 0 dBFS, on the element:
+   --pb-meter-level (the RMS: the bar's length) and --pb-meter-tick (the held peak) as the level moves, and
+   --pb-meter-mid-at and --pb-meter-hot-at (where the zones start) from its props. They are its own, not tokens. */
+.pb-meter {
+  --pb-meter-level: 0;
+  --pb-meter-tick: 0;
+  --pb-meter-mid-at: 0.7;
+  --pb-meter-hot-at: 0.9;
+  --pb-meter-thickness: 6px;
+  display: flex;
+  box-sizing: border-box;
+  align-items: stretch;
+  gap: var(--pb-space-1);
+  width: 100%;
+  min-width: 48px;
+  height: var(--pb-meter-thickness);
+  flex-shrink: 0;
+}
+
+.pb-meter-track {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--pb-sunken);
+  border-radius: 0;
+}
+
+/* The bar covers the whole track in its three zones and is clipped to the level, so each zone keeps its place. */
+.pb-meter-bar {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    var(--pb-meter-low) calc(var(--pb-meter-mid-at) * 100%),
+    var(--pb-meter-mid) 0 calc(var(--pb-meter-hot-at) * 100%),
+    var(--pb-meter-hot) 0
+  );
+  clip-path: inset(0 calc((1 - var(--pb-meter-level)) * 100%) 0 0);
+}
+
+.pb-meter-peak {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--pb-meter-tick) * (100% - 2px));
+  width: 2px;
+  background: var(--pb-meter-peak);
+}
+
+.pb-meter[data-peak="hidden"] .pb-meter-peak {
+  visibility: hidden;
+}
+
+/* The clip lamp at the full end: unlit, a sunken square; lit, the hot zone's colour. */
+.pb-meter-lamp {
+  flex: 0 0 var(--pb-meter-thickness);
+  background: var(--pb-sunken);
+  border-radius: 0;
+}
+
+.pb-meter[data-clipped="true"] .pb-meter-lamp {
+  background: var(--pb-meter-hot);
+}
+
+/* Vertical: 6 px wide, filling its container's height (48 px when it has none), from the bottom up; the lamp on top. */
+.pb-meter[data-orientation="vertical"] {
+  flex-direction: column-reverse;
+  width: var(--pb-meter-thickness);
+  min-width: 0;
+  height: 100%;
+  min-height: 48px;
+}
+
+.pb-meter[data-orientation="vertical"] .pb-meter-bar {
+  background: linear-gradient(
+    to top,
+    var(--pb-meter-low) calc(var(--pb-meter-mid-at) * 100%),
+    var(--pb-meter-mid) 0 calc(var(--pb-meter-hot-at) * 100%),
+    var(--pb-meter-hot) 0
+  );
+  clip-path: inset(calc((1 - var(--pb-meter-level)) * 100%) 0 0 0);
+}
+
+.pb-meter[data-orientation="vertical"] .pb-meter-peak {
+  top: auto;
+  right: 0;
+  bottom: calc(var(--pb-meter-tick) * (100% - 2px));
+  left: 0;
+  width: auto;
+  height: 2px;
+}
+
+/* The level is information, not decoration, so it moves under reduced motion too; nothing here animates. Forced
+   colours: the bar in Highlight, the tick and the lit lamp in CanvasText, the track and an unlit lamp outlined. */
+@media (forced-colors: active) {
+  .pb-meter-track,
+  .pb-meter-lamp {
+    forced-color-adjust: none;
+    background: Canvas;
+    outline: 1px solid CanvasText;
+    outline-offset: -1px;
+  }
+
+  .pb-meter-bar,
+  .pb-meter[data-orientation="vertical"] .pb-meter-bar {
+    forced-color-adjust: none;
+    background: Highlight;
+  }
+
+  .pb-meter-peak,
+  .pb-meter[data-clipped="true"] .pb-meter-lamp {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+}

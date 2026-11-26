@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, fn } from "storybook/test";
+import { useState } from "react";
+import { expect, fn, waitFor } from "storybook/test";
 import { Button } from "./Button";
 
 const meta = {
@@ -64,10 +65,66 @@ export const BusyKeepsWidth: Story = {
   },
 };
 
+/** Busy with its own words: "Saving" beside the spinner instead of the hidden "Save". */
+export const BusyLabel: Story = {
+  args: { busy: true, busyLabel: "Saving", tone: "primary", children: "Save" },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole("button", { name: "Saving" })).toHaveAttribute("aria-busy", "true");
+  },
+};
+
+/** Press it: it turns busy, says its busy words, keeps the focus and holds its width at the wider label. */
+export const BusyLabelToggle: Story = {
+  args: { busyLabel: "Saving every change" },
+  render: function Render(args) {
+    const [busy, setBusy] = useState(false);
+    return (
+      <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+        <Button
+          {...args}
+          busy={busy}
+          onClick={(event) => {
+            args.onClick?.(event);
+            setBusy(true);
+          }}
+        >
+          Save
+        </Button>
+        <Button
+          onClick={() => {
+            setBusy(false);
+          }}
+        >
+          Finish
+        </Button>
+      </div>
+    );
+  },
+  play: async ({ canvas, userEvent }) => {
+    const button = canvas.getByRole("button", { name: "Save" });
+    const idle = button.getBoundingClientRect().width;
+    await userEvent.click(button);
+    await waitFor(() => expect(button).toHaveAccessibleName("Saving every change"));
+    await expect(button).toHaveFocus();
+    await expect(button.getBoundingClientRect().width).toBe(idle);
+    // The width is the wider label's: the busy words set it, as the idle words alone are narrower.
+    const span = (selector: string) => {
+      const range = document.createRange();
+      range.selectNodeContents(button.querySelector(selector) ?? button);
+      return range.getBoundingClientRect().width;
+    };
+    await expect(span(".pb-button-content:not(.pb-button-busy)")).toBeLessThan(span(".pb-button-busy"));
+    await expect(idle).toBeGreaterThanOrEqual(span(".pb-button-busy"));
+    await expect(canvas.getByText("Saving every change", { selector: ".pb-button-announce" })).toBeInTheDocument();
+    await userEvent.click(canvas.getByRole("button", { name: "Finish" }));
+    await expect(button.getBoundingClientRect().width).toBe(idle);
+  },
+};
+
 /** Every tone and state together, for a glance under each brand and theme. */
 export const All: Story = {
   render: (args) => (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, max-content)", gap: "8px" }}>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(5, max-content)", gap: "8px" }}>
       {(["neutral", "primary", "danger"] as const).map((tone) => [
         <Button key={`${tone}-idle`} {...args} tone={tone}>
           {tone}
@@ -80,6 +137,9 @@ export const All: Story = {
         </Button>,
         <Button key={`${tone}-disabled`} {...args} tone={tone} disabled>
           {tone} disabled
+        </Button>,
+        <Button key={`${tone}-busy-label`} {...args} tone={tone} busy busyLabel={`${tone} working`}>
+          {tone}
         </Button>,
       ])}
     </div>

@@ -83,4 +83,29 @@ describe("IconButton", () => {
   it("keeps a pressed one visible in forced colours, where it has no face", () => {
     expect(css).toMatch(/forced-colors: active\)\s*\{[^@]*\[aria-pressed="true"\]\s*\{\s*border-color: Highlight/);
   });
+
+  it("while busy with a busyLabel is named and titled by it, announces it, and shows the glyph still", () => {
+    const { rerender } = render(
+      <IconButton label="Refresh" busyLabel="Refreshing">
+        R
+      </IconButton>,
+    );
+    const button = screen.getByRole("button", { name: "Refresh" });
+    expect(button).toHaveAttribute("title", "Refresh");
+    rerender(
+      <IconButton label="Refresh" busy busyLabel="Refreshing">
+        R
+      </IconButton>,
+    );
+    expect(button).toHaveAccessibleName("Refreshing");
+    expect(button).toHaveAttribute("title", "Refreshing");
+    expect(screen.getByText("R")).toHaveAttribute("aria-hidden", "true");
+    expect(document.querySelector(".pb-button-announce")).toHaveTextContent("Refreshing");
+    rerender(
+      <IconButton label="Refresh" title="Refresh (R)" busy busyLabel="Refreshing">
+        R
+      </IconButton>,
+    );
+    expect(button).toHaveAttribute("title", "Refresh (R)");
+  });
 });
