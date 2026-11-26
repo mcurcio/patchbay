@@ -1,3 +1,9 @@
+## [0.6.0](https://github.com/mcurcio/patchbay/compare/v0.5.0...v0.6.0) (2026-11-26)
+
+### Features
+
+* **graph:** the graph layer: NodeBox, PortRow, Wire, GhostWire, useConnectHints and canvas sugar ([#10](https://github.com/mcurcio/patchbay/issues/10)) ([6c3e8fd](https://github.com/mcurcio/patchbay/commit/6c3e8fd3589110a473e5d8427289058fccb95fa1))
+
 ## [0.5.0](https://github.com/mcurcio/patchbay/compare/v0.4.0...v0.5.0) (2026-11-26)
 
 ### Features
