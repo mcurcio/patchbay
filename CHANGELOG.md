@@ -1,3 +1,16 @@
+## [0.9.0](https://github.com/mcurcio/patchbay/compare/v0.8.0...v0.9.0) (2026-11-26)
+
+### ⚠ BREAKING CHANGES
+
+* Sheet's `side` is logical: "right" becomes "end" (still the default), and "start" is new; `SheetSide` changed to match.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01MtEdSTqe5tHiATcH6Si3jB
+
+### Features
+
+* logical Sheet sides, one-row inspector header, touch hit areas for CodeEditor marks ([#14](https://github.com/mcurcio/patchbay/issues/14)) ([373bb23](https://github.com/mcurcio/patchbay/commit/373bb23a646826a23a9bf31338cd14b6ad2a3a17))
+
 ## [0.8.0](https://github.com/mcurcio/patchbay/compare/v0.7.0...v0.8.0) (2026-11-26)
 
 ### Features
