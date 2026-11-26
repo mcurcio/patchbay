@@ -47,58 +47,21 @@ Built: [`docs/components.md`](../components.md#primitives-primitives).
 
 ### 4.2 Composites (`/composites`)
 
-`Banner`, `StatusWords`, `Toaster`, `DiffView`, `CommandPalette` and `ShortcutSheet` are built:
-[`docs/components.md`](../components.md#composites-composites). Still to build:
+`Banner`, `StatusWords`, `Toaster`, `DiffView`, `CommandPalette`, `ShortcutSheet`, `CodeEditor` and
+`CodeText` are built: [`docs/components.md`](../components.md#composites-composites). Still to
+build:
 
 | Component | Props (sketch) |
 |---|---|
-| `CodeEditor` | `value`, `onChange`, `language?: "knobly"`, `highlight?: (text) => spans`, `diagnostics?: { line, column?, severity, message }[]`, `readOnly?`, `onCaret?` |
-| `CodeText` | `value`, `language?` or `highlight?` (read-only, highlighted) |
 | `SchemaForm` | Deferred by the owner (2026-11-26), not in the first version. `schema` (JSON Schema subset), `value`, `onChange`, `errors?`, `fieldSlot?` |
-
-**Highlighting.** `CodeEditor` and `CodeText` highlight [knobly](https://github.com/mcurcio/knobly)
-configuration text built in (`language: "knobly"`), through the optional `knobly` peer dependency,
-loaded only by `/composites` and only when that language is asked for. Any other language comes
-through `highlight`, a function from the text to coloured spans, so an app brings its own
-highlighter. The diagnostics shape is generic: an app maps its own errors onto it.
 
 ### 4.3 Shell (`/shell`)
 
-`AppShell` is the usual layout of a graph editor: a top bar, the canvas, an inspector on the right
-and a drawer along the bottom:
-
-```tsx
-<AppShell
-  topBar={{ brand, status, start, end }}           // slots, left to right
-  inspector={{ content, width, onWidth, open, onOpen }}
-  drawer={{ header, content, height, onHeight, open, onOpen }}
->
-  {canvas}
-</AppShell>
-```
-
-- Sizes are bounded (inspector 280–560 px, drawer 120 px to 70 % of the window) and dragged by a
-  `Splitter`.
-- **Narrow windows:** below 760 px the inspector is a sheet over the canvas's right edge; below
-  600 px it rises from the bottom (at most 62 % of the workspace). Escape closes it after the
-  palette and the shortcut sheet.
-- **The whole screen:** `100dvh`, padded by the safe-area insets (`viewport-fit=cover`).
-- The shell keeps no data. Its sizes and open states are props; `usePersistentState`
-  ([`docs/components.md`](../components.md#usepersistentstate)) is how an app keeps them.
+Built: [`docs/components.md`](../components.md#shell-shell).
 
 ### 4.4 Graph (`/graph`)
 
-Built: [`docs/graph.md`](../graph.md). What is left of its design is the check on the React Flow
-range below.
-
-#### Supported React Flow
-
-[`docs/graph.md`](../graph.md) states the range, `@xyflow/react` 12.1.0 or newer, below 13.
-`tokens.css`'s `--xy-*` map sets 18 of React Flow's variables; every one is declared in React
-Flow's stylesheet from 12.0.0 through 12.12.1, whose variable sets are identical (85 names; checked
-2026-11-26). The check that keeps this true (pb-nx9.39) is a unit test that every `--xy-*` name
-`tokens.css` sets is declared in the installed React Flow's `style.css`, run against the dev
-dependency, kept at the newest supported minor; `docs/tokens.md` points at the range.
+Built: [`docs/graph.md`](../graph.md).
 
 ### 4.5 Hooks (`/hooks`)
 

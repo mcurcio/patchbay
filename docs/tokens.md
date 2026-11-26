@@ -176,7 +176,8 @@ blanks stylesheets otherwise) and fails:
 - when a brand sets a colour for light without setting it for dark, names a token `tokens.css`
   does not define, sets a node geometry token, or has a rule outside its three blocks;
 - when reduced motion zeroes anything but the fast and slow motion, or a React Flow variable does
-  not point at a token;
+  not point at a token, or is not one the installed React Flow's `style.css` reads (the dev
+  dependency is kept at the newest minor of the [supported range](graph.md#the-graph-layer));
 - when a stylesheet or component under `src/` outside `tokens/` (stories and tests aside) holds a
   colour of its own (a hex value, `rgb()`, `hsl()`, `white` or `black`); when a stylesheet holds a
   duration of its own (`120ms`, `0.8s`), a radius other than a token or `0`, or a shadow other than

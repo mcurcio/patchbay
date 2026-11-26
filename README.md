@@ -14,8 +14,8 @@ patchbay draws and handles interaction. Your app keeps its data, its protocol an
 model: components take props and report what the person did through callbacks.
 
 **Status:** early (0.x). The tokens, the primitives, the first composites and hooks, the level
-meter and the graph layer (node box, port rows, wires, connection hints, canvas tools) are built;
-the rest of the composites and the app shell are designed in
+meter, the graph layer (node box, port rows, wires, connection hints, canvas tools) and the app
+shell are built; the rest is designed in
 [`docs/design/patchbay.md`](docs/design/patchbay.md) and not built yet. Expect
 breaking changes between minor versions until 1.0.
 

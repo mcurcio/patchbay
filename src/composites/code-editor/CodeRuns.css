@@ -1,0 +1,55 @@
+/* A highlighted run (CodeRuns.tsx): each class a code token's colour, any other class the code text's; a mark is a
+   wavy underline in its severity's tone (error, warning, or muted for any other), so the text keeps its colour. */
+.pb-code-run[data-class="directive"] {
+  color: var(--pb-code-directive);
+}
+
+.pb-code-run[data-class="keyword"] {
+  color: var(--pb-code-keyword);
+}
+
+.pb-code-run[data-class="word"] {
+  color: var(--pb-code-text);
+}
+
+.pb-code-run[data-class="variable"] {
+  color: var(--pb-code-variable);
+}
+
+.pb-code-run[data-class="number"] {
+  color: var(--pb-code-number);
+}
+
+.pb-code-run[data-class="string"] {
+  color: var(--pb-code-string);
+}
+
+.pb-code-run[data-class="comment"] {
+  color: var(--pb-code-comment);
+}
+
+.pb-code-run[data-class="punctuation"] {
+  color: var(--pb-code-punctuation);
+}
+
+.pb-code-run[data-class="error"] {
+  color: var(--pb-code-error);
+  background: var(--pb-code-error-surface);
+}
+
+.pb-code-run[data-mark] {
+  text-decoration-line: underline;
+  text-decoration-style: wavy;
+  text-decoration-thickness: 1px;
+  text-decoration-skip-ink: none;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--pb-muted);
+}
+
+.pb-code-run[data-mark="error"] {
+  text-decoration-color: var(--pb-err);
+}
+
+.pb-code-run[data-mark="warning"] {
+  text-decoration-color: var(--pb-warn);
+}

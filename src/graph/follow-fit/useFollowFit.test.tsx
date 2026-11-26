@@ -116,11 +116,43 @@ describe("useFollowFit", () => {
     });
     act(() => {
       follow(seen).flowProps.onMoveStart(new MouseEvent("mousedown"), { x: 0, y: 0, zoom: 1 });
+      follow(seen).flowProps.onMoveEnd(new MouseEvent("mouseup"), { x: 40, y: 0, zoom: 1 });
     });
     expect(follow(seen).following).toBe(false);
     rerender(draw(2, two, onFitted, seen));
     await new Promise((resolve) => setTimeout(resolve, 50));
     expect(onFitted).toHaveBeenCalledOnce();
+  });
+
+  it("keeps following through a press that moves nothing (a click on the pane)", async () => {
+    const onFitted = vi.fn<(viewport: Viewport) => void>();
+    const seen: Seen = { current: null };
+    const { rerender } = render(draw(1, one, onFitted, seen));
+    await waitFor(() => {
+      expect(onFitted).toHaveBeenCalledOnce();
+    });
+    act(() => {
+      follow(seen).flowProps.onMoveStart(new MouseEvent("mousedown"), { x: 0, y: 0, zoom: 1 });
+      follow(seen).flowProps.onMoveEnd(new MouseEvent("mouseup"), { x: 0, y: 0, zoom: 1 });
+    });
+    expect(follow(seen).following).toBe(true);
+    rerender(draw(2, two, onFitted, seen));
+    await waitFor(() => {
+      expect(onFitted).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  it("stops following at stop(), as for an app that moves the view itself", async () => {
+    const onFitted = vi.fn<(viewport: Viewport) => void>();
+    const seen: Seen = { current: null };
+    render(draw(1, one, onFitted, seen));
+    await waitFor(() => {
+      expect(onFitted).toHaveBeenCalledOnce();
+    });
+    act(() => {
+      follow(seen).stop();
+    });
+    expect(follow(seen).following).toBe(false);
   });
 
   it("keeps following through a move made by code", async () => {
@@ -132,6 +164,7 @@ describe("useFollowFit", () => {
     });
     act(() => {
       follow(seen).flowProps.onMoveStart(null, { x: 0, y: 0, zoom: 1 });
+      follow(seen).flowProps.onMoveEnd(null, { x: 40, y: 0, zoom: 2 });
     });
     expect(follow(seen).following).toBe(true);
   });
@@ -144,7 +177,7 @@ describe("useFollowFit", () => {
       expect(onFitted).toHaveBeenCalledOnce();
     });
     act(() => {
-      follow(seen).flowProps.onMoveStart(new MouseEvent("mousedown"), { x: 0, y: 0, zoom: 1 });
+      follow(seen).stop();
     });
     act(() => {
       follow(seen).fit();

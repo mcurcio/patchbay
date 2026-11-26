@@ -393,6 +393,163 @@ paths folded away), `onToggle?(path, open)`, and native `div` props.
   On touch the heading buttons are at least 36 px tall with 16 px words. The chevron turns on
   `--pb-motion-fast`, so it is still under reduced motion.
 
+**`CodeEditor`**: a text editor for configuration text, with highlighting, line numbers and the
+app's diagnostics. `value`, `onChange?(value)`, `language?: "knobly"`, `highlight?`,
+`diagnostics?: { line, column?, severity, message, code? }[]`, `readOnly?`, `onCaret?({ line,
+column, offset })`, `lineNumbers?` (true by default), `indent?` (what Tab inserts, a tab by
+default), `labels?` (its words, [rule 8](#rules-every-component-keeps): `diagnostic(d)`, how a
+diagnostic is read and shown on its mark, "Line 3, column 5: error E1: message"; `tabKey`, "Tab
+indents. Press Escape, then Tab, to move on."; `defaultCodeEditorLabels`), plus native `textarea`
+props.
+
+- **How it is drawn.** A native textarea holds the text, the caret, the selection and every edit,
+  its glyphs transparent; a highlighted copy of what it shows is drawn behind it, sharing every
+  metric (code face, `--pb-code-size`, line height, padding, a 4-column tab, no wrapping), and
+  follows its scroll. No editor library is used. CRLF and a lone CR are shown as LF (a textarea
+  holds LF only), so an edit gives the text back with LF; the last line keeps its height, and the
+  copy has room past the end, so it scrolls as far as the textarea. Under forced colours the copy
+  goes and the plain textarea is drawn in the system's colours.
+- **The textarea is the component** for everything but layout: `id`, `aria-*`, `ref`, `rows`,
+  `name`, `placeholder` and every other native prop go to it, so a [`Field`](#forms) names and
+  describes it; `className` and `style` go to the frame around the gutter and the box. It sizes
+  by `rows`, or fills a frame the app sizes, and can be resized vertically. `readOnly` draws it on
+  `--pb-code-surface-readonly`.
+- **Highlighting.** `highlight` wins over `language`. `highlight(text)` is the app's highlighter:
+  from the shown text (LF line breaks) to spans `{ start, end, class }` (offsets into it, `end`
+  exclusive), pure and total. Spans are clipped to the text and empty ones ignored; where two
+  overlap the later one wins; text no span covers is plain. The classes `directive`, `keyword`,
+  `word`, `variable`, `number`, `string`, `comment`, `punctuation` and `error` are drawn in the
+  code tokens (`--pb-code-*`, [`tokens.md`](tokens.md#the-tokens)); `space` and any other class
+  are drawn as plain text. `language: "knobly"` highlights [knobly](https://github.com/mcurcio/knobly)
+  text with knobly's own highlighter (`knobly/highlight`), imported from the optional `knobly`
+  peer the first time a view asks for it, once for the page (`loadKnobly()` starts it early); the
+  text is plain until it has loaded, and stays plain, with one warning on the console, when
+  `knobly` is not installed. Any other language is drawn as plain text.
+- **Diagnostics.** A diagnostic's `line` and `column` count from 1, the column in UTF-16 code
+  units (a tab is one); a line past the end is read as the last. Each line a diagnostic names gets
+  a mark in the gutter by its worst severity: a circle in `--pb-err` for `error`, a diamond in
+  `--pb-warn` for `warning`, and a ring in `--pb-muted` for any other severity, so the severity
+  never rests on colour alone; the mark's tooltip lists the line's diagnostics. Under the text a
+  wavy line in the same tone runs from the column to the end of the word there (one character on
+  white space), or under the line's text when there is no column; where marks overlap, error
+  wins over warning over any other. A press on a gutter mark focuses the textarea and puts the
+  caret at the line's first diagnostic. The gutter and the copy are hidden from screen readers:
+  every diagnostic is read, in the order given, as part of the textarea's description, after the
+  app's own `aria-describedby` (a `Field`'s hint and error), through `labels.diagnostic`. The
+  description is not live, so it is not announced on every keystroke.
+- **Keyboard.** Tab inserts `indent` in place of a selection within one line; across lines it
+  indents each line the selection touches (empty lines are left alone). Shift+Tab outdents each
+  line the caret or selection touches by `indent`, a tab, or up to the indent's width in spaces
+  (4 for a tab). **Escape, then Tab** (or Shift+Tab) moves the focus on as usual, so the keyboard
+  can always leave; Escape counts for the next key only, and is not stopped, so a dialog around
+  the editor still closes on it. While it can be edited, `labels.tabKey` is read in its
+  description. Read-only, Tab always moves on. Tab's edits go through the browser's own editing
+  (`execCommand("insertText")`, the one way to keep the undo history, so Ctrl+Z takes an indent
+  back), and by value where the browser has none. `tabEdit(text, start, end, indent, out)` is the
+  rule, exported and pure.
+- **The caret.** `onCaret` is called when the caret moves (a key, a press, an edit, a gutter mark),
+  once per place, with its line and column (from 1) and offset; the caret is the selection's
+  moving end. `caretAt(text, offset)` and `offsetAt(text, line, column)` are the conversions, and
+  `shownText`, `codeRuns`, `gutterRows` and `markLevel` the other steps, exported and pure.
+- **The gutter** numbers every line in `--pb-muted` on `--pb-sunken`, as wide as the widest
+  number. On touch the text (and the gutter's) is 16 px, as `--pb-code-size` is there; the marks
+  are a pointer shortcut, and the keyboard reaches each diagnostic by its line and column. It does
+  not animate, so there is nothing to stop under reduced motion.
+
+**`CodeText`**: read-only highlighted text, in code type on the read-only code surface. `value`,
+`language?: "knobly"`, `highlight?` (highlighted as `CodeEditor` is, `highlight` winning), plus
+native `pre` props (`ref` included; name it with `aria-label` where no heading does). CRLF reads as
+LF; lines are kept as written, and a wide one scrolls sideways; the box is a tab stop, so it
+scrolls from the keyboard too. It has no words of its own, so no `labels`.
+
+## Shell (`/shell`)
+
+```ts
+import { AppShell, clampDrawerHeight, clampInspectorWidth, drawerBounds, inspectorBounds } from "@mcurcio/patchbay/shell";
+```
+
+The shell is drawn with primitives and hooks: importing `/shell` loads `/primitives` and its
+stylesheet, and `/hooks`.
+
+### `AppShell`
+
+The usual layout of a graph editor: a top bar, the canvas, an inspector at the inline end (the
+right in left-to-right text) and a drawer along the bottom, filling the screen.
+
+```tsx
+<AppShell
+  topBar={{ brand, status, start, end }}
+  inspector={{ content, open, onOpen, width, onWidth }}
+  drawer={{ header, content, open, onOpen, height, onHeight }}
+  labels={labels}
+>
+  {canvas}
+</AppShell>
+```
+
+- **`topBar?`**: slots drawn in reading order (left to right in left-to-right text): `brand` (the
+  app's mark or name), `status` (a short state, a connection's `Pill`), `start` (the app's
+  controls, taking the free width and giving it up first) and `end` (at the far end: a theme
+  switch, a menu). The bar is `--pb-bar` high (44 px) and a `<header>`. Without `topBar` there is no bar.
+- **`children`**: the canvas, filling the workspace, a `<main>`; the app's `<ReactFlow>` goes
+  here.
+- **`inspector?`**: `content` (usually a [`Panel`](#layout), which scrolls on its own), `open`,
+  `onOpen(open)`, `width` (px) and `onWidth(px)`. On a wide window, while open, it is a region
+  named "Inspector" beside the canvas, `width` px wide, with a vertical [`Splitter`](#layout) on its
+  inline start edge that calls `onWidth`; while closed it is not drawn. The app shows and hides it
+  with its own control (in the top bar, or on a selection); the shell draws no button of its own
+  for it on a wide window.
+- **`drawer?`**: `header` (beside its show and hide button), `content`, `open`, `onOpen(open)`,
+  `height` (px, the open drawer's whole height, header included) and `onHeight(px)`. Its header is
+  always shown; its button ("Show the drawer" or "Hide the drawer", with `aria-expanded`) calls
+  `onOpen(!open)`. While open, a horizontal `Splitter` on its top edge calls `onHeight`. While
+  closed its body stays mounted, hidden, so what it holds (a draft, a caret, a scroll position) is
+  there when it opens. It spans the window's width, under the canvas and the inspector.
+- **`labels?`** (its words, [rule 8](#rules-every-component-keeps)): `inspector` ("Inspector"),
+  `drawer` ("Drawer"), `resizeInspector` ("Resize the inspector"), `resizeDrawer` ("Resize the
+  drawer"), `showDrawer` ("Show the drawer"), `hideDrawer` ("Hide the drawer") and `close`
+  ("Close", the inspector sheet's close button). `className?` is added to its own.
+
+**Sizes.** The inspector is held to 280–560 px (`inspectorBounds`), the drawer to 120 px and 70 %
+of the window's height (`drawerBounds`, followed as the window resizes). A size out of bounds, or
+not a finite number (one kept from a larger window), is drawn within them, in whole px, and not
+written back: `onWidth` and `onHeight` are called only when the person moves a splitter.
+`clampInspectorWidth(px)`, `drawerMaxHeight(windowHeight)` and `clampDrawerHeight(px,
+windowHeight)` are the same rules, for an app's own checks.
+
+**Narrow windows.** It reads [`useMediaBreakpoint`](#usemediabreakpoint): below 760 px the
+inspector is a [`Sheet`](#overlays) over the canvas's right edge, `width` px wide (and 48 px short
+of the canvas); below 600 px it rises from the bottom, at most 62 % of the workspace. The sheet has
+no splitter; its close button and Escape inside it call `onOpen(false)`. Moving between widths
+draws the inspector's `content` afresh (it moves between the region and the sheet), so state it
+must keep belongs to the app. The root has `data-layout` (`wide`, `narrow` or `phone`) for the
+app's own stylesheet.
+
+**Escape.** The shell's only Escape is the inspector sheet's, and it acts while the focus is in the
+sheet. A `Dialog`, a `CommandPalette` or a `ShortcutSheet` the app opens is modal and holds the
+focus, so Escape goes to it first and closes it, and the sheet stays; each marks the press handled,
+so the app's own [`useShortcuts`](#useshortcuts) Escape does not act on it either. On a wide window
+Escape in the inspector is the app's.
+
+**The whole screen.** The shell is `100dvh` high (`100vh` where `dvh` is unknown), so a phone's
+browser bars never hide its foot. Each edge pads itself by its safe-area inset (the bar the top,
+the drawer the bottom, both and the workspace the sides), so the bar's and the drawer's faces reach
+the screen's edges while their contents clear a notch or a home indicator; the left and right
+insets pad the left and right sides in right-to-left text too. The insets are non-zero only when
+the app's page asks for them: `<meta name="viewport" content="width=device-width,
+initial-scale=1, viewport-fit=cover">`.
+
+**It keeps no data.** Sizes and open states are the app's props; an app keeps them across visits
+with [`usePersistentState`](#usepersistentstate), checking a kept width with
+`clampInspectorWidth` (Storybook's `Kept` story).
+
+- **Keyboard:** the splitters as `Splitter`'s keys (arrows, Home, End; in right-to-left text the
+  inspector is on the left and its splitter mirrors); the drawer's button and the sheet's close
+  button are buttons.
+- **Touch:** the splitters' hit areas are 36 px and the drawer's button 36 px, as the primitives'.
+- **Motion:** the shell animates nothing of its own; the sheet's entrance stops under reduced
+  motion. Forced-colours mode draws its edges in the system's colours.
+
 ## Hooks (`/hooks`)
 
 ### `usePersistentState`

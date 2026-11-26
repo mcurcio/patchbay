@@ -136,6 +136,9 @@ export default defineConfig({
       {
         extends: true,
         plugins: [storybookTest({ configDir: fileURLToPath(new URL("./.storybook", import.meta.url)) })],
+        // The code views import knobly's highlighter only when a story asks for it; found that late, Vite would
+        // optimise it mid-run and reload the page under the tests, so it is optimised up front.
+        optimizeDeps: { include: ["knobly/highlight"] },
         test: {
           name: "storybook",
           browser: {
