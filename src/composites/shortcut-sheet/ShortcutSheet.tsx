@@ -22,22 +22,36 @@ export type ShortcutSheetProps = {
   /** Asked for on Escape, the close button and a press on the scrim. */
   onClose: () => void;
   shortcuts: readonly ShortcutLine[];
-  /** The dialog's title, "Keyboard shortcuts" by default. */
-  title?: ReactNode;
   /** A note under the lists (where the keys do not act, say). */
   children?: ReactNode;
-  /** Between two keys that do the same, "or" by default. */
-  orLabel?: string;
-  /** Shown when there are no shortcuts, "No shortcuts" by default. */
-  emptyLabel?: ReactNode;
-  /** The close button's name, "Close" by default. */
-  closeLabel?: string;
   /** The platform keys are drawn for; the browser's by default. */
   platform?: Platform;
-  /** Replaces keyLabel's words for keys and modifiers ("Escape", "Ctrl"). */
-  keyNames?: Readonly<Record<string, string>>;
+  /** Words to replace; the rest keep their defaults. */
+  labels?: Partial<ShortcutSheetLabels>;
   /** A class added to the dialog's box. */
   className?: string;
+};
+
+/** The sheet's own words, each replaceable. */
+export interface ShortcutSheetLabels {
+  /** The dialog's title, which also names it: "Keyboard shortcuts". */
+  title: ReactNode;
+  /** Between two keys that do the same: "or". */
+  or: string;
+  /** Shown when there are no shortcuts: "No shortcuts". */
+  empty: ReactNode;
+  /** The close button's name: "Close". */
+  close: string;
+  /** Replaces keyLabel's words for keys and modifiers ("Escape", "Ctrl"); none by default, keyLabel's own. */
+  keyNames: Readonly<Record<string, string>>;
+}
+
+export const defaultShortcutSheetLabels: ShortcutSheetLabels = {
+  title: "Keyboard shortcuts",
+  or: "or",
+  empty: "No shortcuts",
+  close: "Close",
+  keyNames: {},
 };
 
 /** The lines in groups, the groups in the order they first appear and each group's lines in the order given. */
@@ -51,30 +65,19 @@ export function groupShortcuts(shortcuts: readonly ShortcutLine[]): { group: str
   return [...groups.entries()].map(([group, lines]) => ({ group, lines }));
 }
 
-export function ShortcutSheet({
-  open,
-  onClose,
-  shortcuts,
-  title = "Keyboard shortcuts",
-  children,
-  orLabel = "or",
-  emptyLabel = "No shortcuts",
-  closeLabel = "Close",
-  platform,
-  keyNames,
-  className,
-}: ShortcutSheetProps) {
+export function ShortcutSheet({ open, onClose, shortcuts, children, platform, labels, className }: ShortcutSheetProps) {
+  const words = { ...defaultShortcutSheetLabels, ...labels };
   const ids = useId();
   const groups = groupShortcuts(shortcuts);
   return (
     <Dialog
       open={open}
       onClose={onClose}
-      title={title}
-      closeLabel={closeLabel}
+      title={words.title}
+      labels={{ close: words.close }}
       className={className === undefined ? "pb-shortcut-sheet" : `pb-shortcut-sheet ${className}`}
     >
-      {groups.length === 0 && <p className="pb-shortcut-sheet-empty">{emptyLabel}</p>}
+      {groups.length === 0 && <p className="pb-shortcut-sheet-empty">{words.empty}</p>}
       {groups.map(({ group, lines }, index) => {
         const headingId = `${ids}-${index}`;
         return (
@@ -91,8 +94,8 @@ export function ShortcutSheet({
                     <dd aria-keyshortcuts={keys.length === 0 ? undefined : ariaKeyShortcuts(keys, platform)}>
                       {keys.map((one, n) => (
                         <Fragment key={one}>
-                          {n > 0 && <span className="pb-shortcut-sheet-or"> {orLabel} </span>}
-                          <kbd>{keyLabel(one, { platform, names: keyNames })}</kbd>
+                          {n > 0 && <span className="pb-shortcut-sheet-or"> {words.or} </span>}
+                          <kbd>{keyLabel(one, { platform, names: words.keyNames })}</kbd>
                         </Fragment>
                       ))}
                     </dd>

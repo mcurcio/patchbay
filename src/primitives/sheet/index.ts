@@ -1,2 +1,2 @@
-export { Sheet } from "./Sheet";
-export type { SheetProps, SheetSide } from "./Sheet";
+export { defaultSheetLabels, Sheet } from "./Sheet";
+export type { SheetLabels, SheetProps, SheetSide } from "./Sheet";

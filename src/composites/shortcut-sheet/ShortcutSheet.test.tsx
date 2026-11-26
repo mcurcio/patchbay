@@ -59,8 +59,7 @@ describe("ShortcutSheet", () => {
         onClose={() => {}}
         shortcuts={shortcuts}
         platform="apple"
-        orLabel="/"
-        keyNames={{ Delete: "Del" }}
+        labels={{ or: "/", keyNames: { Delete: "Del" } }}
       />,
     );
     expect(screen.getAllByRole("definition").map((definition) => definition.textContent)).toEqual([
@@ -73,7 +72,7 @@ describe("ShortcutSheet", () => {
 
   it("says when there are none, and shows a note as children", () => {
     render(
-      <ShortcutSheet open onClose={() => {}} shortcuts={[]} emptyLabel="Nothing bound" title="Keys">
+      <ShortcutSheet open onClose={() => {}} shortcuts={[]} labels={{ empty: "Nothing bound", title: "Keys" }}>
         Keys do not act while you type.
       </ShortcutSheet>,
     );
@@ -81,10 +80,10 @@ describe("ShortcutSheet", () => {
     expect(screen.getByText("Keys do not act while you type.")).toBeInTheDocument();
   });
 
-  it("asks to close on Escape and its close button, named by closeLabel", async () => {
+  it("asks to close on Escape and its close button, named by its close label", async () => {
     const onClose = vi.fn();
     const user = userEvent.setup();
-    render(<ShortcutSheet open onClose={onClose} shortcuts={shortcuts} closeLabel="Done" />);
+    render(<ShortcutSheet open onClose={onClose} shortcuts={shortcuts} labels={{ close: "Done" }} />);
     await user.keyboard("{Escape}");
     await user.click(screen.getByRole("button", { name: "Done" }));
     expect(onClose).toHaveBeenCalledTimes(2);

@@ -15,11 +15,15 @@ export type NodeBoxTone = "ok" | "warn" | "err" | "quiet" | "off" | "accent" | "
 /** An edit not yet applied: an open enum, and one it does not know is a plain border with its own string as the word. */
 export type NodeBoxChange = "added" | "removed" | "renamed" | "changed" | (string & {});
 
-/** The words of the change badge. */
-export type NodeBoxChangeLabels = { added: string; removed: string; renamed: string; changed: string };
+/** The box's own words, each replaceable: the change badge's word for each known change. */
+export interface NodeBoxLabels {
+  added: string;
+  removed: string;
+  renamed: string;
+  changed: string;
+}
 
-/** English defaults for `changeLabels`. */
-export const defaultChangeLabels: NodeBoxChangeLabels = {
+export const defaultNodeBoxLabels: NodeBoxLabels = {
   added: "added",
   removed: "removed",
   renamed: "renamed",
@@ -42,8 +46,8 @@ export type NodeBoxProps = Omit<ComponentPropsWithoutRef<"div">, "title" | "chil
   failed?: boolean;
   /** An edit not yet applied: a 2 px border in its tone and a badge with its word; `removed` strikes the title. */
   change?: NodeBoxChange;
-  /** The change badge's words; English by default. */
-  changeLabels?: Partial<NodeBoxChangeLabels>;
+  /** Words to replace; the rest keep their defaults. */
+  labels?: Partial<NodeBoxLabels>;
   /** A slot at the header's end (a `Pill`). */
   status?: ReactNode;
   /** One row under the header saying why the node is silent; a string is also its tooltip. */
@@ -72,7 +76,7 @@ export function NodeBox({
   disabled = false,
   failed = false,
   change,
-  changeLabels,
+  labels,
   status,
   line,
   inputs = [],
@@ -89,13 +93,9 @@ export function NodeBox({
   const layout = ports === "side-by-side" ? "side-by-side" : "stacked";
   usePortsMeasured(inputs, outputs, layout);
 
-  const words = { ...defaultChangeLabels, ...changeLabels };
+  const words = { ...defaultNodeBoxLabels, ...labels };
   const changeWord =
-    change === undefined
-      ? undefined
-      : knownChanges.includes(change)
-        ? words[change as keyof NodeBoxChangeLabels]
-        : change;
+    change === undefined ? undefined : knownChanges.includes(change) ? words[change as keyof NodeBoxLabels] : change;
   const hasPorts = inputs.length > 0 || outputs.length > 0;
   const inputRows = inputs.map((port) => <PortRow key={port.id} {...port} side="input" />);
   const outputRows = outputs.map((port) => <PortRow key={port.id} {...port} side="output" />);

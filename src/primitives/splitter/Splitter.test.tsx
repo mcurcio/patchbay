@@ -4,7 +4,7 @@ import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { Splitter, type SplitterProps } from "./Splitter";
 import css from "./Splitter.css?raw";
-import { clamp, dragged, growKey, keyed } from "./splitter-math";
+import { clamp, dragged, dragSign, growKey, keyed } from "./splitter-math";
 
 const bounds = { min: 280, max: 560 };
 
@@ -23,11 +23,25 @@ describe("the maths", () => {
     expect(dragged(320, -1000, -1, bounds)).toBe(560);
   });
 
-  it("picks the arrow that grows from the orientation and edge", () => {
-    expect(growKey("vertical", "start")).toBe("ArrowLeft");
-    expect(growKey("vertical", "end")).toBe("ArrowRight");
-    expect(growKey("horizontal", "start")).toBe("ArrowUp");
-    expect(growKey("horizontal", "end")).toBe("ArrowDown");
+  it("picks the arrow that grows from the orientation, the edge and the text's direction", () => {
+    expect(growKey("vertical", "start", "ltr")).toBe("ArrowLeft");
+    expect(growKey("vertical", "end", "ltr")).toBe("ArrowRight");
+    expect(growKey("horizontal", "start", "ltr")).toBe("ArrowUp");
+    expect(growKey("horizontal", "end", "ltr")).toBe("ArrowDown");
+    // Right to left, a vertical splitter's start is the pane's right edge; up and down do not mirror.
+    expect(growKey("vertical", "start", "rtl")).toBe("ArrowRight");
+    expect(growKey("vertical", "end", "rtl")).toBe("ArrowLeft");
+    expect(growKey("horizontal", "start", "rtl")).toBe("ArrowUp");
+    expect(growKey("horizontal", "end", "rtl")).toBe("ArrowDown");
+  });
+
+  it("signs a drag so moving outward from the edge grows, mirrored for a vertical one right to left", () => {
+    expect(dragSign("vertical", "start", "ltr")).toBe(-1);
+    expect(dragSign("vertical", "end", "ltr")).toBe(1);
+    expect(dragSign("vertical", "start", "rtl")).toBe(1);
+    expect(dragSign("vertical", "end", "rtl")).toBe(-1);
+    expect(dragSign("horizontal", "start", "rtl")).toBe(-1);
+    expect(dragSign("horizontal", "end", "rtl")).toBe(1);
   });
 
   it("moves by keys: the grow arrow, its opposite, Home and End; any other key is not its own", () => {
@@ -152,6 +166,38 @@ describe("Splitter", () => {
     expect(splitter).toHaveAttribute("aria-valuenow", "340");
   });
 
+  it("mirrors its keys and drag in right-to-left text, read from the element at the time", async () => {
+    const onSize = vi.fn();
+    render(
+      <div dir="rtl" style={{ direction: "rtl" }}>
+        <Held onSize={onSize} />
+      </div>,
+    );
+    const splitter = screen.getByRole("separator");
+    splitter.focus();
+    const user = userEvent.setup();
+    await user.keyboard("{ArrowRight}");
+    expect(splitter).toHaveAttribute("aria-valuenow", "336");
+    await user.keyboard("{ArrowLeft}{ArrowLeft}");
+    expect(splitter).toHaveAttribute("aria-valuenow", "304");
+    // Its start edge is the pane's right: dragging right, outward, grows the pane.
+    fireEvent.pointerDown(splitter, { button: 0, pointerId: 1, clientX: 100 });
+    fireEvent.pointerMove(splitter, { pointerId: 1, clientX: 140 });
+    expect(splitter).toHaveAttribute("aria-valuenow", "344");
+    fireEvent.pointerUp(splitter, { pointerId: 1, clientX: 140 });
+    // The direction is read when a key is pressed, so a page that turns left to right is followed at once.
+    (splitter.parentElement as HTMLElement).style.direction = "ltr";
+    await user.keyboard("{ArrowLeft}");
+    expect(splitter).toHaveAttribute("aria-valuenow", "360");
+    expect(onSize.mock.calls.map((call) => call[0] as number)).toEqual([336, 320, 304, 344, 360]);
+  });
+
+  it("places itself by logical properties, so the start edge follows the text's direction", () => {
+    expect(css).toMatch(/\[data-edge="start"\] \{\s*inset-inline-start: -3px;/);
+    expect(css).toMatch(/\[data-edge="end"\] \{\s*inset-inline-end: -3px;/);
+    expect(css).not.toMatch(/\b(left|right):/);
+  });
+
   it("passes the app's own handlers, classes and props through", () => {
     const onKeyDown = vi.fn();
     const onPointerDown = vi.fn();
@@ -183,6 +229,6 @@ describe("Splitter", () => {
     const touch = /@media \(hover: none\) and \(pointer: coarse\)\s*\{([\s\S]*?)\n\}/.exec(css)?.[1] ?? "";
     // 6 px bar, 15 px either side.
     expect(css).toMatch(/width: 6px/);
-    expect(touch.match(/-15px/g)).toHaveLength(4);
+    expect(touch.match(/inset-(?:inline|block): -15px/g)).toHaveLength(2);
   });
 });

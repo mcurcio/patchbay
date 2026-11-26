@@ -11,6 +11,16 @@ import { IconButton } from "../icon-button";
 import { CloseGlyph } from "./CloseGlyph";
 import "./Dialog.css";
 
+/** The dialog's own words, each replaceable. */
+export interface DialogLabels {
+  /** The close button's name: "Close". */
+  close: string;
+}
+
+export const defaultDialogLabels: DialogLabels = {
+  close: "Close",
+};
+
 export type DialogProps = {
   /** Whether the dialog is shown; the app holds it. */
   open: boolean;
@@ -21,8 +31,8 @@ export type DialogProps = {
   children: ReactNode;
   /** A row at the foot of the dialog, for its buttons. */
   actions?: ReactNode;
-  /** The close button's name: "Close". */
-  closeLabel?: string;
+  /** Words to replace; the rest keep their defaults. */
+  labels?: Partial<DialogLabels>;
   /** A class added to the dialog's box. */
   className?: string;
 };
@@ -50,7 +60,8 @@ function topmost(box: HTMLElement): boolean {
   return open[open.length - 1] === box;
 }
 
-function OpenDialog({ onClose, title, children, actions, closeLabel = "Close", className }: Omit<DialogProps, "open">) {
+function OpenDialog({ onClose, title, children, actions, labels, className }: Omit<DialogProps, "open">) {
+  const words = { ...defaultDialogLabels, ...labels };
   const boxRef = useRef<HTMLDivElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
   const titleId = useId();
@@ -129,7 +140,7 @@ function OpenDialog({ onClose, title, children, actions, closeLabel = "Close", c
           </h2>
           <IconButton
             className="pb-dialog-close"
-            label={closeLabel}
+            label={words.close}
             onClick={() => {
               onCloseRef.current();
             }}

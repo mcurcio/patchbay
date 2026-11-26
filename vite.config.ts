@@ -1,6 +1,6 @@
 // Vite builds the library into dist/ (one ES module per layer, its CSS beside it, the token and
-// base stylesheets copied as written); Vitest runs two projects: "unit" (jsdom, src/**/*.test.ts(x))
-// and "storybook" (every story as a test in Chromium, with its play function and the a11y check).
+// base stylesheets copied as written, and dist/testing.js); Vitest runs two projects: "unit"
+// (jsdom, src/**/*.test.ts(x)) and "storybook" (every story as a test in Chromium, with its play function and the a11y check).
 import { readFileSync } from "node:fs";
 import { posix } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -15,6 +15,12 @@ const src = (path: string) => fileURLToPath(new URL(`./src/${path}`, import.meta
 
 /** The JS layers, each a subpath export of its own ("@mcurcio/patchbay/primitives"). */
 const layers = ["primitives", "composites", "shell", "graph", "hooks"] as const;
+
+/**
+ * Every JS entry, each a subpath export of its own: the layers, and "testing", the checks an app runs in its own tests
+ * (docs/tokens.md#writing-a-brand), which draws nothing and imports no layer and no test runner.
+ */
+const entries = [...layers, "testing"] as const;
 
 /** Every peer dependency, and anything under one ("react/jsx-runtime"), stays an import. */
 const peers = Object.keys(pkg.peerDependencies);
@@ -99,7 +105,7 @@ export default defineConfig({
     sourcemap: true,
     cssCodeSplit: true,
     lib: {
-      entry: Object.fromEntries(layers.map((layer) => [layer, src(`${layer}/index.ts`)])),
+      entry: Object.fromEntries(entries.map((entry) => [entry, src(`${entry}/index.ts`)])),
       formats: ["es"],
     },
     rolldownOptions: {

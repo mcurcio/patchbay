@@ -43,6 +43,18 @@ export const WithNote: Story = {
   args: { children: "Single keys do nothing while you type in a field; chords marked so still act." },
 };
 
+/** The app's words, through `labels`: the title, "or", Close and the keys' names. */
+export const Labels: Story = {
+  args: {
+    labels: { title: "Tastenkürzel", or: "oder", close: "Schließen", keyNames: { Delete: "Entf", Backspace: "Rück" } },
+  },
+  play: async () => {
+    await expect(screen.getByRole("dialog", { name: "Tastenkürzel" })).toBeInTheDocument();
+    await expect(screen.getByRole("region", { name: "Edit" })).toHaveTextContent("Entf oder Rück");
+    await expect(screen.getByRole("button", { name: "Schließen" })).toBeInTheDocument();
+  },
+};
+
 /** No shortcuts. */
 export const Empty: Story = { args: { shortcuts: [] } };
 

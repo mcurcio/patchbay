@@ -135,9 +135,9 @@ export const Changes: Story = {
   },
 };
 
-/** The change's words are the app's. */
-export const OwnChangeWords: Story = {
-  args: { title: "gain", subtitle: "filter", change: "removed", changeLabels: { removed: "to delete" } },
+/** The change's words are the app's, through `labels`. */
+export const Labels: Story = {
+  args: { title: "gain", subtitle: "filter", change: "removed", labels: { removed: "to delete" } },
   play: async ({ canvas }) => {
     await expect(canvas.getByText("to delete")).toHaveClass("pb-badge");
   },

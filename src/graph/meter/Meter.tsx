@@ -47,8 +47,8 @@ export type MeterProps = Omit<ComponentPropsWithoutRef<"div">, "children" | "tit
   clipHoldMs?: number;
   /** The accessible name ("Level" by default); the numbers are never announced. */
   label?: string;
-  /** The tooltip's words; `defaultMeterTitle` by default. */
-  title?: MeterTitle;
+  /** Words to replace; the rest keep their defaults. */
+  labels?: Partial<MeterLabels>;
   /** `reset()`, for when the source closes. */
   ref?: Ref<MeterHandle>;
 };
@@ -83,6 +83,16 @@ const formatDb = (db: number) => (db === -Infinity ? "−∞" : db.toFixed(1));
 export const defaultMeterTitle: MeterTitle = (peakDb, rmsDb) =>
   `peak ${formatDb(peakDb)} dB, rms ${formatDb(rmsDb)} dB`;
 
+/** The meter's own words, each replaceable. */
+export interface MeterLabels {
+  /** Writes the tooltip from the level: `defaultMeterTitle`, "peak -12.0 dB, rms -18.3 dB". */
+  title: MeterTitle;
+}
+
+export const defaultMeterLabels: MeterLabels = {
+  title: defaultMeterTitle,
+};
+
 type Level = {
   peakDb: number;
   rmsDb: number;
@@ -93,7 +103,7 @@ type Level = {
   clippedAt: number;
 };
 
-type Scale = Required<Pick<MeterProps, "floor" | "holdMs" | "fallDbPerS" | "clipAt" | "clipHoldMs" | "title">>;
+type Scale = Required<Pick<MeterProps, "floor" | "holdMs" | "fallDbPerS" | "clipAt" | "clipHoldMs">> & MeterLabels;
 
 const silent = (): Level => ({
   peakDb: -Infinity,
@@ -215,7 +225,7 @@ export function Meter({
   clipAt = defaultMeterScale.clipAt,
   clipHoldMs = defaultMeterScale.clipHoldMs,
   label = "Level",
-  title = defaultMeterTitle,
+  labels,
   ref,
   className,
   style,
@@ -223,6 +233,7 @@ export function Meter({
   onPointerLeave,
   ...rest
 }: MeterProps) {
+  const { title } = { ...defaultMeterLabels, ...labels };
   const [painter] = useState(() => createPainter({ floor, holdMs, fallDbPerS, clipAt, clipHoldMs, title }));
   // Every render hands the painter the scale and words; a new scale redraws the level on it.
   useLayoutEffect(() => {

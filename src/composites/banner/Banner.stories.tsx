@@ -59,6 +59,14 @@ export const Dismissible: Story = {
   },
 };
 
+/** The app's word for Dismiss, through `labels`. */
+export const Labels: Story = {
+  args: { onDismiss: fn(), labels: { dismiss: "Schließen" } },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole("button", { name: "Schließen" })).toBeInTheDocument();
+  },
+};
+
 /** Long words wrap, and the actions drop under them in a narrow pane. */
 export const Narrow: Story = {
   args: {

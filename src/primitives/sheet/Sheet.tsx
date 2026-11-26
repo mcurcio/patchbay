@@ -19,6 +19,16 @@ import "./Sheet.css";
 
 export type SheetSide = "right" | "bottom";
 
+/** The sheet's own words, each replaceable. */
+export interface SheetLabels {
+  /** The close button's name: "Close". */
+  close: string;
+}
+
+export const defaultSheetLabels: SheetLabels = {
+  close: "Close",
+};
+
 export type SheetProps = {
   /** Whether the sheet is shown; the app holds it. */
   open: boolean;
@@ -33,8 +43,8 @@ export type SheetProps = {
   children: ReactNode;
   /** A right sheet's width in px, held to 280–560 px and to 48 px short of its container. */
   width?: number;
-  /** The close button's name: "Close". */
-  closeLabel?: string;
+  /** Words to replace; the rest keep their defaults. */
+  labels?: Partial<SheetLabels>;
   /** A class added to the sheet. */
   className?: string;
 };
@@ -46,9 +56,10 @@ function OpenSheet({
   label,
   children,
   width,
-  closeLabel = "Close",
+  labels,
   className,
 }: Omit<SheetProps, "open">) {
+  const words = { ...defaultSheetLabels, ...labels };
   const sheetRef = useRef<HTMLElement>(null);
   const titleId = useId();
   /** Where the focus came from when it entered the sheet: it goes back there if the sheet closes holding it. */
@@ -98,7 +109,7 @@ function OpenSheet({
             {title}
           </h2>
         )}
-        <IconButton className="pb-sheet-close" label={closeLabel} onClick={onClose}>
+        <IconButton className="pb-sheet-close" label={words.close} onClick={onClose}>
           <CloseGlyph />
         </IconButton>
       </div>

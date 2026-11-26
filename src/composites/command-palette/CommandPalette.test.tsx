@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
-import { type Command, CommandPalette, placePalette } from "./CommandPalette";
+import { type Command, CommandPalette, defaultCommandPaletteLabels, placePalette } from "./CommandPalette";
 import css from "./CommandPalette.css?raw";
 
 function commands(run = vi.fn()): Command[] {
@@ -210,7 +210,12 @@ describe("CommandPalette", () => {
     unmount();
     const user = userEvent.setup();
     render(
-      <CommandPalette open onClose={() => {}} commands={commands()} noMatchLabel={(query) => `Nothing for ${query}`} />,
+      <CommandPalette
+        open
+        onClose={() => {}}
+        commands={commands()}
+        labels={{ noMatch: (query) => `Nothing for ${query}` }}
+      />,
     );
     expect(screen.getByRole("status")).toBeEmptyDOMElement();
     await user.keyboard("qqq");
@@ -229,13 +234,30 @@ describe("CommandPalette", () => {
     expect(activeName()).toBe("Save");
   });
 
-  it("takes its words as props", () => {
-    render(
-      <CommandPalette open onClose={() => {}} commands={[]} label="Actions" placeholder="Find" emptyLabel="Empty" />,
+  it("takes its words through labels, English for the rest", () => {
+    const { unmount } = render(
+      <CommandPalette
+        open
+        onClose={() => {}}
+        commands={[]}
+        labels={{ palette: "Actions", placeholder: "Find", empty: "Empty" }}
+      />,
     );
     expect(screen.getByRole("dialog", { name: "Actions" })).toBeInTheDocument();
     expect(screen.getByRole("combobox")).toHaveAttribute("placeholder", "Find");
     expect(screen.getByRole("status")).toHaveTextContent("Empty");
+    unmount();
+    render(
+      <CommandPalette
+        open
+        onClose={() => {}}
+        commands={[{ id: "close", label: "Close", group: "View", keys: "Escape", run: () => {} }]}
+        platform="other"
+        labels={{ keyNames: { Escape: "Échap" } }}
+      />,
+    );
+    expect(screen.getByRole("dialog", { name: defaultCommandPaletteLabels.palette })).toBeInTheDocument();
+    expect(screen.getByRole("option")).toHaveTextContent("Échap");
   });
 
   it("is centred over a scrim by default, and anchored at a point inside the window with `at`", () => {

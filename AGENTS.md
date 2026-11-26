@@ -65,16 +65,17 @@ pnpm test-storybook            # Vitest's "storybook" project: every story in he
 ```
 
 - **Layout.** One folder per layer under `src/` (`tokens`, `primitives`, `composites`,
-  `shell`, `graph`, `hooks`), each JS layer with its `index.ts` entry. A component is four files
-  beside each other: `Name.tsx`, `Name.css` (tokens only, classes prefixed `pb-`),
-  `Name.stories.tsx` (its states) and `Name.test.tsx` (its behaviour).
+  `shell`, `graph`, `hooks`), each JS layer with its `index.ts` entry, and `src/testing/`
+  (`/testing`, the checks an app runs in its own tests: pure functions, no test runner, no
+  component). A component is four files beside each other: `Name.tsx`, `Name.css` (tokens only,
+  classes prefixed `pb-`), `Name.stories.tsx` (its states) and `Name.test.tsx` (its behaviour).
 - **The package.** `vite.config.ts` builds one ES module per layer (`dist/<layer>.js`) with its CSS
-  beside it (`dist/<layer>.css`, which the module imports itself), and copies `tokens.css` and
-  `base.css` as written. Peer dependencies (React, React DOM, `@xyflow/react`, `knobly`) are
-  never bundled. `package.json`'s `exports` names each subpath. A layer that uses another imports
-  it through that layer's index (`import { IconButton } from "../../primitives"`), which the build
-  keeps an import of `./primitives.js`, so each component ships once; reaching past another
-  layer's index fails the build.
+  beside it (`dist/<layer>.css`, which the module imports itself), and `dist/testing.js`, and
+  copies `tokens.css` and `base.css` as written. Peer dependencies (React, React DOM,
+  `@xyflow/react`, `knobly`) are never bundled. `package.json`'s `exports` names each subpath. A
+  layer that uses another imports it through that layer's index (`import { IconButton } from
+  "../../primitives"`), which the build keeps an import of `./primitives.js`, so each component
+  ships once; reaching past another layer's index fails the build.
 - **Tokens, themes and brands:** [`docs/tokens.md`](docs/tokens.md) (the token test is
   `src/tokens/tokens.test.ts`).
 - **CSS in tests.** Vitest blanks stylesheets by default; the unit project reads every CSS file

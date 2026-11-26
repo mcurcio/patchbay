@@ -69,7 +69,8 @@ write a brand; [`examples/brands/`](examples/brands/) has two worked examples.
 
 ## Documentation
 
-- [`docs/tokens.md`](docs/tokens.md): the tokens, the themes, writing a brand, and the contrast rules
+- [`docs/tokens.md`](docs/tokens.md): the tokens, the themes, writing a brand, and the contrast rules,
+  with `@mcurcio/patchbay/testing`'s `checkBrandContrast` to hold your brand to them in your own tests
 - [`docs/components.md`](docs/components.md): every built component and hook, with props, keyboard
   and touch behaviour
 - Storybook: every component's states under each example brand and theme (`pnpm storybook` in a

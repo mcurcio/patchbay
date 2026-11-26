@@ -82,7 +82,7 @@ export const LongTitle: Story = {
 
 /** The app's word for Close. */
 export const Labels: Story = {
-  args: { title: "Ajouter un nœud", closeLabel: "Fermer" },
+  args: { title: "Ajouter un nœud", labels: { close: "Fermer" } },
   play: async () => {
     await expect(screen.getByRole("button", { name: "Fermer" })).toBeInTheDocument();
   },

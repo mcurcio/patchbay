@@ -46,7 +46,7 @@ React for a level: it reads its source through [`useLiveValue`](components.md#us
 | `clipAt?` | 1.0 (0 dBFS), linear: a peak at or above it lights the clip lamp (`--pb-meter-hot`) |
 | `clipHoldMs?` | 2000: how long the lamp stays lit after the last such peak |
 | `label?` | Its accessible name (`role="img"`), "Level" by default; the numbers are never announced |
-| `title?` | `(peakDb, rmsDb, clipped) => string`, the tooltip; `defaultMeterTitle` reads "peak -12.0 dB, rms -18.3 dB" (−∞ for silence) |
+| `labels?` | Its words ([rule 8](components.md#rules-every-component-keeps)): `title`, `(peakDb, rmsDb, clipped) => string`, writes the tooltip; the default, `defaultMeterTitle`, reads "peak -12.0 dB, rms -18.3 dB" (−∞ for silence) |
 | `ref?` | A `MeterHandle`: `reset()` empties the bar and clears the hold and the lamp, as when the source closes |
 
 Other native `<div>` props (`className`, `id`, `data-*`, pointer handlers) pass through.
@@ -129,7 +129,7 @@ const nodeTypes = { source: SourceBox };
 | `disabled?` | A dashed border, the stripe hatched (the tone and the surface in stripes), the words in `--pb-muted`. Drawing only: whether its ports still connect is the app's rule |
 | `failed?` | The border in `--pb-err`, the header on `--pb-err-soft` and the line in `--pb-err`; the reason goes in `line`. With `disabled`, both looks |
 | `change?` | `"added" \| "removed" \| "renamed" \| "changed"`, open: an edit not yet applied. A 2 px border in `--pb-added`, `--pb-removed`, `--pb-renamed` or `--pb-warn`, drawn inward so the size holds, and a [`Badge`](components.md#state) of the same tone in the header with the change's word, so it never rests on colour; `removed` also strikes the title through. A change it does not know: a `--pb-line-strong` border, and the string itself as the badge's word |
-| `changeLabels?` | Partial `{ added, removed, renamed, changed }`, English defaults (`defaultChangeLabels`) |
+| `labels?` | Its words ([rule 8](components.md#rules-every-component-keeps)): the change badge's `added`, `removed`, `renamed` and `changed`, English in `defaultNodeBoxLabels` |
 | `status?` | Slot at the header's end (a `Pill`) |
 | `line?` | `ReactNode`, one row under the header saying why the node is silent: `--pb-muted`, `--pb-err` when `failed`; one line, ellipsis; a string is also its tooltip |
 | `inputs?`, `outputs?` | `PortSpec[]`: each [`PortRow`](#portrow)'s props without `side` (`NodeBox` sets it), keyed by `id` |
@@ -296,7 +296,7 @@ const follow = useFollowFit({ key: layoutKey, onFitted });
 | `minimap?`, `onMinimap?` | The minimap tool, shown only with `onMinimap(next)`, pressed (`aria-pressed`) while `minimap` is true; `<MiniMap>` is drawn while `minimap` is true, named by the tool's word |
 | `minimapNodeClassName?` | `string` or `(node) → string`, React Flow's `<MiniMap nodeClassName>`, so the app colours the minimap by its nodes' state |
 | `keyShortcuts?` | Partial `{ zoomIn, zoomOut, fit, tidy, minimap }` of `aria-keyshortcuts` values: the app's own bindings, set on the tools and shown in their tooltips ("Fit the view (F)"), not bound |
-| `labels?` | Partial `CanvasToolsLabels` `{ toolbar, zoomIn, zoomOut, fit, tidy, minimap }`; the defaults, `defaultCanvasToolsLabels`, are "Canvas", "Zoom in", "Zoom out", "Fit the view", "Tidy the layout" and "Minimap" |
+| `labels?` | Its words ([rule 8](components.md#rules-every-component-keeps)): `toolbar`, `zoomIn`, `zoomOut`, `fit`, `tidy`, `minimap`; the defaults, `defaultCanvasToolsLabels`, are "Canvas", "Zoom in", "Zoom out", "Fit the view", "Tidy the layout" and "Minimap" |
 | `className?` | Added to the panel's `pb-canvas-tools` |
 | `children?` | More tools (`IconButton`s) after patchbay's, in the same group |
 

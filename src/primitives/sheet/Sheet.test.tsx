@@ -137,7 +137,7 @@ describe("Sheet", () => {
 
   it("takes a width, the app's word for Close and its own class", () => {
     render(
-      <Sheet open onClose={() => undefined} label="S" width={420} closeLabel="Fermer" className="mine">
+      <Sheet open onClose={() => undefined} label="S" width={420} labels={{ close: "Fermer" }} className="mine">
         x
       </Sheet>,
     );

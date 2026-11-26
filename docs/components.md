@@ -36,8 +36,14 @@ focus ring, so none needs `base.css`.
    coarse)`) targets are at least 36 px (40 px in a tool group) and text fields are 16 px, since
    iOS zooms a smaller one; every animation stops under `prefers-reduced-motion`. Forced-colours
    mode keeps edges and states visible.
-8. **No app's words.** A component takes its words as props. The few defaults it has ("Close",
-   the theme switch's words) are props too, each replaceable.
+8. **Words: the `labels` prop.** A component says no app's words. The words it supplies itself
+   (a close button's name, a placeholder, an empty list's line, a tooltip, words only a screen
+   reader reads) come through one prop, `labels`: a partial object merged over English defaults
+   (`{ ...defaultXLabels, ...labels }`), its type `XLabels` and its defaults `defaultXLabels`
+   exported from the layer beside the component. A word that depends on a value is a function in
+   it (`more(n)`). The app's own content (`Field`'s and `Pill`'s `label`, the names `Splitter` and
+   `Toolbar` require, `Button`'s `busyLabel`, what a `Meter` measures) stays a prop of its own.
+   There is no app-wide provider: an app passes each component its words.
 
 Common prop names mean the same everywhere:
 
@@ -46,7 +52,8 @@ Common prop names mean the same everywhere:
 | `tone` | What a state or action is, by colour; an open enum |
 | `size` | `md` (the default) or `sm`, the compact one for dense rows |
 | `label` | The accessible name, or the words a screen reader reads (`Pill`'s and `Checkbox`'s are also shown) |
-| `title` | On `Dialog`, `Sheet`, `Panel` and `NodeBox`, the heading that also names it; on `Meter`, a function that writes its tooltip from the level; elsewhere the native hover tooltip |
+| `labels` | The component's own words, a partial object over its English defaults ([rule 8](#rules-every-component-keeps)) |
+| `title` | On `Dialog`, `Sheet`, `Panel` and `NodeBox`, the heading that also names it; elsewhere the native hover tooltip |
 | `actions` | A slot at the far end of a header, or the foot of a dialog |
 | `open`, `onClose` | Shown or not, held by the app; `onClose` asks the app to set `open` to false |
 | `className` | Added to the component's own `pb-` class, never replacing it |
@@ -86,8 +93,8 @@ pressed). `label` (required) is its accessible name and, unless `title` is given
 hovered, pressed or toned; 36 px on touch, 40 px in a `ToolGroup`.
 
 **`ThemeSwitch`**: one button that cycles system, light and dark. `choice`, `onChoose(next)`,
-`labels?` (a partial `ThemeSwitchLabels`: `theme`, `system`, `light`, `dark`, `systemHint`,
-`clickFor`; `defaultThemeSwitchLabels` are English). It shows an icon and the choice's word; its
+`labels?` (its words, [rule 8](#rules-every-component-keeps): `theme`, `system`, `light`, `dark`,
+`systemHint`, `clickFor`; `defaultThemeSwitchLabels`). It shows an icon and the choice's word; its
 name is "Theme: dark", its tooltip says what a press does (`themeSwitchTitle`). Below 600 px the
 word gives way to the icon alone. 36 px on touch. The choice is the app's, kept by
 [`useTheme`](#usetheme).
@@ -177,16 +184,22 @@ tab stop (with an inset focus ring), so the keyboard can scroll it; a short body
 **`Splitter`**: a pane's resize handle, a WAI-ARIA separator. `orientation: "vertical" |
 "horizontal"` (a vertical bar resizes a width), `value`, `min`, `max` (px), `onChange(px)` (whole
 px within the bounds, called only when the size changes), `label` (required: "Resize the
-inspector"), `edge?: "start" | "end"` (which edge of the pane it sits on; at the start, left or
-top, moving left or up grows the pane), `step?` (px per arrow key, 16 by default).
+inspector"), `edge?: "start" | "end"` (which edge of the pane it sits on, `start` by default),
+`step?` (px per arrow key, 16 by default).
 
-- **Keyboard:** the arrow toward growth adds a step, the opposite one takes one away; Home goes to
-  `min`, End to `max`. Keys with Ctrl, Alt or Meta are left alone.
+- **`edge` is logical.** A vertical splitter's start is the pane's inline start, the left edge in
+  left-to-right text and the right edge in right-to-left text, and its end the other; a horizontal
+  one's start is the top. Moving outward, away from the pane, grows it: on the start edge in
+  left-to-right text, left or up; in right-to-left text a vertical one mirrors, so right grows it
+  on the start edge and left on the end edge. The direction is the element's own
+  (`getComputedStyle(el).direction`), read when a key is pressed or a drag starts, so a page that
+  changes `dir` is followed at once.
+- **Keyboard:** the arrow pointing outward adds a step, the opposite one takes one away; Home goes
+  to `min`, End to `max`. Keys with Ctrl, Alt or Meta are left alone.
 - **Pointer:** the main button drags it, with pointer capture; it takes the focus and has
   `data-dragging` while dragging.
-- It sits absolutely on one edge of its positioned parent. The bar is 6 px; on touch its hit area is
-  36 px.
-- `edge` is physical: in right-to-left text the keys and the drag are not mirrored.
+- It sits absolutely on one edge of its positioned parent, placed with logical properties
+  (`inset-inline-start`, `inset-block-end`). The bar is 6 px; on touch its hit area is 36 px.
 
 **`Toolbar`**: a WAI-ARIA toolbar, a row (or column) of controls that is one tab stop. `label`
 (required), `orientation?: "horizontal" | "vertical"`.
@@ -208,7 +221,8 @@ canvas's zoom, fit and minimap. Its tools are `IconButton`s (or plain buttons na
 ### Overlays
 
 **`Dialog`**: a modal dialog over a scrim, in a portal on `<body>`. `open`, `onClose`, `title`
-(also its name), `children`, `actions?` (a row at its foot), `closeLabel?` ("Close").
+(also its name), `children`, `actions?` (a row at its foot), `labels?` (its words, [rule
+8](#rules-every-component-keeps): `close`, the close button's name, "Close").
 
 - Opening focuses a control the content focused itself (`autoFocus`), else the body's first
   control, else the dialog. Closing gives focus back to what had it.
@@ -222,7 +236,8 @@ canvas's zoom, fit and minimap. Its tools are `IconButton`s (or plain buttons na
 **`Sheet`**: a panel over its container's right edge, or rising from its bottom, as an inspector
 on a narrow window or a phone. `open`, `onClose`, `side?: "right" | "bottom"` (right by default),
 `title?` (or `label?`, its name without one), `children`, `width?` (a right sheet's width in px,
-held to 280–560 px and 48 px short of its container; 360 by default), `closeLabel?` ("Close").
+held to 280–560 px and 48 px short of its container; 360 by default), `labels?` (its words, [rule
+8](#rules-every-component-keeps): `close`, "Close").
 
 - It is not modal: the page stays live, and opening it does not take the focus. Escape inside it
   and its close button call `onClose`; if it closes holding the focus, the focus goes back to where
@@ -235,7 +250,8 @@ held to 280–560 px and 48 px short of its container; 360 by default), `closeLa
 ## Composites (`/composites`)
 
 Composites are drawn with primitives: importing `/composites` loads `/primitives` and its
-stylesheet too. Their few default words ("Dismiss") are props, as the primitives' are.
+stylesheet too. Their own words come through `labels`, as the primitives' do ([rule
+8](#rules-every-component-keeps)).
 
 ### News and state
 
@@ -243,7 +259,8 @@ stylesheet too. Their few default words ("Dismiss") are props, as the primitives
 on a raised surface with a stripe in its tone at the start (warn and err on their soft surfaces).
 `tone: "ok" | "warn" | "err" | "quiet" | "off"` (open; one it does not know keeps a plain stripe),
 `children` (the news), `actions?` (a slot at its end: the buttons that act on it), `onDismiss?`
-(shows a close button that calls it), `dismissLabel?` ("Dismiss"), plus native `div` props.
+(shows a close button that calls it), `labels?` (its words, [rule 8](#rules-every-component-keeps):
+`dismiss`, the close button's name, "Dismiss"), plus native `div` props.
 
 - An `err` banner is `role="alert"`, read at once; every other tone is `role="status"`, read when
   the screen reader is free. The role is the banner's own.
@@ -265,9 +282,10 @@ a saved file), each on a raised, shadowed surface with a stripe in its tone at t
 are this component's props): `toasts: { id, tone, text, count?, action? }[]` (the shown ones,
 oldest first; tones `"ok" | "warn" | "err" | "quiet" | "off"`, open, one it does not know drawn
 with a plain stripe; `text` any node; `action: { label, run }`), `more?` (how many older ones are
-folded away), `onDismiss(id)`, `onHold?(held)`, `placement?`, and the words `label?`
-("Notifications", the region's name), `dismissLabel?` ("Dismiss"), `moreLabel?(more)` ("and n
-more"), `countLabel?(count)` ("n times"), plus native `section` props.
+folded away), `onDismiss(id)`, `onHold?(held)`, `placement?`, `labels?` (its words, [rule
+8](#rules-every-component-keeps): `region`, the region's name, "Notifications", which an
+`aria-label` the app gives replaces; `dismiss`, "Dismiss"; `more(more)`, "and n more";
+`count(count)`, "n times"), plus native `section` props.
 
 - **Placement:** `"bottom-end"` (the default), `"bottom-start"`, `"bottom"`, `"top-end"`,
   `"top-start"` or `"top"` sit at that corner or edge of the nearest positioned container (the
@@ -301,10 +319,11 @@ more"), `countLabel?(count)` ("n times"), plus native `section` props.
 ### Commands and keys
 
 **`CommandPalette`**: a search field over the app's commands, in a portal on `<body>`. `open`,
-`onClose`, `commands: { id, label, group, keys?, hint?, run, disabled? }[]`, `at?: { x, y }`, and
-the words `placeholder?` ("Type a command"), `label?` ("Commands", its name), `emptyLabel?` ("No
-commands"), `noMatchLabel?(query)` ("No command matches “query”"), plus `platform?` and
-`keyNames?` for the keys' labels, and `className?`.
+`onClose`, `commands: { id, label, group, keys?, hint?, run, disabled? }[]`, `at?: { x, y }`,
+`platform?` (the keys' platform), `labels?` (its words, [rule 8](#rules-every-component-keeps):
+`palette`, its name, "Commands"; `placeholder`, "Type a command"; `empty`, "No commands";
+`noMatch(query)`, "No command matches “query”"; `keyNames`, `keyLabel`'s `names` for the keys,
+none by default) and `className?`.
 
 - **Commands.** Each is listed under its `group`, the groups in the order they first appear. `keys`
   (a key string or several, as [`useShortcuts`](#useshortcuts) takes them) is drawn through
@@ -337,19 +356,20 @@ commands"), `noMatchLabel?(query)` ("No command matches “query”"), plus `pla
   follows the window as it resizes. `placePalette(at, window)` is that rule, and `PALETTE_WIDTH`,
   `PALETTE_HEIGHT` and `PALETTE_GUTTER` its sizes.
 - **Empty and no match.** A `role="status"` line, there from the start so a screen reader hears
-  the change, says `emptyLabel` with no commands and `noMatchLabel(query)` when none match.
+  the change, says `labels.empty` with no commands and `labels.noMatch(query)` when none match.
 - On touch the field has 16 px text and the rows are at least 40 px tall. It fades in over
   `--pb-motion-fast`, still under reduced motion; under forced colours the active command keeps a
   frame in the system's highlight.
 
 **`ShortcutSheet`**: the keys an app binds, listed in a [`Dialog`](#overlays). `open`, `onClose`,
-`shortcuts: { keys, label, group }[]`, `children?` (a note under the lists), and the words `title?`
-("Keyboard shortcuts"), `orLabel?` ("or"), `emptyLabel?` ("No shortcuts"), `closeLabel?`
-("Close"), plus `platform?`, `keyNames?` and `className?`.
+`shortcuts: { keys, label, group }[]`, `children?` (a note under the lists), `platform?`,
+`labels?` (its words, [rule 8](#rules-every-component-keeps): `title`, the dialog's title,
+"Keyboard shortcuts"; `or`, "or"; `empty`, "No shortcuts"; `close`, "Close"; `keyNames`, as the
+palette's) and `className?`.
 
 - One section per group, in the order the groups first appear, named by its heading (an `h3`);
   each a `<dl>` of what a key does beside the key in a key cap, drawn through `keyLabel` and
-  given as `aria-keyshortcuts`. Several keys that do the same are joined by `orLabel`.
+  given as `aria-keyshortcuts`. Several keys that do the same are joined by `labels.or`.
   `groupShortcuts(shortcuts)` is the grouping, exported.
 - It binds nothing: the app's `useShortcuts` table is usually where the lines come from. The rest
   (focus, Escape, the scrim, phone width) is `Dialog`'s.

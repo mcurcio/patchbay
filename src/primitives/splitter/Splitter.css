@@ -1,6 +1,7 @@
-/* A splitter (Splitter.tsx): a 6 px bar straddling one edge of its positioned parent, transparent until hovered,
-   focused or dragged, when its accent fill is the cue (so focus needs no outline of its own). On touch its hit area
-   grows to 36 px while the bar drawn stays thin. */
+/* A splitter (Splitter.tsx): a 6 px bar straddling one edge of its positioned parent, placed by logical properties
+   (a vertical one's start is the inline start, the right in right-to-left text), transparent until hovered, focused
+   or dragged, when its accent fill is the cue (so focus needs no outline of its own). On touch its hit area grows to
+   36 px while the bar drawn stays thin. */
 .pb-splitter {
   position: absolute;
   z-index: 5;
@@ -12,33 +13,31 @@
 }
 
 .pb-splitter[data-orientation="vertical"] {
-  top: 0;
-  bottom: 0;
+  inset-block: 0;
   width: 6px;
   cursor: col-resize;
 }
 
 .pb-splitter[data-orientation="vertical"][data-edge="start"] {
-  left: -3px;
+  inset-inline-start: -3px;
 }
 
 .pb-splitter[data-orientation="vertical"][data-edge="end"] {
-  right: -3px;
+  inset-inline-end: -3px;
 }
 
 .pb-splitter[data-orientation="horizontal"] {
-  left: 0;
-  right: 0;
+  inset-inline: 0;
   height: 6px;
   cursor: row-resize;
 }
 
 .pb-splitter[data-orientation="horizontal"][data-edge="start"] {
-  top: -3px;
+  inset-block-start: -3px;
 }
 
 .pb-splitter[data-orientation="horizontal"][data-edge="end"] {
-  bottom: -3px;
+  inset-block-end: -3px;
 }
 
 .pb-splitter:hover,
@@ -56,17 +55,13 @@
   }
 
   .pb-splitter[data-orientation="vertical"]::before {
-    top: 0;
-    bottom: 0;
-    left: -15px;
-    right: -15px;
+    inset-block: 0;
+    inset-inline: -15px;
   }
 
   .pb-splitter[data-orientation="horizontal"]::before {
-    left: 0;
-    right: 0;
-    top: -15px;
-    bottom: -15px;
+    inset-inline: 0;
+    inset-block: -15px;
   }
 }
 

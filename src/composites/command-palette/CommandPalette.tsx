@@ -48,20 +48,34 @@ export type CommandPaletteProps = {
   commands: readonly Command[];
   /** Anchors the palette's top-left corner at this point, kept inside the window; centred near the top without it. */
   at?: PalettePoint;
-  /** The field's placeholder, "Type a command" by default. */
-  placeholder?: string;
-  /** The palette's name for screen readers, "Commands" by default. */
-  label?: string;
-  /** Shown when there are no commands at all, "No commands" by default. */
-  emptyLabel?: ReactNode;
-  /** Shown when the query matches none, "No command matches “query”" by default. */
-  noMatchLabel?: (query: string) => ReactNode;
   /** The platform keys are drawn for; the browser's by default. */
   platform?: Platform;
-  /** Replaces keyLabel's words for keys and modifiers ("Escape", "Ctrl"). */
-  keyNames?: Readonly<Record<string, string>>;
+  /** Words to replace; the rest keep their defaults. */
+  labels?: Partial<CommandPaletteLabels>;
   /** A class added to the palette's box. */
   className?: string;
+};
+
+/** The palette's own words, each replaceable. */
+export interface CommandPaletteLabels {
+  /** The palette's name for screen readers: "Commands". */
+  palette: string;
+  /** The field's placeholder: "Type a command". */
+  placeholder: string;
+  /** Shown when there are no commands at all: "No commands". */
+  empty: ReactNode;
+  /** Shown when the query matches none: "No command matches “query”". */
+  noMatch: (query: string) => ReactNode;
+  /** Replaces keyLabel's words for keys and modifiers ("Escape", "Ctrl"); none by default, keyLabel's own. */
+  keyNames: Readonly<Record<string, string>>;
+}
+
+export const defaultCommandPaletteLabels: CommandPaletteLabels = {
+  palette: "Commands",
+  placeholder: "Type a command",
+  empty: "No commands",
+  noMatch: (query) => `No command matches “${query}”`,
+  keyNames: {},
 };
 
 /** The anchored palette's size, held inside the window less the gutter. */
@@ -86,8 +100,6 @@ export function placePalette(
   return { left: clamp(at.x, width, window.width), top: clamp(at.y, height, window.height), width, height };
 }
 
-const defaultNoMatch = (query: string) => `No command matches “${query}”`;
-
 /** How many rows Page Up and Page Down move when the list's rows cannot be measured. */
 const fallbackPage = 8;
 
@@ -107,18 +119,8 @@ function useWindowSize(watch: boolean) {
   return size;
 }
 
-function OpenPalette({
-  onClose,
-  commands,
-  at,
-  placeholder = "Type a command",
-  label = "Commands",
-  emptyLabel = "No commands",
-  noMatchLabel = defaultNoMatch,
-  platform,
-  keyNames,
-  className,
-}: Omit<CommandPaletteProps, "open">) {
+function OpenPalette({ onClose, commands, at, platform, labels, className }: Omit<CommandPaletteProps, "open">) {
+  const words = { ...defaultCommandPaletteLabels, ...labels };
   const ids = useId();
   const listId = `${ids}-list`;
   const [query, setQuery] = useState("");
@@ -239,8 +241,8 @@ function OpenPalette({
   const anchored = placed !== undefined;
 
   let body: ReactNode;
-  if (commands.length === 0) body = emptyLabel;
-  else if (flat.length === 0) body = noMatchLabel(query.trim());
+  if (commands.length === 0) body = words.empty;
+  else if (flat.length === 0) body = words.noMatch(query.trim());
 
   return (
     <div
@@ -256,7 +258,7 @@ function OpenPalette({
         className={className === undefined ? "pb-palette" : `pb-palette ${className}`}
         role="dialog"
         aria-modal="true"
-        aria-label={label}
+        aria-label={words.palette}
         style={
           placed === undefined
             ? undefined
@@ -272,7 +274,7 @@ function OpenPalette({
           className="pb-palette-field"
           type="text"
           role="combobox"
-          aria-label={label}
+          aria-label={words.palette}
           aria-expanded="true"
           aria-controls={listId}
           aria-autocomplete="list"
@@ -281,7 +283,7 @@ function OpenPalette({
           autoCapitalize="off"
           autoCorrect="off"
           spellCheck={false}
-          placeholder={placeholder}
+          placeholder={words.placeholder}
           value={query}
           onChange={(event) => {
             setQuery(event.target.value);
@@ -293,7 +295,7 @@ function OpenPalette({
           className="pb-palette-list"
           id={listId}
           role="listbox"
-          aria-label={label}
+          aria-label={words.palette}
           hidden={flat.length === 0}
         >
           {groups.map((group, index) => {
@@ -340,7 +342,7 @@ function OpenPalette({
                       {keys.length > 0 && (
                         <span className="pb-palette-keys">
                           {keys.map((one) => (
-                            <kbd key={one}>{keyLabel(one, { platform, names: keyNames })}</kbd>
+                            <kbd key={one}>{keyLabel(one, { platform, names: words.keyNames })}</kbd>
                           ))}
                         </span>
                       )}
