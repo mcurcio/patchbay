@@ -13,9 +13,10 @@ app keeps its own look, and accessible components that work from the keyboard an
 patchbay draws and handles interaction. Your app keeps its data, its protocol and its editing
 model: components take props and report what the person did through callbacks.
 
-**Status:** early (0.x). The tokens, the primitives, the first composites and hooks and the level
-meter are built; the rest of the composites, the app shell and the React Flow graph components are
-designed in [`docs/design/patchbay.md`](docs/design/patchbay.md) and not built yet. Expect
+**Status:** early (0.x). The tokens, the primitives, the first composites and hooks, the level
+meter and the graph's node box and port rows are built; the rest of the composites, the app shell,
+and the graph's wires and canvas tools are designed in
+[`docs/design/patchbay.md`](docs/design/patchbay.md) and not built yet. Expect
 breaking changes between minor versions until 1.0.
 
 ## Install
@@ -24,9 +25,9 @@ breaking changes between minor versions until 1.0.
 npm install @mcurcio/patchbay react react-dom
 ```
 
-React 19 is a peer dependency. The graph layer will also need `@xyflow/react` 12, and the code
-views can highlight [knobly](https://github.com/mcurcio/knobly) text if you install `knobly`; both
-are optional.
+React 19 is a peer dependency. The graph layer (`@mcurcio/patchbay/graph`) also needs
+`@xyflow/react` 12, and the code views can highlight [knobly](https://github.com/mcurcio/knobly)
+text if you install `knobly`; both are optional, needed only by the parts that use them.
 
 ## Quickstart
 

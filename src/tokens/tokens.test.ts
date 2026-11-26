@@ -241,6 +241,13 @@ describe("the example brands", () => {
     expect({ stray, unknown }).toEqual({ stray: [], unknown: [] });
   });
 
+  // A node box's sizes are what an app lays its nodes out with before they render (docs/graph.md#geometry), so a
+  // brand that changed one would draw boxes of another size than the layout made room for.
+  it.each(brands)("$name sets none of the node geometry tokens", (brand) => {
+    const own = [brand.light, brand.systemDark, brand.chosenDark].flatMap((block) => [...tokensOf(block).keys()]);
+    expect(own.filter((name) => name.startsWith("--pb-node-"))).toEqual([]);
+  });
+
   it.each(brands)("$name writes its dark set the same both times", (brand) => {
     expect(tokensOf(brand.systemDark)).toEqual(tokensOf(brand.chosenDark));
   });
