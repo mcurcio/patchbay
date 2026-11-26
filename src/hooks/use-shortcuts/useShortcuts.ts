@@ -108,9 +108,12 @@ function isChord(parsed: Parsed): boolean {
   return parsed.mod || parsed.ctrl || parsed.alt || parsed.meta;
 }
 
-/** A character that Shift itself makes ("?", "!"), whose binding need not name Shift. */
+/**
+ * A character that Shift itself makes ("?", "!"), whose binding need not name Shift. Not a digit: a digit is found by
+ * its physical key too, so Shift+1 ("!") would otherwise run the binding for "1".
+ */
 function isShiftedCharacter(key: string): boolean {
-  return key.length === 1 && key.toLowerCase() === key.toUpperCase() && key !== " ";
+  return key.length === 1 && key.toLowerCase() === key.toUpperCase() && key !== " " && !/[0-9]/.test(key);
 }
 
 type KeyEventLike = Pick<KeyboardEvent, "key" | "code" | "ctrlKey" | "altKey" | "shiftKey" | "metaKey">;

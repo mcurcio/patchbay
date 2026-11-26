@@ -53,6 +53,17 @@ describe("matching a key string", () => {
     expect(matchesKeys(press({ key: "escape" }), "Escape", "other")).toBe(true);
   });
 
+  it("wants Shift named for a digit, which is found by its physical key", () => {
+    expect(matchesKeys(press({ key: "1", code: "Digit1" }), "1", "other")).toBe(true);
+    expect(matchesKeys(press({ key: "!", code: "Digit1", shiftKey: true }), "1", "other")).toBe(false);
+    expect(matchesKeys(press({ key: "!", code: "Digit1", ctrlKey: true, shiftKey: true }), "Mod+1", "other")).toBe(
+      false,
+    );
+    expect(
+      matchesKeys(press({ key: "!", code: "Digit1", ctrlKey: true, shiftKey: true }), "Mod+Shift+1", "other"),
+    ).toBe(true);
+  });
+
   it("reads aliases, Space and Plus", () => {
     expect(matchesKeys(press({ key: " " }), "Space", "other")).toBe(true);
     expect(matchesKeys(press({ key: " " }), " ", "other")).toBe(true);

@@ -414,7 +414,7 @@ preventDefault? }`; the table may change every render, and the one listener alwa
   also what a [`ShortcutSheet` or `CommandPalette`](#commands-and-keys) shows, through `keyLabel`.
 - **Matching.** A press matches when its key is the string's and its Ctrl, Meta, Alt and Shift are
   exactly the ones named, except that a character Shift itself makes (`?`, `!`) need not name
-  Shift. A letter or digit that Alt or the keyboard layout turned into another character is found
+  Shift; a digit always does (`Shift+1` is not `1`). A letter or digit that Alt or the keyboard layout turned into another character is found
   by its physical key (`event.code`), so `Alt+K` works on a Mac and `Mod+K` on a Cyrillic layout;
   a Latin letter that differs is another key. A string naming a modifier it does not know never
   matches.
