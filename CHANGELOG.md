@@ -1,3 +1,9 @@
+## [0.4.0](https://github.com/mcurcio/patchbay/compare/v0.3.0...v0.4.0) (2026-11-26)
+
+### Features
+
+* **primitives:** accent and muted tones, change tones and a filled Badge ([fe7476b](https://github.com/mcurcio/patchbay/commit/fe7476b15716de8f6904b6e6c3f21954833f7bfe))
+
 ## [0.3.0](https://github.com/mcurcio/patchbay/compare/v0.2.0...v0.3.0) (2026-11-25)
 
 ### Features
