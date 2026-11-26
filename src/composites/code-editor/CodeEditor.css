@@ -117,8 +117,10 @@
 }
 
 /* A line's mark: a circle for an error, a diamond for a warning, a ring for any other severity, so the severity
-   never rests on colour alone; a line with none keeps the room. */
+   never rests on colour alone; a line with none keeps the room. The mark's own 7 px box takes the pointer and its
+   ::before draws the shape, so the shape can turn (the diamond) while the box, and its touch hit area, do not. */
 .pb-code-gutter-mark {
+  position: relative;
   display: inline-block;
   box-sizing: border-box;
   width: 7px;
@@ -132,20 +134,40 @@
   cursor: pointer;
 }
 
-.pb-code-gutter-mark[data-mark="error"] {
+.pb-code-gutter-mark[data-mark]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+}
+
+.pb-code-gutter-mark[data-mark="error"]::before {
   border-radius: var(--pb-radius-pill);
   background: var(--pb-err);
 }
 
-.pb-code-gutter-mark[data-mark="warning"] {
+.pb-code-gutter-mark[data-mark="warning"]::before {
   border-radius: 0;
   background: var(--pb-warn);
   transform: rotate(45deg) scale(0.85);
 }
 
-.pb-code-gutter-mark[data-mark="other"] {
+.pb-code-gutter-mark[data-mark="other"]::before {
   border: 2px solid var(--pb-muted);
   border-radius: var(--pb-radius-pill);
+}
+
+/* On a touch screen a mark's hit area is 36 px square, centred on the mark (its row and its neighbours' share the
+   overlap, and the gutter's own edge clips it), while the mark drawn stays 7 px. */
+@media (hover: none) and (pointer: coarse) {
+  .pb-code-gutter-mark[data-mark]::after {
+    content: "";
+    position: absolute;
+    inset-block-start: calc(50% - 18px);
+    inset-inline-start: calc(50% - 18px);
+    width: 36px;
+    height: 36px;
+  }
 }
 
 /* Forced colours (high contrast): the plain textarea in the system's colours, no copy behind it; the marks keep their
@@ -160,13 +182,13 @@
     background: Canvas;
   }
 
-  .pb-code-gutter-mark[data-mark="error"],
-  .pb-code-gutter-mark[data-mark="warning"] {
+  .pb-code-gutter-mark[data-mark="error"]::before,
+  .pb-code-gutter-mark[data-mark="warning"]::before {
     forced-color-adjust: none;
     background: CanvasText;
   }
 
-  .pb-code-gutter-mark[data-mark="other"] {
+  .pb-code-gutter-mark[data-mark="other"]::before {
     border-color: CanvasText;
   }
 }

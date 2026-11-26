@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
-import { expect, fn } from "storybook/test";
+import { expect, fn, waitFor } from "storybook/test";
 import { Button } from "../button";
 import { TextInput } from "../text-input";
 import { Sheet } from "./Sheet";
@@ -23,7 +23,7 @@ const meta = {
     title: "transform_1",
     children: <p style={{ margin: 0 }}>The selected node&apos;s settings.</p>,
   },
-  argTypes: { side: { control: "inline-radio", options: ["right", "bottom"] } },
+  argTypes: { side: { control: "inline-radio", options: ["end", "start", "bottom"] } },
   decorators: [
     (Story) => (
       <div style={workspace}>
@@ -36,16 +36,66 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Right: Story = {
-  play: async ({ args, canvas, userEvent }) => {
+/** The sheet's edge and its container's, in px, once the entrance has finished. */
+async function edges(canvasElement: HTMLElement) {
+  const sheet = canvasElement.querySelector<HTMLElement>(".pb-sheet");
+  const box = sheet?.parentElement;
+  if (sheet == null || box == null) throw new Error("no sheet");
+  await waitFor(() => expect(sheet.getAnimations()).toHaveLength(0));
+  const inner = box.getBoundingClientRect();
+  const border = parseFloat(getComputedStyle(box).borderLeftWidth);
+  return { sheet: sheet.getBoundingClientRect(), left: inner.left + border, right: inner.right - border };
+}
+
+/** At the inline end, the default: the right edge in left-to-right text. */
+export const End: Story = {
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    const { sheet, right } = await edges(canvasElement);
+    await expect(Math.abs(sheet.right - right)).toBeLessThan(0.5);
     await userEvent.click(canvas.getByRole("button", { name: "Close" }));
     await expect(args.onClose).toHaveBeenCalledOnce();
   },
 };
 
+/** At the inline start: the left edge in left-to-right text. */
+export const Start: Story = {
+  args: { side: "start" },
+  play: async ({ canvasElement }) => {
+    const { sheet, left } = await edges(canvasElement);
+    await expect(Math.abs(sheet.left - left)).toBeLessThan(0.5);
+  },
+};
+
+/** Right-to-left text: the inline end is the left edge, so the sheet is there, its close button at its left end. */
+export const RightToLeft: Story = {
+  decorators: [
+    (Story) => (
+      <div dir="rtl">
+        <Story />
+      </div>
+    ),
+  ],
+  play: async ({ canvas, canvasElement }) => {
+    const { sheet, left } = await edges(canvasElement);
+    await expect(Math.abs(sheet.left - left)).toBeLessThan(0.5);
+    const close = canvas.getByRole("button", { name: "Close" }).getBoundingClientRect();
+    await expect(close.left - sheet.left).toBeLessThan(sheet.width / 2);
+  },
+};
+
+/** Right-to-left text at the inline start: the right edge. */
+export const RightToLeftStart: Story = {
+  ...RightToLeft,
+  args: { side: "start" },
+  play: async ({ canvasElement }) => {
+    const { sheet, right } = await edges(canvasElement);
+    await expect(Math.abs(sheet.right - right)).toBeLessThan(0.5);
+  },
+};
+
 export const Bottom: Story = { args: { side: "bottom" } };
 
-/** A right sheet as wide as the app keeps its inspector. */
+/** An inline sheet as wide as the app keeps its inspector. */
 export const Wide: Story = { args: { width: 520 } };
 
 /** Named by a label, with no title drawn. */

@@ -36,19 +36,57 @@ describe("Sheet", () => {
     expect(screen.getByRole("dialog", { name: "Inspector" })).toBeInTheDocument();
   });
 
-  it("is drawn from the right by default, or from the bottom", () => {
+  it("is drawn from the inline end by default, or from the inline start or the bottom", () => {
     const { rerender } = render(
       <Sheet open onClose={() => undefined} label="S">
         x
       </Sheet>,
     );
-    expect(screen.getByRole("dialog")).toHaveAttribute("data-side", "right");
-    rerender(
-      <Sheet open onClose={() => undefined} label="S" side="bottom">
+    expect(screen.getByRole("dialog")).toHaveAttribute("data-side", "end");
+    for (const side of ["start", "bottom"] as const) {
+      rerender(
+        <Sheet open onClose={() => undefined} label="S" side={side}>
+          x
+        </Sheet>,
+      );
+      expect(screen.getByRole("dialog")).toHaveAttribute("data-side", side);
+    }
+  });
+
+  it("is placed by logical properties, so right-to-left text mirrors it, and slides in from its own edge", () => {
+    const rule = (selector: string) => {
+      const at = css.indexOf(`${selector} {`);
+      if (at < 0) throw new Error(`no rule for ${selector}`);
+      return css.slice(at, css.indexOf("}", at));
+    };
+    expect(rule(".pb-sheet")).toMatch(/inset-inline-end: 0/);
+    expect(rule(".pb-sheet")).toMatch(/border-inline-start: 1px/);
+    expect(rule('.pb-sheet[data-side="start"]')).toMatch(/inset-inline: 0 auto/);
+    expect(rule('.pb-sheet[data-side="bottom"]')).toMatch(/inset-inline: 0/);
+    expect(css).not.toMatch(/(^|[\s;{])(left|right):/m);
+    expect(css).not.toMatch(/border-(left|right)|padding-(left|right)/);
+    // The entrance moves the logical inset of its own edge, so it turns with the text without a direction selector
+    // (a build may rewrite :dir() into a list of languages, which a page that sets only dir would not match).
+    expect(rule("@keyframes pb-sheet-from-end")).toMatch(/inset-inline-end: calc\(-1 \* var\(--pb-space-5\)\)/);
+    expect(rule("@keyframes pb-sheet-from-start")).toMatch(/inset-inline-start: calc\(-1 \* var\(--pb-space-5\)\)/);
+    expect(rule('.pb-sheet[data-side="start"]')).toMatch(/animation-name: pb-sheet-from-start/);
+    expect(css).not.toMatch(/:dir\(|translateX/);
+  });
+
+  it("draws its actions in the header row, after the title and before the close button", () => {
+    render(
+      <Sheet open onClose={() => undefined} title="transform_1" actions={<button type="button">More</button>}>
         x
       </Sheet>,
     );
-    expect(screen.getByRole("dialog")).toHaveAttribute("data-side", "bottom");
+    const head = screen.getByRole("heading", { name: "transform_1" }).parentElement;
+    expect(head).toHaveClass("pb-sheet-head");
+    expect([...(head?.children ?? [])].map((child) => child.getAttribute("aria-label") ?? child.textContent)).toEqual([
+      "transform_1",
+      "More",
+      "Close",
+    ]);
+    expect(head?.lastElementChild).toBe(screen.getByRole("button", { name: "Close" }));
   });
 
   it("does not take the focus on opening", () => {
@@ -147,7 +185,7 @@ describe("Sheet", () => {
     expect(screen.getByRole("button", { name: "Fermer" })).toBeInTheDocument();
   });
 
-  it("holds the inspector's sizes: 280–560 px on the right, 62 % from the bottom", () => {
+  it("holds the inspector's sizes: 280–560 px at an inline edge, 62 % from the bottom", () => {
     expect(css).toMatch(/width: min\(clamp\(280px, var\(--pb-sheet-width, 360px\), 560px\), calc\(100% - 48px\)\)/);
     expect(css).toMatch(/\.pb-sheet\[data-side="bottom"\] \{[^}]*max-height: 62%/);
     expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*?animation: none/);

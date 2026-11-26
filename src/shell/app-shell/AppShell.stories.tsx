@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { type ReactNode, useState } from "react";
 import { expect, fn, waitFor } from "storybook/test";
 import { usePersistentState } from "../../hooks";
-import { Button, Dialog, IconButton, Panel, Pill, ThemeSwitch, ToolGroup } from "../../primitives";
+import { Button, Dialog, IconButton, Pill, ThemeSwitch, ToolGroup } from "../../primitives";
 import { AppShell, type AppShellProps } from "./AppShell";
 import { clampDrawerHeight, clampInspectorWidth } from "./bounds";
 
@@ -23,13 +23,13 @@ function Canvas() {
   );
 }
 
+/** The inspector's body: the shell draws its header row from the inspector's title and actions. */
 function Settings() {
-  return (
-    <Panel title="transform_1" level={2}>
-      <p style={{ margin: 0 }}>The selected node&apos;s settings.</p>
-    </Panel>
-  );
+  return <p style={{ margin: 0 }}>The selected node&apos;s settings.</p>;
 }
+
+/** The header row's own controls, at its far end. */
+const inspectorActions = <IconButton label="More">⋯</IconButton>;
 
 function Log() {
   return (
@@ -79,7 +79,15 @@ function Held({ seed = {}, ...props }: Partial<AppShellProps> & { seed?: Seed; c
           </Button>
         ),
       }}
-      inspector={{ content: <Settings />, open: inspectorOpen, onOpen: setInspectorOpen, width, onWidth: setWidth }}
+      inspector={{
+        title: "transform_1",
+        actions: inspectorActions,
+        content: <Settings />,
+        open: inspectorOpen,
+        onOpen: setInspectorOpen,
+        width,
+        onWidth: setWidth,
+      }}
       drawer={{ header: "Log", content: <Log />, open: drawerOpen, onOpen: setDrawerOpen, height, onHeight: setHeight }}
       {...props}
     >
@@ -138,13 +146,13 @@ export const BarOnly: Story = { args: { topBar } };
 /** Just the canvas, inside the safe-area insets. */
 export const CanvasOnly: Story = {};
 
-/** Below 760 px the inspector is a sheet over the canvas's right edge; Escape inside it closes it. */
+/** Below 760 px the inspector is a sheet over the canvas's inline end (the right); Escape inside it closes it. */
 export const Narrow: Story = {
   globals: { viewport: { value: "narrow" } },
   render: () => <Held />,
   play: async ({ canvas, userEvent }) => {
-    const sheet = await canvas.findByRole("dialog", { name: "Inspector" });
-    await expect(sheet).toHaveAttribute("data-side", "right");
+    const sheet = await canvas.findByRole("dialog", { name: "transform_1" });
+    await expect(sheet).toHaveAttribute("data-side", "end");
     await expect(canvas.queryByRole("complementary")).toBeNull();
     // The app's own toggle closes and opens it, and so does the sheet's close button.
     await userEvent.click(canvas.getByRole("button", { name: "Inspector" }));
@@ -155,12 +163,73 @@ export const Narrow: Story = {
   },
 };
 
+/**
+ * The inspector's one header row: its title and actions, then its body. Each layout draws one row, never a sheet's
+ * close row above a panel's header.
+ */
+async function oneHeaderRow(root: HTMLElement, within: HTMLElement) {
+  const headings = within.querySelectorAll("h1, h2, h3, h4, h5, h6");
+  await expect(headings).toHaveLength(1);
+  await expect(headings[0]).toHaveTextContent("transform_1");
+  const more = within.querySelector<HTMLElement>('[aria-label="More"]');
+  if (more === null) throw new Error("no actions");
+  const row = (element: Element) => element.getBoundingClientRect();
+  const heading = row(headings[0] as Element);
+  // The actions sit on the heading's row, and the body below it.
+  await expect(Math.abs(row(more).top + row(more).height / 2 - (heading.top + heading.height / 2))).toBeLessThan(4);
+  const body = [...root.querySelectorAll("p")].find((p) => p.textContent.includes("settings"));
+  if (body === undefined) throw new Error("no body");
+  await expect(row(body).top).toBeGreaterThan(heading.bottom);
+}
+
+/** At 1280 px the shell draws the inspector's header row as a Panel's, its body under it. */
+export const TitledWide: Story = {
+  globals: { viewport: { value: "wide" } },
+  render: () => <Held />,
+  play: async ({ canvas, canvasElement }) => {
+    const inspector = canvas.getByRole("complementary", { name: "Inspector" });
+    await expect(canvas.getByRole("region", { name: "transform_1" })).toBeInTheDocument();
+    await oneHeaderRow(canvasElement, inspector);
+  },
+};
+
+/** At 700 px the sheet's own header row holds the title, the actions and its close button: one row. */
+export const TitledNarrow: Story = {
+  globals: { viewport: { value: "narrow" } },
+  render: () => <Held />,
+  play: async ({ canvas, canvasElement }) => {
+    const sheet = await canvas.findByRole("dialog", { name: "transform_1" });
+    await waitFor(() => expect(sheet.getAnimations()).toHaveLength(0));
+    await expect(sheet.querySelector(".pb-panel-header")).toBeNull();
+    await oneHeaderRow(canvasElement, sheet);
+    const close = canvas.getByRole("button", { name: "Close" }).getBoundingClientRect();
+    const title = canvas.getByRole("heading", { name: "transform_1" }).getBoundingClientRect();
+    await expect(Math.abs(close.top + close.height / 2 - (title.top + title.height / 2))).toBeLessThan(4);
+  },
+};
+
+/** At 390 px the same one row heads the sheet rising from the bottom. */
+export const TitledPhone: Story = {
+  ...TitledNarrow,
+  globals: { viewport: { value: "phone" } },
+};
+
+/** Without a title or actions the content is drawn as given, and the narrow sheet is named by the shell's word. */
+export const Untitled: Story = {
+  globals: { viewport: { value: "narrow" } },
+  args: { inspector: { content: <Settings />, open: true, onOpen: fn(), width: 320, onWidth: fn() } },
+  play: async ({ canvas }) => {
+    const sheet = await canvas.findByRole("dialog", { name: "Inspector" });
+    await expect(sheet.querySelectorAll("h1, h2, h3, h4, h5, h6")).toHaveLength(0);
+  },
+};
+
 /** Below 600 px the inspector rises from the bottom, at most 62 % of the workspace. */
 export const Phone: Story = {
   globals: { viewport: { value: "phone" } },
   render: () => <Held />,
   play: async ({ canvas }) => {
-    await expect(await canvas.findByRole("dialog", { name: "Inspector" })).toHaveAttribute("data-side", "bottom");
+    await expect(await canvas.findByRole("dialog", { name: "transform_1" })).toHaveAttribute("data-side", "bottom");
   },
 };
 
@@ -202,23 +271,23 @@ export const EscapeOrder: Story = {
     );
   },
   play: async ({ canvas, userEvent }) => {
-    await canvas.findByRole("dialog", { name: "Inspector" });
+    await canvas.findByRole("dialog", { name: "transform_1" });
     await userEvent.click(canvas.getByRole("button", { name: "Settings" }));
     await waitFor(() => expect(document.querySelector(".pb-dialog")).not.toBeNull());
     await userEvent.keyboard("{Escape}");
     await waitFor(() => expect(document.querySelector(".pb-dialog")).toBeNull());
-    await expect(canvas.getByRole("dialog", { name: "Inspector" })).toBeInTheDocument();
+    await expect(canvas.getByRole("dialog", { name: "transform_1" })).toBeInTheDocument();
     // Escape inside the sheet closes it.
     canvas.getByRole("button", { name: "Close" }).focus();
     await userEvent.keyboard("{Escape}");
-    await expect(canvas.queryByRole("dialog", { name: "Inspector" })).toBeNull();
+    await expect(canvas.queryByRole("dialog", { name: "transform_1" })).toBeNull();
   },
 };
 
 /** Sizes the app kept from a larger window: drawn within the bounds, and not written back until the person drags. */
 export const OutOfBounds: Story = {
   args: {
-    inspector: { content: <Settings />, open: true, onOpen: fn(), width: 9000, onWidth: fn() },
+    inspector: { title: "transform_1", content: <Settings />, open: true, onOpen: fn(), width: 9000, onWidth: fn() },
     drawer: { header: "Log", content: <Log />, open: true, onOpen: fn(), height: 9000, onHeight: fn() },
   },
   play: async ({ args, canvas }) => {
@@ -269,6 +338,18 @@ export const RightToLeft: Story = {
   },
 };
 
+/** A narrow window in right-to-left text: the sheet is at the canvas's inline end, the left, as the wide one is. */
+export const NarrowRightToLeft: Story = {
+  ...RightToLeft,
+  globals: { viewport: { value: "narrow" } },
+  play: async ({ canvas }) => {
+    const sheet = await canvas.findByRole("dialog", { name: "transform_1" });
+    await waitFor(() => expect(sheet.getAnimations()).toHaveLength(0));
+    const main = canvas.getByRole("main").getBoundingClientRect();
+    await expect(Math.abs(sheet.getBoundingClientRect().left - main.left)).toBeLessThan(0.5);
+  },
+};
+
 const isOpen = (value: unknown) => (typeof value === "boolean" ? value : undefined);
 const isNumber = (value: unknown) => (typeof value === "number" && Number.isFinite(value) ? value : undefined);
 
@@ -288,7 +369,14 @@ export const Kept: Story = {
     return (
       <AppShell
         topBar={topBar}
-        inspector={{ content: <Settings />, open: inspectorOpen, onOpen: setInspectorOpen, width, onWidth: setWidth }}
+        inspector={{
+          title: "transform_1",
+          content: <Settings />,
+          open: inspectorOpen,
+          onOpen: setInspectorOpen,
+          width,
+          onWidth: setWidth,
+        }}
         drawer={{
           header: "Log",
           content: <Log />,

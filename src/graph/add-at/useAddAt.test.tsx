@@ -1,7 +1,7 @@
 // useAddAt on React Flow's own canvas: a double-click on the empty pane adds at its point in flow coordinates and not
 // on a node, a wire dropped on the pane where no handle took it adds with the port it came from (a touch drop read
 // from changedTouches and the element under its end), a drop on a handle or off the pane adds nothing, `enabled`
-// switches it off, and React Flow's zoom on double-click is off.
+// switches it off, and React Flow's zoom on double-click is off while adding is on and left to React Flow while off.
 import { fireEvent, render, renderHook } from "@testing-library/react";
 import { type FinalConnectionState, type Node, ReactFlow, ReactFlowProvider } from "@xyflow/react";
 import type { ReactNode } from "react";
@@ -99,6 +99,18 @@ describe("useAddAt", () => {
   it("turns React Flow's zoom on double-click off", () => {
     const { result } = renderHook(() => useAddAt(vi.fn()), { wrapper: inProvider });
     expect(result.current.flowProps.zoomOnDoubleClick).toBe(false);
+  });
+
+  it("leaves the zoom on double-click to React Flow while switched off, and takes it again when on", () => {
+    const { result, rerender } = renderHook(({ enabled }) => useAddAt(vi.fn(), { enabled }), {
+      wrapper: inProvider,
+      initialProps: { enabled: false },
+    });
+    expect("zoomOnDoubleClick" in result.current.flowProps).toBe(false);
+    const off = result.current.flowProps;
+    rerender({ enabled: true });
+    expect(result.current.flowProps.zoomOnDoubleClick).toBe(false);
+    expect(result.current.flowProps.onDoubleClick).toBe(off.onDoubleClick);
   });
 
   it("adds where a wire from an output is dropped on the pane, with its port", () => {

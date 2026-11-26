@@ -1,12 +1,13 @@
-// The layout of a graph-editing app (docs/components.md#appshell): a top bar of slots, the canvas, an inspector on the
-// right and a drawer along the bottom, filling the screen (100dvh) inside the safe-area insets. It keeps no data: the
-// inspector's width, the drawer's height and whether each is open are the app's props, drawn within the shell's bounds
-// (bounds.ts) and changed through callbacks. Below 760 px the inspector is a Sheet over the canvas's right edge, below
-// 600 px one rising from the bottom (useMediaBreakpoint's widths). The drawer's body stays mounted while it is closed,
-// so what it holds (a draft, a caret, a scroll position) is still there when it opens.
+// The layout of a graph-editing app (docs/components.md#appshell): a top bar of slots, the canvas, an inspector at the
+// inline end and a drawer along the bottom, filling the screen (100dvh) inside the safe-area insets. It keeps no data:
+// the inspector's width, the drawer's height and whether each is open are the app's props, drawn within the shell's
+// bounds (bounds.ts) and changed through callbacks. Below 760 px the inspector is a Sheet over the canvas's inline
+// end, below 600 px one rising from the bottom (useMediaBreakpoint's widths). With the inspector's title or actions,
+// the shell draws its one header row: a Panel's when wide, the sheet's own when narrow. The drawer's body stays
+// mounted while it is closed, so what it holds (a draft, a caret, a scroll position) is still there when it opens.
 import { type ReactNode, useId, useSyncExternalStore } from "react";
 import { useMediaBreakpoint } from "../../hooks";
-import { IconButton, Sheet, Splitter } from "../../primitives";
+import { IconButton, Panel, Sheet, Splitter } from "../../primitives";
 import { clampDrawerHeight, clampInspectorWidth, drawerBounds, drawerMaxHeight, inspectorBounds } from "./bounds";
 import "./AppShell.css";
 
@@ -26,7 +27,15 @@ export type AppShellTopBar = {
 };
 
 export type AppShellInspector = {
-  /** What the inspector shows: usually a Panel, which scrolls on its own. */
+  /**
+   * The inspector's heading (the selection's name). With it, or with `actions`, the shell draws the inspector's one
+   * header row itself: a Panel's on a wide window, the sheet's own beside its close button on a narrow one, and
+   * `content` is the body under it. Without either, `content` is drawn as given (usually a Panel).
+   */
+  title?: ReactNode;
+  /** Slot at the far end of the inspector's header row (buttons, a count), before the sheet's close button. */
+  actions?: ReactNode;
+  /** What the inspector shows: its body under `title` and `actions`, or without them usually a Panel. */
   content: ReactNode;
   /** Whether it is shown; the app holds it. */
   open: boolean;
@@ -181,6 +190,7 @@ export function AppShell({ topBar, inspector, drawer, children, labels, classNam
   const { width: layout } = useMediaBreakpoint();
   const width = inspector === undefined ? 0 : clampInspectorWidth(inspector.width);
   const wide = layout === "wide";
+  const headed = inspector !== undefined && (inspector.title !== undefined || inspector.actions !== undefined);
   return (
     <div
       className={className === undefined ? "pb-shell" : `pb-shell ${className}`}
@@ -198,8 +208,10 @@ export function AppShell({ topBar, inspector, drawer, children, labels, classNam
               onClose={() => {
                 inspector.onOpen(false);
               }}
-              side={layout === "phone" ? "bottom" : "right"}
+              side={layout === "phone" ? "bottom" : "end"}
+              title={inspector.title}
               label={words.inspector}
+              actions={inspector.actions}
               width={width}
               labels={{ close: words.close }}
             >
@@ -218,7 +230,15 @@ export function AppShell({ topBar, inspector, drawer, children, labels, classNam
               onChange={inspector.onWidth}
               label={words.resizeInspector}
             />
-            <div className="pb-shell-inspector-body">{inspector.content}</div>
+            <div className="pb-shell-inspector-body">
+              {headed ? (
+                <Panel className="pb-shell-inspector-panel" title={inspector.title} actions={inspector.actions}>
+                  {inspector.content}
+                </Panel>
+              ) : (
+                inspector.content
+              )}
+            </div>
           </aside>
         )}
       </div>

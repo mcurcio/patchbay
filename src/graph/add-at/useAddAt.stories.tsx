@@ -117,15 +117,15 @@ export const AllHarborDark: Story = { ...All, globals: { brand: "harbor", theme:
 /** And under the example ember brand in light. */
 export const AllEmberLight: Story = { ...All, globals: { brand: "ember", theme: "light" } };
 
-/** Switched off, as while the graph is read-only: a double-click adds nothing, and does not zoom. */
+/** Switched off, as while the graph is read-only: a double-click adds nothing, and zooms in as React Flow's does. */
 export const Off: Story = {
   args: { enabled: false },
   play: async ({ canvasElement }) => {
     await waitFor(() => expect(canvasElement.querySelectorAll(".react-flow__node")).toHaveLength(1));
-    const transform = canvasElement.querySelector<HTMLElement>(".react-flow__viewport")?.style.transform;
+    const viewport = () => canvasElement.querySelector<HTMLElement>(".react-flow__viewport")?.style.transform;
+    const before = viewport();
     await fireEvent.doubleClick(pane(canvasElement), at(pane(canvasElement), 400, 60));
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    await waitFor(() => expect(viewport()).not.toBe(before));
     await expect(canvasElement.querySelectorAll(".react-flow__node")).toHaveLength(1);
-    await expect(canvasElement.querySelector<HTMLElement>(".react-flow__viewport")?.style.transform).toBe(transform);
   },
 };

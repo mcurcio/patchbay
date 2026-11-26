@@ -320,12 +320,14 @@ Adding a node at a place on the canvas: `useAddAt(onAddAt, options?)` → `{ flo
   handle or a panel; a drop counts only where no handle took it (React Flow's `toHandle` is none)
   and the pane is under the drop. A touch drop's point is read from `changedTouches`, and the
   element under it from the page, as a touch's end is on the element it began on.
-- **`flowProps`**: `onDoubleClick`, `onConnectStart`, `onConnectEnd` and `zoomOnDoubleClick:
-  false`, for `<ReactFlow>` (with others through [`mergeFlowProps`](#mergeflowprops)). React Flow's
-  zoom on double-click stays off, as the double-click is the add. The object is the same across
-  renders, and the newest `onAddAt` is called.
+- **`flowProps`**: `onDoubleClick`, `onConnectStart`, `onConnectEnd` and, while adding is on,
+  `zoomOnDoubleClick: false`, for `<ReactFlow>` (with others through
+  [`mergeFlowProps`](#mergeflowprops)). React Flow's zoom on double-click is off while adding is on,
+  as the double-click is the add. The object is the same across renders while `enabled` holds (its
+  handlers always), and the newest `onAddAt` is called.
 - **`options.enabled`** (`true`) switches adding off, as while the graph is read-only: neither a
-  double-click nor a drop adds, and a double-click does not zoom either.
+  double-click nor a drop adds, and `flowProps` leaves `zoomOnDoubleClick` out, so a double-click
+  zooms in as React Flow's own does (or as the app's own `zoomOnDoubleClick` says).
 - A double-click has no keyboard path; the app's own add command (a palette entry, a button) is
   that path.
 
@@ -337,13 +339,16 @@ Keeping the whole graph in view until the person takes the view over:
 - **Following** (from the start), the view fits again whenever `key` changes (`Object.is`; the
   app's value that changes when nodes are added, removed or laid out) and whenever the canvas
   changes size, each time once every shown node is measured. These fits are instant.
-- **The person's move stops it.** `flowProps` holds `onMoveStart` and `onMoveEnd`: a move with an
-  event (a drag, a wheel, a pinch) that ends with the viewport changed sets `following` to false. A
-  press that moves nothing (React Flow starts a move on every press on the pane, so a click to
-  deselect or a double-click to add) keeps following, and a move made by code has no event and
-  changes nothing, so CanvasTools' zoom tools do not stop following. `stop()` stops following as
-  the person's move does, for an app that moves the view itself (going to a node). `fit()` fits now, moving as the fit tool does (over
-  `--pb-motion-slow`), and follows again.
+- **The person's move stops it.** `flowProps` holds `onMoveStart`, `onMove` and `onMoveEnd`: a
+  move with an event (a drag, a wheel, a pinch) sets `following` to false as soon as one of its
+  steps, or its end, has the viewport changed from where it began. Each step counts, not only the
+  end, because d3-zoom folds a fit that lands during the person's move into the person's gesture,
+  which can then end where it began. A press that moves nothing (React Flow starts a move on every
+  press on the pane, so a click to deselect or a double-click to add) keeps following, and a move
+  made by code has no event and changes nothing, so CanvasTools' zoom tools do not stop following.
+  `stop()` stops following as the person's move does, for an app that moves the view itself (going
+  to a node). `fit()` fits now, moving as the fit tool does (over `--pb-motion-slow`), and follows
+  again.
 - **`onFitted(viewport)`** is called after each fit has landed, in the frame after the viewport is
   set, with React Flow's viewport: an app, or its browser tests, can mark the layout ready on it
   instead of waiting on a timer. With no node there is nothing to fit; the view stays, and

@@ -223,7 +223,22 @@ describe("CodeEditor", () => {
 
   it("drops the copy under forced colours and draws marks by shape", () => {
     expect(css).toMatch(/@media \(forced-colors: active\)[\s\S]*\.pb-code-layer \{\s*display: none;/);
-    expect(css).toMatch(/data-mark="warning"\][^}]*rotate\(45deg\)/);
+    expect(css).toMatch(/data-mark="warning"\]::before[^}]*rotate\(45deg\)/);
+  });
+
+  it("gives a mark a 36 px hit area on a touch screen, centred on it, while the mark drawn stays 7 px", () => {
+    const touch = /@media \(hover: none\) and \(pointer: coarse\)\s*\{([\s\S]*?)\n\}/.exec(css)?.[1] ?? "";
+    const hit = /\.pb-code-gutter-mark\[data-mark\]::after \{([^}]*)\}/.exec(touch)?.[1] ?? "";
+    expect(hit).toMatch(/width: 36px/);
+    expect(hit).toMatch(/height: 36px/);
+    expect(hit).toMatch(/inset-block-start: calc\(50% - 18px\)/);
+    expect(hit).toMatch(/inset-inline-start: calc\(50% - 18px\)/);
+    expect(touch).not.toMatch(/\.pb-code-gutter-mark[^{]*\{[^}]*(?<!-)(width|height): (?!36px)/);
+    const mark = /\.pb-code-gutter-mark \{([^}]*)\}/.exec(css)?.[1] ?? "";
+    expect(mark).toMatch(/position: relative/);
+    expect(mark).toMatch(/width: 7px/);
+    // The shape turns on its ::before, so the box, and its hit area, stay square to the row.
+    expect(mark).not.toMatch(/transform/);
   });
 });
 
