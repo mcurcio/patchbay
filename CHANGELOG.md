@@ -1,3 +1,19 @@
+## [0.5.0](https://github.com/mcurcio/patchbay/compare/v0.4.0...v0.5.0) (2026-11-26)
+
+### Features
+
+* **composites:** CommandPalette and ShortcutSheet ([c1507d0](https://github.com/mcurcio/patchbay/commit/c1507d0170b42c8f2461227a001a8d7054d695c5))
+* **composites:** Toaster and useToasts ([676e713](https://github.com/mcurcio/patchbay/commit/676e7131a9a0dc0d482faa9479d52098cc1fd97b))
+* **graph:** Meter and useLiveValue ([eeb2e4c](https://github.com/mcurcio/patchbay/commit/eeb2e4c962d0f8daa50654f87cd3c8f24ac1ced0))
+* **hooks:** useShortcuts and useMediaBreakpoint ([7f86725](https://github.com/mcurcio/patchbay/commit/7f867258f7c829f9779d11c8b3400c363a53ae9c))
+* **primitives:** busyLabel on Button ([d50bae4](https://github.com/mcurcio/patchbay/commit/d50bae423ab14f9c833ef78ce58585b067550d28))
+
+### Bug Fixes
+
+* **composites:** Toaster says its news through live regions that are there first ([26d34ea](https://github.com/mcurcio/patchbay/commit/26d34ea3f3f4893bf7ae69eac6d1f0006320b391))
+* **hooks:** Shift+digit no longer runs the digit's binding ([5d5cf4a](https://github.com/mcurcio/patchbay/commit/5d5cf4a55332ce1b6294e19616bfc72e3423f78e))
+* **hooks:** useToasts sets its timer again when it fires early ([94b0bc2](https://github.com/mcurcio/patchbay/commit/94b0bc25d130db744d5c5d080512132e07b46449))
+
 ## [0.4.0](https://github.com/mcurcio/patchbay/compare/v0.3.0...v0.4.0) (2026-11-26)
 
 ### Features
