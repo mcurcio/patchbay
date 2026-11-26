@@ -1,0 +1,19 @@
+/* A canvas's tools (CanvasTools.tsx): the tool group floats in React Flow's panel, which keeps its own inset from the
+   canvas's edge. The minimap is React Flow's, coloured by tokens.css's --xy-minimap-* map; it keeps the group's frame. */
+.pb-canvas-tools {
+  display: flex;
+}
+
+.pb-canvas-minimap {
+  border: 1px solid var(--pb-line);
+  border-radius: var(--pb-radius-box);
+  box-shadow: var(--pb-shadow);
+  overflow: hidden;
+}
+
+/* Forced colours: the minimap's frame stays visible. */
+@media (forced-colors: active) {
+  .pb-canvas-minimap {
+    border-color: CanvasText;
+  }
+}

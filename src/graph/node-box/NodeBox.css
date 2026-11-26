@@ -1,0 +1,258 @@
+/* A node's box (NodeBox.tsx). Its parts are sized by the --pb-node-* tokens, which are the geometry constants'
+   values, so a box is exactly nodeBoxSize: the header, the line, the ports (padded above and below) and the footer
+   stack with nothing between them. The 1 px border is drawn by ::after over the box's edge, inside those sizes, and
+   the stripe by ::before; the selection ring is an outline, outside them. */
+.pb-node-box {
+  --_pb-node-stripe: var(--pb-line-strong);
+  --_pb-node-border: var(--pb-line);
+
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: var(--pb-node-width);
+  border-radius: var(--pb-radius-box);
+  background: var(--pb-raised);
+  box-shadow: var(--pb-shadow);
+  color: var(--pb-text);
+  font-family: var(--pb-font-ui);
+  font-size: var(--pb-text-md);
+  outline: 2px solid transparent;
+  outline-offset: 0;
+  transition: outline-color var(--pb-motion-fast);
+}
+
+/* The border: 1 px, or 2 px for a change, drawn inward so the size holds. */
+.pb-node-box::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+  border: 1px solid var(--_pb-node-border);
+  border-radius: var(--pb-radius-box);
+  pointer-events: none;
+}
+
+/* The stripe down the start edge, in the tone. */
+.pb-node-box::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 4px;
+  border-start-start-radius: var(--pb-radius-box);
+  border-end-start-radius: var(--pb-radius-box);
+  background: var(--_pb-node-stripe);
+  pointer-events: none;
+}
+
+.pb-node-box[data-tone="ok"] {
+  --_pb-node-stripe: var(--pb-ok);
+}
+
+.pb-node-box[data-tone="warn"] {
+  --_pb-node-stripe: var(--pb-warn);
+}
+
+.pb-node-box[data-tone="err"] {
+  --_pb-node-stripe: var(--pb-err);
+}
+
+.pb-node-box[data-tone="quiet"] {
+  --_pb-node-stripe: var(--pb-quiet);
+}
+
+.pb-node-box[data-tone="off"] {
+  --_pb-node-stripe: var(--pb-off);
+}
+
+.pb-node-box[data-tone="accent"] {
+  --_pb-node-stripe: var(--pb-accent);
+}
+
+.pb-node-box[data-tone="muted"] {
+  --_pb-node-stripe: var(--pb-muted);
+}
+
+.pb-node-box[data-selected] {
+  outline-color: var(--pb-accent);
+}
+
+/* React Flow's node wrapper holds the focus and draws no ring of its own: the box shows it, 2 px clear of the
+   selection's place. */
+.react-flow__node:focus-visible > .pb-node-box {
+  outline: 2px solid var(--pb-accent);
+  outline-offset: 2px;
+}
+
+/* The header: the title and subtitle, then the change's badge and the status slot, in --pb-node-header whether or not
+   there is a subtitle. */
+.pb-node-header {
+  box-sizing: border-box;
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--pb-space-3);
+  height: var(--pb-node-header);
+  padding-inline: calc(4px + var(--pb-space-3)) var(--pb-space-3);
+  border-start-start-radius: var(--pb-radius-box);
+  border-start-end-radius: var(--pb-radius-box);
+}
+
+.pb-node-heading {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.pb-node-title,
+.pb-node-subtitle,
+.pb-node-line {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pb-node-title {
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.pb-node-subtitle {
+  color: var(--pb-muted);
+  font-size: var(--pb-text-sm);
+  line-height: 1.3;
+}
+
+.pb-node-change,
+.pb-node-status {
+  flex: none;
+}
+
+/* The line under the header: why the node is silent. */
+.pb-node-line {
+  box-sizing: border-box;
+  flex: none;
+  height: var(--pb-node-line);
+  padding-inline: calc(4px + var(--pb-space-3)) var(--pb-space-3);
+  color: var(--pb-muted);
+  font-size: var(--pb-text-sm);
+  line-height: var(--pb-node-line);
+}
+
+/* The ports, padded above and below; side by side, two columns with row n of each on one line. */
+.pb-node-ports {
+  box-sizing: border-box;
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  padding-block: var(--pb-node-pad);
+}
+
+.pb-node-ports[data-ports="side-by-side"] {
+  flex-direction: row;
+  align-items: flex-start;
+}
+
+.pb-node-column {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* Handles stay physical in either text direction: the inputs' column is on the left. */
+.pb-node-ports[data-ports="side-by-side"]:dir(rtl) {
+  flex-direction: row-reverse;
+}
+
+/* The footer: one row of badges. */
+.pb-node-footer {
+  box-sizing: border-box;
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--pb-space-2);
+  height: var(--pb-node-footer);
+  padding-inline: calc(4px + var(--pb-space-3)) var(--pb-space-3);
+  overflow: hidden;
+  border-top: 1px solid var(--pb-line);
+}
+
+/* Failed: the border in --pb-err and the header on --pb-err-soft; the line in --pb-err. */
+.pb-node-box[data-failed] {
+  --_pb-node-border: var(--pb-err);
+}
+
+.pb-node-box[data-failed] .pb-node-header {
+  background: var(--pb-err-soft);
+}
+
+.pb-node-box[data-failed] .pb-node-line {
+  color: var(--pb-err);
+}
+
+/* Disabled: a dashed border, the stripe hatched (the tone and the surface in stripes), the words muted. */
+.pb-node-box[data-disabled]::after {
+  border-style: dashed;
+}
+
+.pb-node-box[data-disabled]::before {
+  background: repeating-linear-gradient(-45deg, var(--_pb-node-stripe) 0 3px, var(--pb-raised) 3px 6px);
+}
+
+.pb-node-box[data-disabled],
+.pb-node-box[data-disabled] .pb-port-row {
+  color: var(--pb-muted);
+}
+
+/* A change not yet applied: a 2 px border in its tone, drawn inward; removed strikes the title through. A change it
+   does not know is in --pb-line-strong. */
+.pb-node-box[data-change]::after {
+  border-width: 2px;
+  border-color: var(--pb-line-strong);
+}
+
+.pb-node-box[data-change="added"]::after {
+  border-color: var(--pb-added);
+}
+
+.pb-node-box[data-change="removed"]::after {
+  border-color: var(--pb-removed);
+}
+
+.pb-node-box[data-change="renamed"]::after {
+  border-color: var(--pb-renamed);
+}
+
+.pb-node-box[data-change="changed"]::after {
+  border-color: var(--pb-warn);
+}
+
+.pb-node-box[data-change="removed"] .pb-node-title {
+  text-decoration: line-through;
+}
+
+/* Forced colours: the stripe and the border in the text colour (the change keeps its word in the badge), the
+   selection in Highlight. */
+@media (forced-colors: active) {
+  .pb-node-box::before {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+
+  .pb-node-box[data-disabled]::before {
+    background: repeating-linear-gradient(-45deg, CanvasText 0 3px, Canvas 3px 6px);
+  }
+
+  .pb-node-box::after,
+  .pb-node-box[data-change]::after {
+    border-color: CanvasText;
+  }
+
+  .pb-node-box[data-selected] {
+    outline-color: Highlight;
+  }
+}

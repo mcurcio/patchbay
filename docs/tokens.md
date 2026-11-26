@@ -36,22 +36,26 @@ and a dark value; the rest are the same in both themes.
 | Code | `--pb-code-surface`, `--pb-code-surface-readonly`, `--pb-code-border`, `--pb-code-text`, `--pb-code-directive`, `--pb-code-keyword`, `--pb-code-variable`, `--pb-code-number`, `--pb-code-string`, `--pb-code-comment`, `--pb-code-punctuation`, `--pb-code-error`, `--pb-code-error-surface` | A code box and its highlighter's token colours (the surfaces, border, text and error surface point at the tokens above) |
 | Shape | `--pb-radius-box` (8 px), `--pb-radius-control` (6 px), `--pb-radius-pill`, `--pb-shadow`, `--pb-shadow-lifted` | Boxes; controls and text boxes; pills; a resting and a lifted shadow |
 | Motion | `--pb-motion-fast` (120 ms), `--pb-motion-slow` (180 ms), `--pb-motion-pulse` (2 s), `--pb-motion-flow` (1 s), `--pb-motion-spin` (0.8 s) | Hover and selection; what slides; a pulsing dot; a wire's flow; the busy spinner's turn |
-| Density | `--pb-space-1` … `--pb-space-5` (2, 4, 8, 12, 16 px), `--pb-row` (22 px), `--pb-bar` (44 px) | Spacing steps; a port row's height; the top bar's height |
+| Density | `--pb-space-1` … `--pb-space-5` (2, 4, 8, 12, 16 px), `--pb-row` (22 px), `--pb-bar` (44 px) | Spacing steps; a compact control's height; the top bar's height |
+| Node geometry | `--pb-node-width` (240 px), `--pb-node-header` (46 px), `--pb-node-line` (22 px), `--pb-node-row` (22 px), `--pb-node-pad` (8 px), `--pb-node-footer` (28 px), `--pb-node-handle` (10 px), `--pb-node-handle-hit` (20 px, 32 px on touch) | A node box's fixed sizes, equal to the constants `/graph` exports for layout code ([`graph.md`](graph.md#geometry)). A brand may not set them |
 | Type | `--pb-font-ui`, `--pb-font-code`, `--pb-text-sm` (12 px), `--pb-text-md` (13 px), `--pb-code-size` (12 px) | The faces; the two text sizes; the code boxes' size |
 
-The values live in `tokens.css` alone; a brand overrides them, it never adds tokens of its own.
+The values live in `tokens.css` alone; a brand overrides them (all but the node geometry), it never
+adds tokens of its own.
 
 - **Code size.** One token, shared by a code box's textarea, its highlighted copy and its gutter,
   so their glyphs line up. On a touch screen (`(hover: none) and (pointer: coarse)`) it is 16 px,
-  as iOS Safari zooms the page when a smaller text field takes the focus.
+  as iOS Safari zooms the page when a smaller text field takes the focus; there
+  `--pb-node-handle-hit` is 32 px too.
 - **Reduced motion.** Under `prefers-reduced-motion: reduce`, `--pb-motion-fast` and
   `--pb-motion-slow` are 0 ms. The pulse, flow and spin keep their durations: a component stops
   those infinite animations itself under reduced motion, since one at 0 s would churn rather than
   stop.
 - **React Flow.** `tokens.css` points React Flow's own variables (`--xy-*`: the canvas, dot grid,
   edges, connection line, handles, selection box, controls, attribution and minimap) at the
-  tokens, on `.react-flow`, so its canvas follows the theme and the brand. React Flow's `colorMode`
-  prop is not used: it would fight `data-theme`.
+  tokens, on `.react-flow`, so its canvas follows the theme and the brand. Its attribution link,
+  drawn in a fixed grey below 4.5:1 with no variable of its own, is set to `--pb-muted`. React
+  Flow's `colorMode` prop is not used: it would fight `data-theme`.
 
 ## The theme
 
@@ -87,7 +91,10 @@ Every rule is under the brand's attribute, in up to three blocks that mirror the
   `:root[data-theme="dark"]` and loads after it, so a light-only colour would win in dark as well.
   The two dark blocks are written the same, as the base's are. Tokens that are not colours (type,
   density, shape) need only the first block.
-- **Few overrides.** A brand may override any `--pb-` token, but usually touches few: the accent,
+- **Not the node geometry.** The `--pb-node-*` tokens are the sizes an app lays its nodes out
+  with before they render; a brand that changed one would draw boxes the layout did not make room
+  for, so a brand sets none of them.
+- **Few overrides.** A brand may override any other `--pb-` token, but usually touches few: the accent,
   the type (`--pb-font-ui`, `--pb-font-code` and the sizes), the density (the spacing steps,
   `--pb-row`, `--pb-bar`), and, in dark, the surfaces, lines and text where its canvas differs. A
   state hue changes only where the app's domain needs one. Each override says why in a comment.
@@ -133,7 +140,7 @@ blanks stylesheets otherwise) and fails:
 - when a colour in the light set has no dark value, or the dark set names a token the light set
   lacks;
 - when a brand sets a colour for light without setting it for dark, names a token `tokens.css`
-  does not define, or has a rule outside its three blocks;
+  does not define, sets a node geometry token, or has a rule outside its three blocks;
 - when reduced motion zeroes anything but the fast and slow motion, or a React Flow variable does
   not point at a token;
 - when a stylesheet or component under `src/` outside `tokens/` (stories and tests aside) holds a

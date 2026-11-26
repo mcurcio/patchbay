@@ -1,0 +1,145 @@
+/* One port row (PortRow.tsx): --pb-node-row high, its handle centred on the row's outer edge (React Flow's
+   .react-flow__handle-left and -right place it there, relative to the row), its words toward that edge and its
+   trailing slot toward the box's centre. The handle is the hit area, --pb-node-handle-hit square and transparent; its
+   dot (::after) is --pb-node-handle. Handles stay physical: an input on the left, an output on the right, in either
+   text direction, as React Flow's positions are physical. */
+.pb-port-row {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: var(--pb-space-2);
+  height: var(--pb-node-row);
+  min-width: 0;
+  padding: 0 var(--pb-space-3) 0 calc(var(--pb-node-handle) / 2 + var(--pb-space-3));
+  color: var(--pb-text);
+  font-family: var(--pb-font-ui);
+  font-size: var(--pb-text-sm);
+  line-height: var(--pb-node-row);
+}
+
+.pb-port-row[data-side="output"] {
+  flex-direction: row-reverse;
+  padding: 0 calc(var(--pb-node-handle) / 2 + var(--pb-space-3)) 0 var(--pb-space-3);
+}
+
+.pb-port-row[data-side="input"]:dir(rtl) {
+  flex-direction: row-reverse;
+}
+
+.pb-port-row[data-side="output"]:dir(rtl) {
+  flex-direction: row;
+}
+
+.pb-port-words {
+  display: inline-flex;
+  flex: 0 1 auto;
+  align-items: center;
+  gap: var(--pb-space-2);
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.pb-port-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pb-port-type {
+  flex: none;
+  color: var(--pb-muted);
+  font-family: var(--pb-font-code);
+  font-size: var(--pb-text-sm);
+}
+
+.pb-port-trailing {
+  display: flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.pb-port-row[data-side="output"] .pb-port-trailing {
+  justify-content: flex-start;
+}
+
+/* The handle: React Flow's classes stay (its connection logic reads them); its look is replaced, so its box is the
+   transparent hit area and the dot is drawn inside. */
+.react-flow__handle.pb-port-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--pb-node-handle-hit);
+  min-width: 0;
+  height: var(--pb-node-handle-hit);
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+}
+
+.react-flow__handle.pb-port-handle::after {
+  content: "";
+  box-sizing: border-box;
+  width: var(--pb-node-handle);
+  height: var(--pb-node-handle);
+  border: 1px solid var(--xy-handle-border-color, var(--pb-raised));
+  border-radius: var(--pb-radius-pill);
+  background: var(--xy-handle-background-color, var(--pb-text));
+  pointer-events: none;
+  transition:
+    width var(--pb-motion-fast),
+    height var(--pb-motion-fast),
+    background-color var(--pb-motion-fast),
+    outline-color var(--pb-motion-fast);
+}
+
+/* While a wire is dragged: the origin ringed in the accent, a handle that accepts it grown and in --pb-ok, one that
+   refuses it in --pb-off with the row's words muted and a not-allowed cursor. */
+.react-flow__handle.pb-port-handle[data-hint="origin"]::after {
+  outline: 2px solid var(--pb-accent);
+  outline-offset: 1px;
+}
+
+.react-flow__handle.pb-port-handle[data-hint="ok"]::after {
+  width: 12px;
+  height: 12px;
+  background: var(--pb-ok);
+}
+
+.react-flow__handle.pb-port-handle[data-hint="no"]::after {
+  background: var(--pb-off);
+}
+
+.react-flow__handle.pb-port-handle[data-hint="no"] {
+  cursor: not-allowed;
+}
+
+.pb-port-row[data-hint="no"],
+.pb-port-row[data-hint="no"] .pb-port-type {
+  color: var(--pb-muted);
+}
+
+/* Forced colours: the dot in the text colour; a hint shows as the dot's border, Highlight for ok and the origin,
+   GrayText for no. */
+@media (forced-colors: active) {
+  .react-flow__handle.pb-port-handle::after {
+    forced-color-adjust: none;
+    border-color: CanvasText;
+    background: CanvasText;
+  }
+
+  .react-flow__handle.pb-port-handle[data-hint="ok"]::after,
+  .react-flow__handle.pb-port-handle[data-hint="origin"]::after {
+    border: 2px solid Highlight;
+    outline: none;
+  }
+
+  .react-flow__handle.pb-port-handle[data-hint="no"]::after {
+    border: 2px solid GrayText;
+    background: Canvas;
+  }
+}

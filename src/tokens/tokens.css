@@ -74,7 +74,7 @@
   --pb-motion-flow: 1s;
   --pb-motion-spin: 0.8s;
 
-  /* Density: the spacing steps, a port row's height, the top bar's height. */
+  /* Density: the spacing steps, a compact control's height, the top bar's height. */
   --pb-space-1: 2px;
   --pb-space-2: 4px;
   --pb-space-3: 8px;
@@ -82,6 +82,18 @@
   --pb-space-5: 16px;
   --pb-row: 22px;
   --pb-bar: 44px;
+
+  /* Node geometry: a node box's fixed sizes, the same values as the constants /graph exports (NODE_WIDTH and the
+     rest), since an app lays its nodes out from those before they render. A brand may not set these; the tests hold
+     each equal to its constant and fail on a brand that sets one. */
+  --pb-node-width: 240px;
+  --pb-node-header: 46px;
+  --pb-node-line: 22px;
+  --pb-node-row: 22px;
+  --pb-node-pad: 8px;
+  --pb-node-footer: 28px;
+  --pb-node-handle: 10px;
+  --pb-node-handle-hit: 20px;
 
   /* Type: the faces, the two text sizes, and the code boxes' size (shared by a textarea, its highlighted copy and a
      gutter, so their glyphs line up). */
@@ -171,10 +183,11 @@
 }
 
 /* A finger: every text field is 16 px, code boxes included, as iOS Safari zooms the page when a smaller field takes
-   the focus. */
+   the focus; a handle's hit area grows to 32 px (handles sit 22 px apart, too close for 36 px targets). */
 @media (hover: none) and (pointer: coarse) {
   :root {
     --pb-code-size: 16px;
+    --pb-node-handle-hit: 32px;
   }
 }
 
@@ -218,4 +231,11 @@
   --xy-minimap-mask-stroke-color: var(--pb-accent);
   --xy-minimap-node-background-color: var(--pb-sunken);
   --xy-minimap-node-stroke-color: var(--pb-line-strong);
+}
+
+/* React Flow's attribution link is drawn in a fixed grey of its own, below 4.5:1 on its panel, with no variable to
+   point at a token; the muted text colour keeps it legible in both themes and under a brand. Written under .react-flow,
+   so it wins whichever of the two stylesheets an app loads first. */
+.react-flow .react-flow__attribution a {
+  color: var(--pb-muted);
 }

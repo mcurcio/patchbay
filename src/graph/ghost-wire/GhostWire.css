@@ -1,0 +1,55 @@
+/* A ghost wire: thin and dashed, plainly a request and not yet an edge; pending in the quiet tone, dimmed, refused in the
+   error tone. It is never under the pointer. */
+.pb-ghost-wire {
+  --pb-ghost-wire-color: var(--pb-quiet);
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.pb-ghost-wire[data-tone="refused"] {
+  --pb-ghost-wire-color: var(--pb-err);
+  opacity: 1;
+}
+
+/* Two classes, so it outweighs React Flow's own .react-flow__edge-path stroke. */
+.pb-ghost-wire .react-flow__edge-path.pb-ghost-wire-path {
+  stroke: var(--pb-ghost-wire-color);
+  stroke-width: 1.5px;
+  stroke-dasharray: 4 4;
+  pointer-events: none;
+  transition: stroke var(--pb-motion-fast);
+}
+
+.pb-ghost-wire-label {
+  position: absolute;
+  pointer-events: none;
+  padding: 0 var(--pb-space-2);
+  border: 1px dashed var(--pb-quiet);
+  border-radius: var(--pb-radius-pill);
+  background: var(--pb-raised);
+  color: var(--pb-muted);
+  font-family: var(--pb-font-ui);
+  font-size: var(--pb-text-sm);
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+.pb-ghost-wire-label[data-tone="refused"] {
+  border-color: var(--pb-err);
+  color: var(--pb-err);
+}
+
+/* Forced colours: the dashes stay, in the system's grey for a request, the text colour for a refusal. */
+@media (forced-colors: active) {
+  .pb-ghost-wire .react-flow__edge-path.pb-ghost-wire-path {
+    stroke: GrayText;
+  }
+
+  .pb-ghost-wire[data-tone="refused"] .react-flow__edge-path.pb-ghost-wire-path {
+    stroke: CanvasText;
+  }
+
+  .pb-ghost-wire-label {
+    border-color: GrayText;
+  }
+}

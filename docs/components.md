@@ -46,7 +46,7 @@ Common prop names mean the same everywhere:
 | `tone` | What a state or action is, by colour; an open enum |
 | `size` | `md` (the default) or `sm`, the compact one for dense rows |
 | `label` | The accessible name, or the words a screen reader reads (`Pill`'s and `Checkbox`'s are also shown) |
-| `title` | On `Dialog`, `Sheet` and `Panel`, the heading that also names it; on `Meter`, a function that writes its tooltip from the level; elsewhere the native hover tooltip |
+| `title` | On `Dialog`, `Sheet`, `Panel` and `NodeBox`, the heading that also names it; on `Meter`, a function that writes its tooltip from the level; elsewhere the native hover tooltip |
 | `actions` | A slot at the far end of a header, or the foot of a dialog |
 | `open`, `onClose` | Shown or not, held by the app; `onClose` asks the app to set `open` to false |
 | `className` | Added to the component's own `pb-` class, never replacing it |
