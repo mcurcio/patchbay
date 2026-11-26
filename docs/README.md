@@ -4,7 +4,7 @@ The library docs describe patchbay as built; each fact has one home. Read them i
 
 | Page | What it holds |
 |---|---|
-| [`tokens.md`](tokens.md) | The design tokens, the light and dark themes, writing a brand, the base stylesheet, and the tests that hold them |
+| [`tokens.md`](tokens.md) | The design tokens, the light and dark themes, writing a brand and checking its contrast (`/testing`), the base stylesheet, and the tests that hold them |
 | [`components.md`](components.md) | The rules every component keeps, and each built component and hook: what it is for, its props, its keyboard and touch behaviour |
 | [`graph.md`](graph.md) | The graph layer's built parts (`Meter`, the node geometry, `NodeBox`, `PortRow`, `useConnectHints`, `Wire`, `GhostWire`, `CanvasTools`, `useAddAt`, `useFollowFit`): props, how they move, and how they draw |
 | [`design/`](design/patchbay.md) | Designs for work not built yet (the remaining composites, the shell); when a part is built it moves into the pages above |

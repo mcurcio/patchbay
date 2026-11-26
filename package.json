@@ -58,6 +58,10 @@
       "types": "./dist/types/hooks/index.d.ts",
       "default": "./dist/hooks.js"
     },
+    "./testing": {
+      "types": "./dist/types/testing/index.d.ts",
+      "default": "./dist/testing.js"
+    },
     "./package.json": "./package.json"
   },
   "scripts": {

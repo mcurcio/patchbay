@@ -100,18 +100,49 @@ Every rule is under the brand's attribute, in up to three blocks that mirror the
   state hue changes only where the app's domain needs one. Each override says why in a comment.
 - **It keeps the contrast rule.** Every text, tone, change, on-strong and code token stays at
   4.5:1 on each surface it is drawn on, in light and in dark, with the brand's values in force
-  ([The tests](#the-tests) lists the pairs). An accent dark enough for 4.5:1 on the light surfaces
+  ([The tests](#the-tests) lists the pairs; [Checking a brand](#checking-a-brand) runs them over an
+  app's own brand). An accent dark enough for 4.5:1 on the light surfaces
   must also keep `--pb-on-strong` legible on it, as a filled chip or primary button draws one on
   the other; the same holds for every tone, change and `--pb-muted`, which a filled badge fills
   with.
 - *Why an attribute and not load order:* a page can switch brands at run time, as Storybook's
   toolbar does, and can show two.
 
+### Checking a brand
+
+`@mcurcio/patchbay/testing` holds the contrast check, so an app holds its own brand to the rule in
+its own tests, with whatever test runner it uses:
+
+```ts
+import { checkBrandContrast } from "@mcurcio/patchbay/testing";
+import brandCss from "./brand.css?raw"; // or readFileSync("src/brand.css", "utf8")
+
+expect(checkBrandContrast(brandCss, "harbor").map((failure) => failure.message)).toEqual([]);
+```
+
+- **`checkBrandContrast(css, brand)`** takes the brand's stylesheet as text and its name (the
+  `data-brand` value) and returns the failures, none when the brand keeps the rule. It checks three
+  themes: light, dark chosen (`data-theme="dark"`) and dark by the system (no `data-theme`), each
+  with `tokens.css`'s set for it and the brand's block for it over that, as the browser's cascade
+  has them. An empty stylesheet checks the base theme alone. Each failure says its `brand`,
+  `theme`, `fg` and `on` tokens, the values they resolve to (`fgValue`, `onValue`), the `ratio`,
+  and all of it in a `message` ("harbor dark: --pb-muted (#64748b) on --pb-raised (#1e293b) is
+  3.07:1").
+- **Hex only.** The colours a pair resolves to must be hex (`#rgb` or `#rrggbb`), as the base's
+  are; any other colour (`rgb()`, a name, `color-mix()`) fails, said so in its message
+  ("is not two hex colours"), and so does a token that is not set or a `var()` that does not
+  resolve.
+- **The pairs.** `contrastPairs` lists each text token with the surfaces it is drawn on (the list
+  under [The tests](#the-tests)), `minimumContrast` is 4.5, and `contrastRatio(a, b)` is WCAG 2's
+  ratio of two hex colours (NaN when either is not one).
+- It reads the stylesheet as patchbay's token files and brands are written: rule sets at the top or
+  inside `@media`, under the three selectors above; a rule under any other selector is not read. It
+  is pure, imports no test runner and no other patchbay layer, and touches no DOM; the base's
+  tokens are the `tokens.css` of the same version, built in.
+
 `examples/brands/` holds two worked examples, which the package does not ship: Storybook's brand
 toolbar offers them beside the base theme, and `src/tokens/tokens.test.ts` holds them to the rules
-above. That test is the reference for checking a brand of your own: in a checkout of patchbay, put
-the stylesheet in `examples/brands/`, add its name to the test's list of brands and run `pnpm
-test`; or run the same contrast pairs over it in the app's own tests.
+above, the contrast rule through `checkBrandContrast`.
 
 | Example | Overrides |
 |---|---|
@@ -133,9 +164,12 @@ it; each sets what it needs itself. Storybook's preview loads it.
 blanks stylesheets otherwise) and fails:
 
 - naming the brand, theme and pair, when any text, tone, change, on-strong or code token falls
-  below 4.5:1 on a surface it is drawn on. It runs for the base alone and each example brand, in
-  light and in dark, resolving the cascade as the browser does (`tokens.css`'s sets, then the
-  brand's).
+  below 4.5:1 on a surface it is drawn on: the text and muted tokens on the three surfaces, the
+  text on the warn and err soft surfaces, the accent, every tone and change on the three surfaces,
+  warn and err on their soft surfaces, on-strong on the accent, the tones, the changes and muted,
+  and each code token on the code surfaces (the code error also on its own surface). It runs
+  [`checkBrandContrast`](#checking-a-brand) for the base alone and each example brand, in light,
+  chosen dark and system dark.
 - when the two copies of a dark set differ, in `tokens.css` or a brand;
 - when a colour in the light set has no dark value, or the dark set names a token the light set
   lacks;
