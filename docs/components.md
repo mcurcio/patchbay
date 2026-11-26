@@ -184,16 +184,22 @@ tab stop (with an inset focus ring), so the keyboard can scroll it; a short body
 **`Splitter`**: a pane's resize handle, a WAI-ARIA separator. `orientation: "vertical" |
 "horizontal"` (a vertical bar resizes a width), `value`, `min`, `max` (px), `onChange(px)` (whole
 px within the bounds, called only when the size changes), `label` (required: "Resize the
-inspector"), `edge?: "start" | "end"` (which edge of the pane it sits on; at the start, left or
-top, moving left or up grows the pane), `step?` (px per arrow key, 16 by default).
+inspector"), `edge?: "start" | "end"` (which edge of the pane it sits on, `start` by default),
+`step?` (px per arrow key, 16 by default).
 
-- **Keyboard:** the arrow toward growth adds a step, the opposite one takes one away; Home goes to
-  `min`, End to `max`. Keys with Ctrl, Alt or Meta are left alone.
+- **`edge` is logical.** A vertical splitter's start is the pane's inline start, the left edge in
+  left-to-right text and the right edge in right-to-left text, and its end the other; a horizontal
+  one's start is the top. Moving outward, away from the pane, grows it: on the start edge in
+  left-to-right text, left or up; in right-to-left text a vertical one mirrors, so right grows it
+  on the start edge and left on the end edge. The direction is the element's own
+  (`getComputedStyle(el).direction`), read when a key is pressed or a drag starts, so a page that
+  changes `dir` is followed at once.
+- **Keyboard:** the arrow pointing outward adds a step, the opposite one takes one away; Home goes
+  to `min`, End to `max`. Keys with Ctrl, Alt or Meta are left alone.
 - **Pointer:** the main button drags it, with pointer capture; it takes the focus and has
   `data-dragging` while dragging.
-- It sits absolutely on one edge of its positioned parent. The bar is 6 px; on touch its hit area is
-  36 px.
-- `edge` is physical: in right-to-left text the keys and the drag are not mirrored.
+- It sits absolutely on one edge of its positioned parent, placed with logical properties
+  (`inset-inline-start`, `inset-block-end`). The bar is 6 px; on touch its hit area is 36 px.
 
 **`Toolbar`**: a WAI-ARIA toolbar, a row (or column) of controls that is one tab stop. `label`
 (required), `orientation?: "horizontal" | "vertical"`.

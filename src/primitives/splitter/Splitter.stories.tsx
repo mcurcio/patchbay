@@ -18,8 +18,13 @@ function Resizable(args: SplitterProps) {
         color: "var(--pb-text)",
         padding: "var(--pb-space-3)",
         boxSizing: "border-box",
-        [vertical ? (startEdge ? "borderLeft" : "borderRight") : startEdge ? "borderTop" : "borderBottom"]:
-          "1px solid var(--pb-line)",
+        [vertical
+          ? startEdge
+            ? "borderInlineStart"
+            : "borderInlineEnd"
+          : startEdge
+            ? "borderBlockStart"
+            : "borderBlockEnd"]: "1px solid var(--pb-line)",
       }}
     >
       {String(size)} px
@@ -67,7 +72,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** A side pane's left edge: drag it, or focus it and use the arrows, Home and End. */
+/** A side pane's start edge (its left): drag it, or focus it and use the arrows, Home and End. */
 export const Vertical: Story = {
   play: async ({ args, canvas, userEvent }) => {
     const splitter = canvas.getByRole("separator", { name: "Resize the pane" });
@@ -83,7 +88,7 @@ export const Vertical: Story = {
   },
 };
 
-/** A pane on the left, resized by its right edge: the right arrow grows it. */
+/** A pane on the left, resized by its end edge (its right): the right arrow grows it. */
 export const VerticalEndEdge: Story = { args: { edge: "end" } };
 
 /** A bottom drawer's top edge: the up arrow grows it. */
@@ -117,6 +122,44 @@ export const Dragged: Story = {
     await waitFor(() => expect(splitter).toHaveAttribute("aria-valuenow", "560"));
     at("pointerup", x - 1000);
     await expect(splitter).not.toHaveAttribute("data-dragging");
+  },
+};
+
+/**
+ * Right-to-left text: the start edge is the pane's right, so the splitter sits there, the right arrow grows the pane,
+ * and so does a drag to the right.
+ */
+export const RightToLeft: Story = {
+  decorators: [
+    (Story) => (
+      <div dir="rtl">
+        <Story />
+      </div>
+    ),
+  ],
+  play: async ({ args, canvas, userEvent }) => {
+    const splitter = canvas.getByRole("separator", { name: "Resize the pane" });
+    const pane = splitter.parentElement as HTMLElement;
+    const edge = splitter.getBoundingClientRect();
+    // Centred on the pane's inner right edge, inside its 1 px border.
+    const right = pane.getBoundingClientRect().right - parseFloat(getComputedStyle(pane).borderRightWidth);
+    await expect(Math.abs(edge.left + edge.width / 2 - right)).toBeLessThan(0.5);
+    splitter.focus();
+    await userEvent.keyboard("{ArrowRight}");
+    await expect(splitter).toHaveAttribute("aria-valuenow", "336");
+    await userEvent.keyboard("{ArrowLeft}");
+    await expect(splitter).toHaveAttribute("aria-valuenow", "320");
+    const y = edge.top + edge.height / 2;
+    const x = edge.left + edge.width / 2;
+    const at = (type: string, clientX: number) =>
+      splitter.dispatchEvent(
+        new PointerEvent(type, { bubbles: true, button: 0, pointerId: 1, isPrimary: true, clientX, clientY: y }),
+      );
+    at("pointerdown", x);
+    at("pointermove", x + 40);
+    await waitFor(() => expect(splitter).toHaveAttribute("aria-valuenow", "360"));
+    at("pointerup", x + 40);
+    await expect(args.onChange).toHaveBeenLastCalledWith(360);
   },
 };
 
