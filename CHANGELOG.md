@@ -1,3 +1,13 @@
+## [0.8.0](https://github.com/mcurcio/patchbay/compare/v0.7.0...v0.8.0) (2026-11-26)
+
+### Features
+
+* CodeEditor and CodeText, AppShell, and useFollowFit's stop() ([#12](https://github.com/mcurcio/patchbay/issues/12)) ([df0e625](https://github.com/mcurcio/patchbay/commit/df0e6254bc1b4d9dae61871bd8955159ede9d55a))
+
+### Bug Fixes
+
+* **graph:** useFollowFit stops following when a fit lands during the person's move ([#13](https://github.com/mcurcio/patchbay/issues/13)) ([e297c80](https://github.com/mcurcio/patchbay/commit/e297c803dd8881083fa70827b2db24953e801580))
+
 ## [0.7.0](https://github.com/mcurcio/patchbay/compare/v0.6.0...v0.7.0) (2026-11-26)
 
 ### ⚠ BREAKING CHANGES
