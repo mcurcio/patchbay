@@ -7,7 +7,7 @@ for every field.
 
 ```ts
 import { Button, Field, TextInput } from "@mcurcio/patchbay/primitives";
-import { usePersistentState, useTheme } from "@mcurcio/patchbay/hooks";
+import { useMediaBreakpoint, usePersistentState, useShortcuts, useTheme } from "@mcurcio/patchbay/hooks";
 ```
 
 Importing a layer loads its stylesheet (`dist/primitives.css`); an app loads the tokens and its
@@ -308,3 +308,56 @@ changes).
 the kept choice before the first paint, so a dark page never flashes light. The helpers
 `nextTheme`, `checkTheme`, `applyTheme`, `themeChoices`, `defaultTheme` and `defaultThemeKey` are
 exported too.
+
+### `useShortcuts`
+
+`useShortcuts(bindings, { enabled?, platform? })` binds a table of keys on the window while the
+component is mounted. Each binding is `{ keys, run, inTextFields?, enabled?, repeat?,
+preventDefault? }`; the table may change every render, and the one listener always reads the latest.
+`enabled: false` turns the whole table off (while a dialog the keys must not reach is open, say).
+
+- **Key strings.** Modifiers then the key, joined by `+`: `"Mod+K"`, `"Mod+Shift+Z"`, `"Shift+?"`,
+  `"Delete"`, `"Escape"`. `Mod` is Cmd on Apple platforms (macOS, iOS, iPadOS) and Ctrl elsewhere;
+  `Ctrl`, `Alt`, `Shift` and `Meta` are those keys on every platform. The key is a `KeyboardEvent`
+  key name or the character it types, in any case; `Space`, `Esc` and `Plus` (or `"Mod++"`) are read
+  too. `keys` may be a list of strings that do the same (`["Delete", "Backspace"]`). The table is
+  also what a shortcut sheet or palette shows, through `keyLabel`.
+- **Matching.** A press matches when its key is the string's and its Ctrl, Meta, Alt and Shift are
+  exactly the ones named, except that a character Shift itself makes (`?`, `!`) need not name
+  Shift. A letter or digit that Alt or the keyboard layout turned into another character is found
+  by its physical key (`event.code`), so `Alt+K` works on a Mac and `Mod+K` on a Cyrillic layout;
+  a Latin letter that differs is another key. A string naming a modifier it does not know never
+  matches.
+- **The first binding that matches runs**, and only it; the browser's own action for the key is
+  prevented unless the binding says `preventDefault: false`. A held key's auto-repeat acts only
+  with `repeat: true`. A press a component already handled (`defaultPrevented`, as `Dialog`'s and
+  `Sheet`'s Escape are) and a press inside an input method's composition are left alone.
+- **Text fields.** While focus is in a text field, single keys and Escape never act: the field
+  keeps them. A chord (a key with Mod, Ctrl, Alt or Meta) acts there only when its binding says
+  `inTextFields: true`, as a command palette's `Mod+K` does. `isTextTarget(target)` is the test: a
+  text-like `<input>` (not a checkbox, radio, range, button, colour or file input), a `<textarea>`,
+  a `<select>`, editable content, or anything inside an element with React Flow's `nokey` class,
+  which React Flow's own keys skip too. So the canvas's Delete and the app's never both act on one
+  press, and a control that keeps its own keys inside the canvas is marked `nokey` once for both.
+
+`keyLabel(keys, { platform?, names? })` writes a key string as people read it: `⌘K`, `⇧⌘Z`, `⌫`
+and `⌦` on Apple platforms (modifiers as symbols in the order ⌃⌥⇧⌘), `Ctrl+K`, `Ctrl+Shift+Z`,
+`Backspace` and `Delete` elsewhere; `Esc`, `Space`, arrows and `Page Up` on both. `names` replaces
+the words, keyed by key name (`Escape`, `Space`, `ArrowUp`) or modifier (`Ctrl`, `Alt`, `Shift`,
+`Meta`). A key with no word of its own (`F5`) is shown by its name, and a string it cannot read as
+written. `ariaKeyShortcuts(keys, platform?)` writes the same as an `aria-keyshortcuts` value
+(`Meta+K`, `Control+K`). `matchesKeys(event, keys, platform?)`, `findShortcut(event, bindings,
+platform?)` and `detectPlatform()` are the same steps outside React.
+
+### `useMediaBreakpoint`
+
+`useMediaBreakpoint()` returns `{ width, touch }`: `width` is `"wide"`, `"narrow"` below 760 px or
+`"phone"` below 600 px (the shell's three widths), and `touch` is true where the main pointer is
+coarse and cannot hover (`(hover: none) and (pointer: coarse)`, the query behind the components'
+touch sizes). It reads the media queries through `useSyncExternalStore`, so it follows the window
+as it resizes or a pointer changes, and returns the same object while the answer is unchanged.
+With no window to ask (on a server, before hydration, or with no `matchMedia`) it answers wide and
+not touch.
+
+`narrowBelow` (760), `phoneBelow` (600), `mediaQueries` (the three queries, for an app's own
+stylesheet or `matchMedia`), `widthOf(px)` and `readBreakpoint()` are exported too.

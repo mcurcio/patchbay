@@ -341,15 +341,14 @@ or places the person dragged to) and hands React Flow the positions, sizing node
 
 ### 4.5 Hooks (`/hooks`)
 
-`useTheme` and `usePersistentState` are built: [`docs/components.md`](../components.md#hooks-hooks).
+`useTheme`, `usePersistentState`, `useShortcuts` and `useMediaBreakpoint` are built:
+[`docs/components.md`](../components.md#hooks-hooks).
 Still to build:
 
 | Hook | What it does |
 |---|---|
-| `useShortcuts(map)` | Key bindings, Cmd on macOS and Ctrl elsewhere, never inside a text field |
 | `useToasts()` | `show({ tone, text, action? })`, where `action: { label, run }` |
 | `useLiveValue(subscribe, read)` | For hot values outside React state; what `Meter` uses |
-| `useMediaBreakpoint()` | The shell's three widths (wide, narrow, phone) and touch |
 
 ## 5. Storybook
 
