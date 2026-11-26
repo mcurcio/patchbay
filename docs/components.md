@@ -233,11 +233,16 @@ canvas's zoom, fit and minimap. Its tools are `IconButton`s (or plain buttons na
 - The body is a tab stop of its own, so a long one scrolls from the keyboard. At phone width the
   box takes the whole width less the gutters. It fades and rises in, still under reduced motion.
 
-**`Sheet`**: a panel over its container's right edge, or rising from its bottom, as an inspector
-on a narrow window or a phone. `open`, `onClose`, `side?: "right" | "bottom"` (right by default),
-`title?` (or `label?`, its name without one), `children`, `width?` (a right sheet's width in px,
-held to 280–560 px and 48 px short of its container; 360 by default), `labels?` (its words, [rule
-8](#rules-every-component-keeps): `close`, "Close").
+**`Sheet`**: a panel over its container's inline end (or start) edge, or rising from its bottom, as
+an inspector on a narrow window or a phone. `open`, `onClose`, `side?: "end" | "start" | "bottom"`
+(`end` by default), `title?` (or `label?`, its name without one), `children`, `width?` (an inline
+sheet's width in px, held to 280–560 px and 48 px short of its container; 360 by default),
+`labels?` (its words, [rule 8](#rules-every-component-keeps): `close`, "Close").
+
+- **`side` is logical**, as `Splitter`'s `edge` is: `end` is the container's inline end, the right
+  edge in left-to-right text and the left edge in right-to-left text, and `start` the other. It is
+  placed with logical properties (`inset-inline-end`, `border-inline-start`), so it follows the
+  direction the browser lays its container out in, and slides in from the edge it is on.
 
 - It is not modal: the page stays live, and opening it does not take the focus. Escape inside it
   and its close button call `onClose`; if it closes holding the focus, the focus goes back to where
@@ -245,7 +250,7 @@ held to 280–560 px and 48 px short of its container; 360 by default), `labels?
 - From the bottom it is the full width, at most 62 % of the height, rounded at the top and padded
   by the bottom safe-area inset.
 - It is placed absolutely, so its container (the app's workspace) is positioned. The app chooses
-  the side (the right below 760 px, the bottom below 600 px).
+  the side (the inline end below 760 px, the bottom below 600 px).
 
 ## Composites (`/composites`)
 
@@ -518,8 +523,8 @@ written back: `onWidth` and `onHeight` are called only when the person moves a s
 windowHeight)` are the same rules, for an app's own checks.
 
 **Narrow windows.** It reads [`useMediaBreakpoint`](#usemediabreakpoint): below 760 px the
-inspector is a [`Sheet`](#overlays) over the canvas's right edge, `width` px wide (and 48 px short
-of the canvas); below 600 px it rises from the bottom, at most 62 % of the workspace. The sheet has
+inspector is a [`Sheet`](#overlays) over the canvas's inline end (the left in right-to-left text,
+where the wide inspector is too), `width` px wide (and 48 px short of the canvas); below 600 px it rises from the bottom, at most 62 % of the workspace. The sheet has
 no splitter; its close button and Escape inside it call `onOpen(false)`. Moving between widths
 draws the inspector's `content` afresh (it moves between the region and the sheet), so state it
 must keep belongs to the app. The root has `data-layout` (`wide`, `narrow` or `phone`) for the

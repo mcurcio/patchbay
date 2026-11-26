@@ -138,13 +138,13 @@ export const BarOnly: Story = { args: { topBar } };
 /** Just the canvas, inside the safe-area insets. */
 export const CanvasOnly: Story = {};
 
-/** Below 760 px the inspector is a sheet over the canvas's right edge; Escape inside it closes it. */
+/** Below 760 px the inspector is a sheet over the canvas's inline end (the right); Escape inside it closes it. */
 export const Narrow: Story = {
   globals: { viewport: { value: "narrow" } },
   render: () => <Held />,
   play: async ({ canvas, userEvent }) => {
     const sheet = await canvas.findByRole("dialog", { name: "Inspector" });
-    await expect(sheet).toHaveAttribute("data-side", "right");
+    await expect(sheet).toHaveAttribute("data-side", "end");
     await expect(canvas.queryByRole("complementary")).toBeNull();
     // The app's own toggle closes and opens it, and so does the sheet's close button.
     await userEvent.click(canvas.getByRole("button", { name: "Inspector" }));
@@ -266,6 +266,18 @@ export const RightToLeft: Story = {
     canvas.getByRole("separator", { name: "Resize the inspector" }).focus();
     await userEvent.keyboard("{ArrowRight}");
     await expect(inspector).toHaveStyle({ width: "336px" });
+  },
+};
+
+/** A narrow window in right-to-left text: the sheet is at the canvas's inline end, the left, as the wide inspector is. */
+export const NarrowRightToLeft: Story = {
+  ...RightToLeft,
+  globals: { viewport: { value: "narrow" } },
+  play: async ({ canvas }) => {
+    const sheet = await canvas.findByRole("dialog", { name: "Inspector" });
+    await waitFor(() => expect(sheet.getAnimations()).toHaveLength(0));
+    const main = canvas.getByRole("main").getBoundingClientRect();
+    await expect(Math.abs(sheet.getBoundingClientRect().left - main.left)).toBeLessThan(0.5);
   },
 };
 

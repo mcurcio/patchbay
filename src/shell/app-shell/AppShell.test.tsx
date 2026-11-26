@@ -140,7 +140,7 @@ describe("AppShell", () => {
   });
 
   describe("on a narrow window", () => {
-    it("draws the inspector as a sheet over the canvas's right edge, at its width", () => {
+    it("draws the inspector as a sheet over the canvas's inline end, at its width", () => {
       windowOf("narrow");
       const { container } = render(
         <AppShell inspector={inspectorOf({ width: 400 })}>
@@ -150,7 +150,7 @@ describe("AppShell", () => {
       expect(container.firstElementChild).toHaveAttribute("data-layout", "narrow");
       expect(screen.queryByRole("complementary")).toBeNull();
       const sheet = screen.getByRole("dialog", { name: "Inspector" });
-      expect(sheet).toHaveAttribute("data-side", "right");
+      expect(sheet).toHaveAttribute("data-side", "end");
       expect(sheet.style.getPropertyValue("--pb-sheet-width")).toBe("400px");
       expect(screen.getByRole("main")).toContainElement(sheet);
       expect(screen.queryByRole("separator")).toBeNull();

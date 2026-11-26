@@ -1,7 +1,7 @@
-// The layout of a graph-editing app (docs/components.md#appshell): a top bar of slots, the canvas, an inspector on the
-// right and a drawer along the bottom, filling the screen (100dvh) inside the safe-area insets. It keeps no data: the
-// inspector's width, the drawer's height and whether each is open are the app's props, drawn within the shell's bounds
-// (bounds.ts) and changed through callbacks. Below 760 px the inspector is a Sheet over the canvas's right edge, below
+// The layout of a graph-editing app (docs/components.md#appshell): a top bar of slots, the canvas, an inspector at the
+// inline end and a drawer along the bottom, filling the screen (100dvh) inside the safe-area insets. It keeps no data:
+// the inspector's width, the drawer's height and whether each is open are the app's props, drawn within the shell's
+// bounds (bounds.ts) and changed through callbacks. Below 760 px the inspector is a Sheet over the canvas's inline end, below
 // 600 px one rising from the bottom (useMediaBreakpoint's widths). The drawer's body stays mounted while it is closed,
 // so what it holds (a draft, a caret, a scroll position) is still there when it opens.
 import { type ReactNode, useId, useSyncExternalStore } from "react";
@@ -198,7 +198,7 @@ export function AppShell({ topBar, inspector, drawer, children, labels, classNam
               onClose={() => {
                 inspector.onOpen(false);
               }}
-              side={layout === "phone" ? "bottom" : "right"}
+              side={layout === "phone" ? "bottom" : "end"}
               label={words.inspector}
               width={width}
               labels={{ close: words.close }}

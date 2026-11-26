@@ -36,19 +36,38 @@ describe("Sheet", () => {
     expect(screen.getByRole("dialog", { name: "Inspector" })).toBeInTheDocument();
   });
 
-  it("is drawn from the right by default, or from the bottom", () => {
+  it("is drawn from the inline end by default, or from the inline start or the bottom", () => {
     const { rerender } = render(
       <Sheet open onClose={() => undefined} label="S">
         x
       </Sheet>,
     );
-    expect(screen.getByRole("dialog")).toHaveAttribute("data-side", "right");
-    rerender(
-      <Sheet open onClose={() => undefined} label="S" side="bottom">
-        x
-      </Sheet>,
-    );
-    expect(screen.getByRole("dialog")).toHaveAttribute("data-side", "bottom");
+    expect(screen.getByRole("dialog")).toHaveAttribute("data-side", "end");
+    for (const side of ["start", "bottom"] as const) {
+      rerender(
+        <Sheet open onClose={() => undefined} label="S" side={side}>
+          x
+        </Sheet>,
+      );
+      expect(screen.getByRole("dialog")).toHaveAttribute("data-side", side);
+    }
+  });
+
+  it("is placed by logical properties, so right-to-left text mirrors it, and slides in from its own edge", () => {
+    const rule = (selector: string) => {
+      const at = css.indexOf(`${selector} {`);
+      if (at < 0) throw new Error(`no rule for ${selector}`);
+      return css.slice(at, css.indexOf("}", at));
+    };
+    expect(rule(".pb-sheet")).toMatch(/inset-inline-end: 0/);
+    expect(rule(".pb-sheet")).toMatch(/border-inline-start: 1px/);
+    expect(rule('.pb-sheet[data-side="start"]')).toMatch(/inset-inline: 0 auto/);
+    expect(rule('.pb-sheet[data-side="bottom"]')).toMatch(/inset-inline: 0/);
+    expect(css).not.toMatch(/(^|[\s;{])(left|right):/m);
+    expect(css).not.toMatch(/border-(left|right)|padding-(left|right)/);
+    // The entrance's offset turns with the text and the side: an end sheet in right-to-left text comes from the left.
+    expect(rule(".pb-sheet:dir(rtl)")).toMatch(/--pb-sheet-from: calc\(-1 \* var\(--pb-space-5\)\)/);
+    expect(rule('.pb-sheet[data-side="start"]:dir(rtl)')).toMatch(/--pb-sheet-from: var\(--pb-space-5\)/);
   });
 
   it("does not take the focus on opening", () => {
@@ -147,7 +166,7 @@ describe("Sheet", () => {
     expect(screen.getByRole("button", { name: "Fermer" })).toBeInTheDocument();
   });
 
-  it("holds the inspector's sizes: 280–560 px on the right, 62 % from the bottom", () => {
+  it("holds the inspector's sizes: 280–560 px at an inline edge, 62 % from the bottom", () => {
     expect(css).toMatch(/width: min\(clamp\(280px, var\(--pb-sheet-width, 360px\), 560px\), calc\(100% - 48px\)\)/);
     expect(css).toMatch(/\.pb-sheet\[data-side="bottom"\] \{[^}]*max-height: 62%/);
     expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*?animation: none/);
