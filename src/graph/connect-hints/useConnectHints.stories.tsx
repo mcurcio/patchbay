@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import "@xyflow/react/dist/style.css";
 import { addEdge, type Connection, type Edge, ReactFlow, ReactFlowProvider, useEdgesState } from "@xyflow/react";
 import { expect, fireEvent, waitFor } from "storybook/test";
+import { measuredHandle } from "../../test/measured-handle";
 import { type BoxNode, storyNodeTypes } from "../../test/story-canvas";
 import { Wire } from "../wire";
 import { mergeFlowProps } from "./mergeFlowProps";
@@ -95,12 +96,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const handle = (root: HTMLElement, nodeId: string, handleId: string) =>
-  waitFor(() => {
-    const found = root.querySelector<HTMLElement>(`[data-nodeid="${nodeId}"][data-handleid="${handleId}"]`);
-    if (found === null) throw new Error(`no handle ${nodeId}/${handleId} yet`);
-    return found;
-  });
+const handle = measuredHandle;
 
 const centre = (element: HTMLElement) => {
   const rect = element.getBoundingClientRect();

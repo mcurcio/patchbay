@@ -3,6 +3,7 @@ import "@xyflow/react/dist/style.css";
 import { type Edge, ReactFlow, ReactFlowProvider, useEdgesState, useNodesState } from "@xyflow/react";
 import { useRef } from "react";
 import { expect, fireEvent, waitFor } from "storybook/test";
+import { measuredHandle } from "../../test/measured-handle";
 import { type BoxNode, storyNodeTypes } from "../../test/story-canvas";
 import { type OnAddAt, useAddAt } from "./useAddAt";
 
@@ -96,11 +97,7 @@ const at = (element: Element, dx: number, dy: number) => {
 /** A double-click on empty canvas adds a node; a wire dropped on empty canvas adds one joined to it. */
 export const All: Story = {
   play: async ({ canvasElement }) => {
-    const handle = await waitFor(() => {
-      const found = canvasElement.querySelector<HTMLElement>('[data-nodeid="src"][data-handleid="left"]');
-      if (found === null) throw new Error("no handle yet");
-      return found;
-    });
+    const handle = await measuredHandle(canvasElement, "src", "left");
     await fireEvent.doubleClick(pane(canvasElement), at(pane(canvasElement), 400, 60));
     await waitFor(() => expect(canvasElement.querySelectorAll(".react-flow__node")).toHaveLength(2));
 
