@@ -24,7 +24,10 @@ export type BadgeVariant = "outlined" | "filled";
 export type BadgeProps = {
   /** The badge's tone: its text and border colour (outlined) or its fill (filled). */
   tone: BadgeTone;
-  /** Outlined (the default): text and border in the tone. Filled: the tone's fill under on-strong text, for a fact that must stand out. */
+  /**
+   * Outlined (the default): text and border in the tone. Filled: the tone's fill under on-strong text, for a fact that
+   * must stand out.
+   */
   variant?: BadgeVariant;
   /** What the badge says: a word, a count, a WarnMark beside them. */
   children: ReactNode;

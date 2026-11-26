@@ -243,8 +243,8 @@ on a raised surface with a stripe in its tone at the start (warn and err on thei
 
 **`StatusWords`**: a short row of states, each a word in its tone, a dot between each two (a pane's
 "2 errors · 1 warning · saved"). `items: { tone, label, title? }[]` (tones `"ok" | "warn" | "err" |
-"quiet" | "off"`, open), drawn in the order given, which is most urgent first, plus native `ul` props (name it with
-`aria-label`).
+"quiet" | "off"`, open), drawn in the order given, which is most urgent first, plus native `ul`
+props (name it with `aria-label`).
 
 - The list is one `aria-live="polite"` region (an app may pass another `aria-live`), so a screen
   reader reads a change when it is free; it stays in the page while empty, ready for the next
