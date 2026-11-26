@@ -104,13 +104,15 @@ export function useFollowFit<NodeType extends Node = Node>({
   const flowProps = useMemo<FollowFitFlowProps>(
     () => ({
       // A move made by code (a fit, a zoom from a tool) has no event; only the person's own move counts.
+      // A move by code that starts or ends during the person's (a fit landing mid-wheel) leaves theirs as it was.
       onMoveStart: (event, viewport) => {
-        movedFrom.current = event === null ? null : viewport;
+        if (event !== null) movedFrom.current = viewport;
       },
       onMoveEnd: (event, viewport) => {
+        if (event === null) return;
         const from = movedFrom.current;
         movedFrom.current = null;
-        if (event === null || from === null) return;
+        if (from === null) return;
         if (from.x !== viewport.x || from.y !== viewport.y || from.zoom !== viewport.zoom) setFollowing(false);
       },
     }),

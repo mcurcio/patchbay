@@ -142,6 +142,23 @@ describe("useFollowFit", () => {
     });
   });
 
+  it("stops following when a fit by code lands during the person's move", async () => {
+    const onFitted = vi.fn<(viewport: Viewport) => void>();
+    const seen: Seen = { current: null };
+    render(draw(1, one, onFitted, seen));
+    await waitFor(() => {
+      expect(onFitted).toHaveBeenCalledOnce();
+    });
+    act(() => {
+      const { onMoveStart, onMoveEnd } = follow(seen).flowProps;
+      onMoveStart(new WheelEvent("wheel"), { x: 0, y: 0, zoom: 1 });
+      onMoveStart(null, { x: 0, y: 0, zoom: 1 });
+      onMoveEnd(null, { x: 10, y: 0, zoom: 1 });
+      onMoveEnd(new WheelEvent("wheel"), { x: 10, y: 0, zoom: 1.5 });
+    });
+    expect(follow(seen).following).toBe(false);
+  });
+
   it("stops following at stop(), as for an app that moves the view itself", async () => {
     const onFitted = vi.fn<(viewport: Viewport) => void>();
     const seen: Seen = { current: null };
