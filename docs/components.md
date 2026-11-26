@@ -393,6 +393,75 @@ paths folded away), `onToggle?(path, open)`, and native `div` props.
   On touch the heading buttons are at least 36 px tall with 16 px words. The chevron turns on
   `--pb-motion-fast`, so it is still under reduced motion.
 
+**`CodeEditor`**: a text editor for configuration text, with highlighting, line numbers and the
+app's diagnostics. `value`, `onChange?(value)`, `language?: "knobly"`, `highlight?`,
+`diagnostics?: { line, column?, severity, message, code? }[]`, `readOnly?`, `onCaret?({ line,
+column, offset })`, `lineNumbers?` (true by default), `indent?` (what Tab inserts, a tab by
+default), `labels?` (its words, [rule 8](#rules-every-component-keeps): `diagnostic(d)`, how a
+diagnostic is read and shown on its mark, "Line 3, column 5: error E1: message"; `tabKey`, "Tab
+indents. Press Escape, then Tab, to move on."; `defaultCodeEditorLabels`), plus native `textarea`
+props.
+
+- **How it is drawn.** A native textarea holds the text, the caret, the selection and every edit,
+  its glyphs transparent; a highlighted copy of what it shows is drawn behind it, sharing every
+  metric (code face, `--pb-code-size`, line height, padding, a 4-column tab, no wrapping), and
+  follows its scroll. No editor library is used. CRLF and a lone CR are shown as LF (a textarea
+  holds LF only), so an edit gives the text back with LF; the last line keeps its height, and the
+  copy has room past the end, so it scrolls as far as the textarea. Under forced colours the copy
+  goes and the plain textarea is drawn in the system's colours.
+- **The textarea is the component** for everything but layout: `id`, `aria-*`, `ref`, `rows`,
+  `name`, `placeholder` and every other native prop go to it, so a [`Field`](#forms) names and
+  describes it; `className` and `style` go to the frame around the gutter and the box. It sizes
+  by `rows`, or fills a frame the app sizes, and can be resized vertically. `readOnly` draws it on
+  `--pb-code-surface-readonly`.
+- **Highlighting.** `highlight` wins over `language`. `highlight(text)` is the app's highlighter:
+  from the shown text (LF line breaks) to spans `{ start, end, class }` (offsets into it, `end`
+  exclusive), pure and total. Spans are clipped to the text and empty ones ignored; where two
+  overlap the later one wins; text no span covers is plain. The classes `directive`, `keyword`,
+  `word`, `variable`, `number`, `string`, `comment`, `punctuation` and `error` are drawn in the
+  code tokens (`--pb-code-*`, [`tokens.md`](tokens.md#the-tokens)); `space` and any other class
+  are drawn as plain text. `language: "knobly"` highlights [knobly](https://github.com/mcurcio/knobly)
+  text with knobly's own highlighter (`knobly/highlight`), imported from the optional `knobly`
+  peer the first time a view asks for it, once for the page (`loadKnobly()` starts it early); the
+  text is plain until it has loaded, and stays plain, with one warning on the console, when
+  `knobly` is not installed. Any other language is drawn as plain text.
+- **Diagnostics.** A diagnostic's `line` and `column` count from 1, the column in UTF-16 code
+  units (a tab is one); a line past the end is read as the last. Each line a diagnostic names gets
+  a mark in the gutter by its worst severity: a circle in `--pb-err` for `error`, a diamond in
+  `--pb-warn` for `warning`, and a ring in `--pb-muted` for any other severity, so the severity
+  never rests on colour alone; the mark's tooltip lists the line's diagnostics. Under the text a
+  wavy line in the same tone runs from the column to the end of the word there (one character on
+  white space), or under the line's text when there is no column; where marks overlap, error
+  wins over warning over any other. A press on a gutter mark focuses the textarea and puts the
+  caret at the line's first diagnostic. The gutter and the copy are hidden from screen readers:
+  every diagnostic is read, in the order given, as part of the textarea's description, after the
+  app's own `aria-describedby` (a `Field`'s hint and error), through `labels.diagnostic`. The
+  description is not live, so it is not announced on every keystroke.
+- **Keyboard.** Tab inserts `indent` in place of a selection within one line; across lines it
+  indents each line the selection touches (empty lines are left alone). Shift+Tab outdents each
+  line the caret or selection touches by `indent`, a tab, or up to the indent's width in spaces
+  (4 for a tab). **Escape, then Tab** (or Shift+Tab) moves the focus on as usual, so the keyboard
+  can always leave; Escape counts for the next key only, and is not stopped, so a dialog around
+  the editor still closes on it. While it can be edited, `labels.tabKey` is read in its
+  description. Read-only, Tab always moves on. Tab's edits go through the browser's own editing
+  (`execCommand("insertText")`, the one way to keep the undo history, so Ctrl+Z takes an indent
+  back), and by value where the browser has none. `tabEdit(text, start, end, indent, out)` is the
+  rule, exported and pure.
+- **The caret.** `onCaret` is called when the caret moves (a key, a press, an edit, a gutter mark),
+  once per place, with its line and column (from 1) and offset; the caret is the selection's
+  moving end. `caretAt(text, offset)` and `offsetAt(text, line, column)` are the conversions, and
+  `shownText`, `codeRuns`, `gutterRows` and `markLevel` the other steps, exported and pure.
+- **The gutter** numbers every line in `--pb-muted` on `--pb-sunken`, as wide as the widest
+  number. On touch the text (and the gutter's) is 16 px, as `--pb-code-size` is there; the marks
+  are a pointer shortcut, and the keyboard reaches each diagnostic by its line and column. It does
+  not animate, so there is nothing to stop under reduced motion.
+
+**`CodeText`**: read-only highlighted text, in code type on the read-only code surface. `value`,
+`language?: "knobly"`, `highlight?` (highlighted as `CodeEditor` is, `highlight` winning), plus
+native `pre` props (`ref` included; name it with `aria-label` where no heading does). CRLF reads as
+LF; lines are kept as written, and a wide one scrolls sideways; the box is a tab stop, so it
+scrolls from the keyboard too. It has no words of its own, so no `labels`.
+
 ## Hooks (`/hooks`)
 
 ### `usePersistentState`

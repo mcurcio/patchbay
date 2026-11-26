@@ -47,20 +47,13 @@ Built: [`docs/components.md`](../components.md#primitives-primitives).
 
 ### 4.2 Composites (`/composites`)
 
-`Banner`, `StatusWords`, `Toaster`, `DiffView`, `CommandPalette` and `ShortcutSheet` are built:
-[`docs/components.md`](../components.md#composites-composites). Still to build:
+`Banner`, `StatusWords`, `Toaster`, `DiffView`, `CommandPalette`, `ShortcutSheet`, `CodeEditor` and
+`CodeText` are built: [`docs/components.md`](../components.md#composites-composites). Still to
+build:
 
 | Component | Props (sketch) |
 |---|---|
-| `CodeEditor` | `value`, `onChange`, `language?: "knobly"`, `highlight?: (text) => spans`, `diagnostics?: { line, column?, severity, message }[]`, `readOnly?`, `onCaret?` |
-| `CodeText` | `value`, `language?` or `highlight?` (read-only, highlighted) |
 | `SchemaForm` | Deferred by the owner (2026-11-26), not in the first version. `schema` (JSON Schema subset), `value`, `onChange`, `errors?`, `fieldSlot?` |
-
-**Highlighting.** `CodeEditor` and `CodeText` highlight [knobly](https://github.com/mcurcio/knobly)
-configuration text built in (`language: "knobly"`), through the optional `knobly` peer dependency,
-loaded only by `/composites` and only when that language is asked for. Any other language comes
-through `highlight`, a function from the text to coloured spans, so an app brings its own
-highlighter. The diagnostics shape is generic: an app maps its own errors onto it.
 
 ### 4.3 Shell (`/shell`)
 
