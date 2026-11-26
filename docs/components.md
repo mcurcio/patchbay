@@ -293,6 +293,62 @@ more"), `countLabel?(count)` ("n times"), plus native `section` props.
   `--pb-motion-slow`, still under reduced motion; under forced colours the stripe stays, in the
   system's text colour.
 
+### Commands and keys
+
+**`CommandPalette`**: a search field over the app's commands, in a portal on `<body>`. `open`,
+`onClose`, `commands: { id, label, group, keys?, hint?, run, disabled? }[]`, `at?: { x, y }`, and
+the words `placeholder?` ("Type a command"), `label?` ("Commands", its name), `emptyLabel?` ("No
+commands"), `noMatchLabel?(query)` ("No command matches “query”"), plus `platform?` and
+`keyNames?` for the keys' labels, and `className?`.
+
+- **Commands.** Each is listed under its `group`, the groups in the order they first appear. `keys`
+  (a key string or several, as [`useShortcuts`](#useshortcuts) takes them) is drawn through
+  `keyLabel` and given as `aria-keyshortcuts`; the palette binds nothing. `hint` is a quieter
+  second line (what the command does, or what it acts on), shown but not matched. A `disabled`
+  command is listed, dimmed and `aria-disabled`; the keys skip it and a press on it does nothing.
+  An option's name is its words as shown: the label, the hint and the keys.
+- **Matching.** The query matches a label when its letters appear in it in order, in any case,
+  white space ignored ("adn" matches "Add a node"). The best way the letters can be found is kept:
+  the label's start and the start of a word (after a space or a mark, or a capital after a small
+  letter) score more, letters together score more, gaps and a late start less. Each group's
+  matches go best first and the groups by their best, ties in the order given; the matched letters
+  are drawn in `<mark>`, in the accent and bold (underlined under forced colours), so a match never
+  rests on colour alone. An empty query lists every command as given. `rankCommands(commands,
+  query)`, `matchSubsequence(text, query)` and `markRuns(label, indices)` are the same steps,
+  exported and pure.
+- **Keyboard.** The focus stays in the field, a `combobox` controlling the `listbox`; the active
+  command is its `aria-activedescendant`, the first enabled match after every keystroke and kept
+  by `id` while the commands change. The arrows move one (wrapping at the ends), Page Up and Page
+  Down a listful, Home and End to the first and last (Shift+Home and Shift+End stay with the
+  field, to select its text), and Enter runs the active one. Running a command asks to close
+  (`onClose`) and then calls `run`.
+- **Closing.** Escape (not passed on to the page), Tab (as a combobox's list closes), a press
+  outside the box, and the focus leaving it for another element call `onClose`. Opening focuses
+  the field; closing gives the focus back to what had it, unless it already went elsewhere.
+- **Placement.** Without `at` it is centred near the top over the scrim, 560 px wide at most (the
+  width less the gutters on a phone). With `at` (a point in the window, where a press happened) its
+  top-left corner sits there over a clear layer, 320 by 360 px at most, moved back inside the
+  window less an 8 px gutter where it would cross an edge, and smaller in a smaller window; it
+  follows the window as it resizes. `placePalette(at, window)` is that rule, and `PALETTE_WIDTH`,
+  `PALETTE_HEIGHT` and `PALETTE_GUTTER` its sizes.
+- **Empty and no match.** A `role="status"` line, there from the start so a screen reader hears
+  the change, says `emptyLabel` with no commands and `noMatchLabel(query)` when none match.
+- On touch the field has 16 px text and the rows are at least 40 px tall. It fades in over
+  `--pb-motion-fast`, still under reduced motion; under forced colours the active command keeps a
+  frame in the system's highlight.
+
+**`ShortcutSheet`**: the keys an app binds, listed in a [`Dialog`](#overlays). `open`, `onClose`,
+`shortcuts: { keys, label, group }[]`, `children?` (a note under the lists), and the words `title?`
+("Keyboard shortcuts"), `orLabel?` ("or"), `emptyLabel?` ("No shortcuts"), `closeLabel?`
+("Close"), plus `platform?`, `keyNames?` and `className?`.
+
+- One section per group, in the order the groups first appear, named by its heading (an `h3`);
+  each a `<dl>` of what a key does beside the key in a key cap, drawn through `keyLabel` and
+  given as `aria-keyshortcuts`. Several keys that do the same are joined by `orLabel`.
+  `groupShortcuts(shortcuts)` is the grouping, exported.
+- It binds nothing: the app's `useShortcuts` table is usually where the lines come from. The rest
+  (focus, Escape, the scrim, phone width) is `Dialog`'s.
+
 ### Code
 
 **`DiffView`**: unified diff text, drawn line by line in code type on the code surface. Either
@@ -355,7 +411,7 @@ preventDefault? }`; the table may change every render, and the one listener alwa
   `Ctrl`, `Alt`, `Shift` and `Meta` are those keys on every platform. The key is a `KeyboardEvent`
   key name or the character it types, in any case; `Space`, `Esc` and `Plus` (or `"Mod++"`) are read
   too. `keys` may be a list of strings that do the same (`["Delete", "Backspace"]`). The table is
-  also what a shortcut sheet or palette shows, through `keyLabel`.
+  also what a [`ShortcutSheet` or `CommandPalette`](#commands-and-keys) shows, through `keyLabel`.
 - **Matching.** A press matches when its key is the string's and its Ctrl, Meta, Alt and Shift are
   exactly the ones named, except that a character Shift itself makes (`?`, `!`) need not name
   Shift. A letter or digit that Alt or the keyboard layout turned into another character is found

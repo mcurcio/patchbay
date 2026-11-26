@@ -1,0 +1,207 @@
+/* The command palette (CommandPalette.tsx): a raised box over a scrim, centred near the top of the window, or, when
+   anchored at a point, placed there by its inline style over a clear layer. A search field over a list of commands in
+   groups; the active one is on the sunken surface with an accent bar at its start, and the matched letters are in the
+   accent and bold, so a match never rests on colour alone. */
+.pb-palette-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: max(10vh, env(safe-area-inset-top)) max(var(--pb-space-5), env(safe-area-inset-right))
+    max(var(--pb-space-5), env(safe-area-inset-bottom)) max(var(--pb-space-5), env(safe-area-inset-left));
+  background: var(--pb-scrim);
+  animation: pb-palette-fade var(--pb-motion-fast) ease-out;
+}
+
+.pb-palette-layer[data-anchored] {
+  display: block;
+  padding: 0;
+  background: transparent;
+}
+
+.pb-palette {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: min(560px, 100%);
+  max-height: min(420px, 100%);
+  overflow: hidden;
+  font-family: var(--pb-font-ui);
+  font-size: var(--pb-text-md);
+  color: var(--pb-text);
+  background: var(--pb-raised);
+  border: 1px solid var(--pb-line);
+  border-radius: var(--pb-radius-box);
+  box-shadow: var(--pb-shadow-lifted);
+}
+
+.pb-palette-field {
+  flex: none;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 40px;
+  margin: 0;
+  padding: var(--pb-space-3) var(--pb-space-4);
+  font: inherit;
+  color: var(--pb-text);
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--pb-line);
+  border-radius: 0;
+  outline: none;
+}
+
+.pb-palette-field::placeholder {
+  color: var(--pb-muted);
+  opacity: 1;
+}
+
+/* The field holds the focus the whole time; the box's ring says so. */
+.pb-palette:focus-within {
+  outline: 2px solid var(--pb-accent);
+  outline-offset: 2px;
+}
+
+.pb-palette-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--pb-space-2) 0;
+}
+
+.pb-palette-list[hidden] {
+  display: none;
+}
+
+.pb-palette-heading {
+  padding: var(--pb-space-2) var(--pb-space-4) var(--pb-space-1);
+  font-size: var(--pb-text-sm);
+  font-weight: 600;
+  color: var(--pb-muted);
+}
+
+.pb-palette-option {
+  display: flex;
+  align-items: center;
+  gap: var(--pb-space-3);
+  min-height: 28px;
+  padding: var(--pb-space-1) var(--pb-space-4);
+  border-inline-start: 2px solid transparent;
+  cursor: pointer;
+}
+
+.pb-palette-option[aria-selected="true"] {
+  background: var(--pb-sunken);
+  border-inline-start-color: var(--pb-accent);
+}
+
+.pb-palette-option[aria-disabled="true"] {
+  color: var(--pb-muted);
+  cursor: default;
+}
+
+.pb-palette-text {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.pb-palette-label,
+.pb-palette-hint {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pb-palette-label mark {
+  color: var(--pb-accent);
+  font-weight: 700;
+  background: transparent;
+}
+
+.pb-palette-option[aria-disabled="true"] .pb-palette-label mark {
+  color: inherit;
+}
+
+.pb-palette-hint {
+  font-size: var(--pb-text-sm);
+  color: var(--pb-muted);
+}
+
+.pb-palette-keys {
+  display: flex;
+  flex: none;
+  gap: var(--pb-space-1);
+}
+
+.pb-palette-keys kbd {
+  min-width: 1.5em;
+  padding: 0 var(--pb-space-1);
+  font-family: var(--pb-font-code);
+  font-size: var(--pb-text-sm);
+  color: var(--pb-muted);
+  text-align: center;
+  background: var(--pb-sunken);
+  border: 1px solid var(--pb-line);
+  border-radius: var(--pb-radius-control);
+}
+
+.pb-palette-empty {
+  margin: 0;
+  padding: var(--pb-space-4);
+  color: var(--pb-muted);
+}
+
+.pb-palette-empty:empty {
+  padding: 0;
+}
+
+@keyframes pb-palette-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* On a touch screen: 16 px text in the field, so iOS does not zoom, and rows a finger can hit. */
+@media (hover: none) and (pointer: coarse) {
+  .pb-palette-field {
+    min-height: 44px;
+    font-size: 16px;
+  }
+
+  .pb-palette-option {
+    min-height: 40px;
+  }
+}
+
+/* At phone width the centred box takes the width less the gutters. */
+@media (max-width: 599px) {
+  .pb-palette-layer:not([data-anchored]) {
+    padding-top: max(var(--pb-space-5), env(safe-area-inset-top));
+    padding-right: max(var(--pb-space-4), env(safe-area-inset-right));
+    padding-left: max(var(--pb-space-4), env(safe-area-inset-left));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pb-palette-layer {
+    animation: none;
+  }
+}
+
+/* Under forced colours the active command keeps a frame in the system's highlight, and the marks an underline. */
+@media (forced-colors: active) {
+  .pb-palette-option[aria-selected="true"] {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+
+  .pb-palette-label mark {
+    text-decoration: underline;
+  }
+}

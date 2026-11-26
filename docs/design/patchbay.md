@@ -47,13 +47,11 @@ Built: [`docs/components.md`](../components.md#primitives-primitives).
 
 ### 4.2 Composites (`/composites`)
 
-`Banner`, `StatusWords`, `Toaster` and `DiffView` are built:
+`Banner`, `StatusWords`, `Toaster`, `DiffView`, `CommandPalette` and `ShortcutSheet` are built:
 [`docs/components.md`](../components.md#composites-composites). Still to build:
 
 | Component | Props (sketch) |
 |---|---|
-| `CommandPalette` | `open`, `onClose`, `commands: { id, label, group, keys?, run, disabled? }[]`, `placeholder?` |
-| `ShortcutSheet` | `shortcuts: { keys, label, group }[]`, `onClose` |
 | `CodeEditor` | `value`, `onChange`, `language?: "knobly"`, `highlight?: (text) => spans`, `diagnostics?: { line, column?, severity, message }[]`, `readOnly?`, `onCaret?` |
 | `CodeText` | `value`, `language?` or `highlight?` (read-only, highlighted) |
 | `SchemaForm` | `schema` (JSON Schema subset), `value`, `onChange`, `errors?`, `fieldSlot?` |
