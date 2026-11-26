@@ -94,27 +94,250 @@ and a drawer along the bottom:
 On React Flow 12 (a peer dependency of `/graph` only). patchbay provides the node and edge
 components and sugar for the canvas, not a wrapper around it: the app renders React Flow's own
 `<ReactFlow>`, so every React Flow prop and future feature stays within reach, turns its graph into
-React Flow nodes and edges, lays them out and handles the events.
+React Flow nodes and edges, lays them out and handles the events (decided by the owner,
+2026-11-25). Only `/graph` imports `@xyflow/react`; the hooks below that need React Flow live in
+`/graph`, not `/hooks`.
 
-| Component | Props (sketch) |
+The props below are settled for build (owner, 2026-11-26: patchbay's model is the standard, the
+correct general model rather than one app's habits). Each part keeps the rules every component
+keeps (open enums drawn neutrally, slots over flags, tokens only, words as props with English
+defaults, keyboard, touch, reduced motion and forced colours); what is built moves to a new
+`docs/graph.md`. The props were checked against two neutral node shapes, which the stories draw:
+
+- **A level node**: title "Tone 1", subtitle "oscillator", a `Pill` status, two outputs ("left",
+  "right"), each with a `Meter` as its trailing slot, and a footer of badges ("48 kHz", "2 ch").
+- **A staged-edit node**: title "mix-2", subtitle "mixer", `change: "added"`, typed ports
+  ("in · audio", "side · control", "out · audio") with inputs and outputs side by side, one port
+  with a problem, drawn while a wire is dragged (its ports' hints).
+
+#### Supported React Flow
+
+`@xyflow/react` 12.1.0 or newer, below 13. `useAddAt` reads the connection state that
+`onConnectEnd` passes, first in 12.1.0, so the peer range narrows from `^12.0.0` to `^12.1.0`
+when `/graph` ships. `tokens.css`'s `--xy-*` map sets 18 of React Flow's variables; every one is
+declared in React Flow's stylesheet from 12.0.0 through 12.12.1, whose variable sets are identical
+(85 names; checked 2026-11-26). The check that keeps this true (pb-nx9.39) is a unit test that
+every `--xy-*` name `tokens.css` sets is declared in the installed React Flow's `style.css`, run
+against the dev dependency, kept at the newest supported minor; `docs/tokens.md` states the range.
+
+#### Geometry
+
+An app sizes its nodes before they render (dagre and ELK take sizes), so a node box's geometry is
+fixed: exported constants, mirrored by tokens of the same values that a brand may not change. A
+unit test holds each token equal to its constant, and the brand tests fail on a brand that sets
+one. Components size themselves from the tokens; layout code reads the constants.
+
+| Constant | Token | Value | What it is |
+|---|---|---|---|
+| `NODE_WIDTH` | `--pb-node-width` | 240 | The default width; `NodeBox`'s `width` prop overrides it per node |
+| `NODE_HEADER` | `--pb-node-header` | 46 | The header (title and subtitle), with or without a subtitle |
+| `NODE_LINE` | `--pb-node-line` | 22 | The `line` row, when there is one |
+| `NODE_ROW` | `--pb-node-row` | 22 | One port row |
+| `NODE_PAD` | `--pb-node-pad` | 8 | Above the first port row and below the last |
+| `NODE_FOOTER` | `--pb-node-footer` | 28 | The footer, when there is one |
+| `HANDLE_SIZE` | `--pb-node-handle` | 10 | A handle's dot |
+| `HANDLE_HIT` | `--pb-node-handle-hit` | 20 | A handle's hit area, centred on the dot (32 on touch) |
+
+`nodeBoxSize({ inputs, outputs, ports, line, footer, width? }) → { width, height }` (counts and
+presences) is the one formula: `NODE_HEADER`, plus `NODE_LINE` with a line, plus
+`2 × NODE_PAD + rows × NODE_ROW` when there are ports (rows is inputs plus outputs when stacked,
+the larger of the two side by side), plus `NODE_FOOTER` with a footer. The box is
+`box-sizing: border-box`, so its 1 px border is inside these sizes; the selection ring is an
+outline outside them. A story measures a rendered box in Chromium against `nodeBoxSize`.
+`--pb-row` stays the compact control's height (buttons, icon buttons), which a brand may change;
+`docs/tokens.md` drops "a port row's height" from it when `NodeBox` ships.
+
+A touch screen's 36 px target rule has one exception here: handles sit 22 px apart, so their hit
+area grows to 32 px on touch and React Flow's `connectionRadius` finishes a drop near a handle.
+
+#### `NodeBox`
+
+The body of the app's own node type: the app writes a node component that maps its data onto
+`NodeBox` and registers it in `nodeTypes` (defined outside render, as React Flow asks).
+
+```tsx
+function SourceBox({ data, selected }: NodeProps<SourceNode>) {
+  return (
+    <NodeBox title={data.name} subtitle={data.kind} selected={selected} inputs={…} outputs={…} />
+  );
+}
+const nodeTypes = { source: SourceBox };
+```
+
+| Prop | Settled |
 |---|---|
-| `CanvasTools` | The floating `ToolGroup` for a React Flow `<Panel>`: zoom, fit, tidy, minimap (the minimap's node class from the app) |
-| `useAddAt` | `onAddAt(point, from?)`: a double-click on empty canvas, or a wire dropped there |
-| `useFollowFit` | Fit again on changes until the person moves the view; `onFitted` when a fit lands |
-| `NodeBox` | `title`, `subtitle?` (type), `tone?` (the stripe), `status?` (slot: a `Pill`), `line?` (why it is silent), `inputs`, `outputs`, `footer?` (slot: badges), `selected`, `change?: "added" \| "removed" \| "renamed" \| "changed"` |
-| `PortRow` | `id`, `label`, `typeLabel?`, `side`, `hint?: "ok" \| "no" \| null` (while a wire is dragged), `problem?`, `trailing?` (slot: a meter) |
-| `Wire` (edge type) | `tone` (`ok`, `pending`, `refused`, `added`, `removed`, open), `emphasis?: 0..1` (thickness and brightness), `dashed?`, `flow?`, `label?` (at the midpoint) |
-| `GhostWire` | a request on its way: `from`, `to` |
-| `Meter` | `subscribe(listener) → unsubscribe`, `read() → [peak, rms]`, `orientation?` |
-| `useConnectHints` | `canConnect(from, to) → boolean \| string` → the `hint` of every handle while a wire is dragged |
+| `title` | `ReactNode`, one line, cut with an ellipsis; a string is also the header's tooltip |
+| `subtitle?` | `ReactNode`, the second header line in `--pb-muted` (the type) |
+| `tone?` | `"ok" \| "warn" \| "err" \| "quiet" \| "off" \| "accent" \| "muted" \| (string & {})`: a 4 px stripe down the box's start edge, in the tone's token. None, or a tone it does not know, draws the stripe in `--pb-line-strong` |
+| `disabled?` | A dashed border, the stripe hatched (the tone and the surface in stripes), the words in `--pb-muted`. Drawing only: whether its ports still connect is the app's rule |
+| `failed?` | The border in `--pb-err` and the header on `--pb-err-soft`; the reason goes in `line`. With `disabled`, both looks |
+| `change?` | `"added" \| "removed" \| "renamed" \| "changed" \| (string & {})`, an edit not yet applied: a 2 px border in `--pb-added`, `--pb-removed`, `--pb-renamed` or `--pb-warn` (2 px drawn inward, so the size holds) and a `Badge` of the same tone in the header with the change's word, so it never rests on colour; `removed` also strikes the title through. A change it does not know: a `--pb-line-strong` border and the string itself as the badge's word |
+| `changeLabels?` | Partial `{ added, removed, renamed, changed }`, English defaults (`defaultChangeLabels`) |
+| `status?` | Slot at the header's end (a `Pill`) |
+| `line?` | `ReactNode`, one row under the header saying why the node is silent: `--pb-muted`, `--pb-err` when `failed`; one line, ellipsis, a string is also its tooltip |
+| `inputs?`, `outputs?` | `PortSpec[]`: each `PortRow`'s props without `side` (`NodeBox` sets it), keyed by `id` |
+| `ports?` | `"stacked" \| "side-by-side"` (open; one it does not know is stacked). Stacked: the inputs' rows, then the outputs'. Side by side: two columns, the inputs at the start and the outputs at the end, row *n* of each on one line |
+| `footer?` | Slot: one row at the foot (badges) |
+| `selected?` | From `NodeProps`: a 2 px outline in `--pb-accent` |
+| `width?` | Number of px, `NODE_WIDTH` by default |
+| others | Native `div` props pass through to the root (`className`, `data-*`, `ref`) |
+
+- The root is `role="group"` named by the title. React Flow's node wrapper keeps the focus, the
+  selection, the dragging and the Delete key; `NodeBox` adds no tab stop of its own beyond what its
+  slots hold.
+- When its ordered list of port ids or its `ports` layout changes, `NodeBox` calls React Flow's
+  `updateNodeInternals` for its node itself (`useNodeId`), so handles added or moved are measured;
+  it must render inside a React Flow node.
+- Forced colours: the stripe and the change are borders (`CanvasText`, `Highlight` for selected)
+  and the change keeps its word. Only the selection's colour moves, at `--pb-motion-fast`.
+
+#### `PortRow`
+
+One port: its handle at the box's edge and its words. `NodeBox` draws its rows with it; an app
+drawing a box of its own may use it alone, inside a React Flow node.
+
+| Prop | Settled |
+|---|---|
+| `id` | The handle id, passed to React Flow's `<Handle id>` unchanged (the app's own scheme) |
+| `side` | `"input" \| "output"`: an input is a `target` handle on the left edge, an output a `source` handle on the right. React Flow's positions are physical, so right-to-left text does not mirror them |
+| `label` | `ReactNode`, the port's name; a string is also its tooltip |
+| `typeLabel?` | `ReactNode`, after the label in `--pb-muted`, the code face (the port's type) |
+| `hint?` | `"ok" \| "no" \| "origin" \| null \| (string & {})`, while a wire is dragged: `origin` the handle the drag began at (accent ring); `ok` accepts it (the dot in `--pb-ok`, grown to 12 px); `no` refuses it (the dot in `--pb-off`, the words muted, a not-allowed cursor); `null` no drag. One it does not know is drawn as `null`. Given, it wins over `useConnectHints`' context |
+| `reason?` | Why `no`: the handle's and the row's tooltip while `hint` is `no` |
+| `problem?` | `string`: a `WarnMark` beside the label, with this as its words |
+| `trailing?` | Slot at the row's inner end, toward the box's centre (a `Meter`) |
+| `connectable?` | `true` by default; `<Handle isConnectable>` |
+
+- React Flow's handle classes (`react-flow__handle`, `source`, `target`, `connectable…`) are kept,
+  so its connection logic and `connectionRadius` work as on any handle; `PortRow` adds
+  `pb-port-handle` and `data-hint`.
+- The dot is `HANDLE_SIZE` with a `HANDLE_HIT` hit area (32 px on touch). The hint's change of
+  size and colour is at `--pb-motion-fast`, none under reduced motion; under forced colours the
+  hint shows as the dot's border (`Highlight` for ok and origin, `GrayText` for no).
+
+#### `useConnectHints`
+
+One rule for which ports may be joined, used both for the hints while a wire is dragged and for
+React Flow's own check on the drop.
+
+```tsx
+const hints = useConnectHints(canConnect);
+<ConnectHints value={hints.value}>
+  <ReactFlow {...mergeFlowProps(hints.flowProps, addAt.flowProps)} … />
+</ConnectHints>
+```
+
+- `canConnect(from: PortRef, to: PortRef) → true | false | string`, where
+  `PortRef = { nodeId, handleId: string | null }`. `from` is always the output and `to` the input,
+  whichever end the drag began at. `true` accepts; `false` refuses; a string refuses and is the
+  reason. Called at most once per candidate handle per drag.
+- `flowProps`: `onConnectStart`, `onConnectEnd` and `isValidConnection` (`canConnect(...) === true`
+  on React Flow's source and target), for `<ReactFlow>`. State changes twice per drag, at its start
+  and end, never per pointer move.
+- `value` goes to `<ConnectHints>`, a context every `PortRow` reads: the origin is `origin`, each
+  handle on the other side `ok` or `no` with its reason, handles on the origin's side `null` (not
+  candidates, in React Flow's strict connection mode).
+- `mergeFlowProps(...objects)`: one object whose handlers call each object's handler in order, for
+  `useConnectHints`, `useAddAt`, `useFollowFit` and the app's own.
+
+#### `Wire` and `GhostWire`
+
+Edge types the app registers in `edgeTypes`; their props arrive as React Flow's edge `data`
+(`WireData`, `type WireEdge = Edge<WireData, "wire">`). Both draw with React Flow's `BaseEdge`, so
+its `react-flow__edge-path` and `react-flow__edge-interaction` classes, its interaction width and
+its selection stay. The path is React Flow's bezier, rebuilt only when an end moves.
+
+| `WireData` | Settled |
+|---|---|
+| `tone?` | `Pill`'s tones, the changes (`added`, `removed`, `changed` in `--pb-warn`), `pending` (`--pb-quiet`) and `refused` (`--pb-err`); open. None, or one it does not know, is `--xy-edge-stroke` (`--pb-muted`). Selected: `--pb-accent` |
+| `emphasis?` | `0..1` (clamped; not a number is 0): the signal's level as thickness (1.5 px to 3.5 px) and brightness, set as `--pb-wire-emphasis` on the edge, so a change of level restyles without rebuilding the path |
+| `dashed?` | Dashes: an edit not yet saved |
+| `flow?` | Dots move along the wire toward the input, one cycle per `--pb-motion-flow`; under reduced motion the dots are not drawn |
+| `arrow?` | An arrowhead at the input end, drawn by `Wire` facing the handle's side (not an SVG `<marker>`, so CSS colours it with the tone) |
+| `label?` | `ReactNode` at the midpoint, on the raised surface in `--pb-text-sm`, through React Flow's `EdgeLabelRenderer`; it takes no pointer events |
+| `title?` | `string`, a `<title>` on the interaction path: the wire's tooltip |
 
 - A wire drawn by its signal's level and a dashed wire for an edit not yet saved are one `Wire`
-  with different props; a request on its way and a queued edit are both drawn with `change` and
-  `tone`.
-- `Meter` takes a subscription rather than a store, so it never re-renders through React; it keeps
-  its own peak hold.
-- Layout is out of scope for the first version: an app lays out its graph with the library it
-  prefers (dagre, ELK, or places the person dragged to) and hands React Flow the positions.
+  with different props; a queued edit is drawn with `tone` (a change) and `dashed`.
+- Forced colours: the stroke is `CanvasText` (`Highlight` selected); dashes and the arrow stay.
+
+**`GhostWire`**: a request on its way, before the app's graph holds the edge. The app adds it as an
+edge of type `ghost` between the two handle ids, with `selectable`, `focusable` and `deletable`
+false; `data: { tone?: "pending" | "refused" | (string & {}), label? }` (`pending` by default,
+dashed in `--pb-quiet` at reduced opacity; `refused` in `--pb-err`; one it does not know as
+`pending`). It takes no pointer events. How long a refused one stays is the app's: it removes the
+edge.
+
+#### `Meter`
+
+A level bar on a decibel scale, painted through refs (it never re-renders through React), built on
+`useLiveValue` ([4.5](#45-hooks-hooks)).
+
+| Prop | Settled |
+|---|---|
+| `subscribe` | `(listener: () => void) → unsubscribe`: the listener means a new value is ready |
+| `read` | `() → readonly [peak, rms]`, linear amplitude, 1.0 = 0 dBFS. Not a number, or 0 and below, is silence |
+| `orientation?` | `"horizontal" \| "vertical"` (open; one it does not know is horizontal). Horizontal fills its container's width (48 px when it has none) and is 6 px thick; vertical the other way |
+| `floor?` | dBFS at the bar's empty end, -60. The full end is 0 dBFS |
+| `zones?` | `[mid, hot]` in dBFS, `[-18, -6]`: below `mid` the bar is `--pb-meter-low`, from `mid` `--pb-meter-mid`, from `hot` `--pb-meter-hot` (set as fractions in CSS variables) |
+| `holdMs?` | 1500: the peak tick (`--pb-meter-peak`) holds the highest peak this long |
+| `fallDbPerS?` | 20: then the tick falls at this rate until it meets the current peak |
+| `clipAt?` | 1.0 (0 dBFS), linear: a peak at or above it lights the clip lamp (`--pb-meter-hot`) |
+| `clipHoldMs?` | 2000: how long the lamp stays lit after the last such peak |
+| `label?` | Its accessible name (`role="img"`), "Level" by default; the numbers are never announced |
+| `title?` | `(peakDb, rmsDb, clipped) → string`, the tooltip; the English default reads "peak -12.0 dB, rms -18.3 dB" (−∞ for silence). Refreshed on pointer entry and at most every 250 ms while hovered |
+| `ref?` | `MeterHandle`: `reset()` empties the bar and clears the hold and the clip lamp (when the source closes) |
+
+- The bar's length is the RMS; the tick is the held peak. Times come from `performance.now()`, a
+  monotonic clock. `requestAnimationFrame` runs only while something moves (a new value, a falling
+  tick, a lit lamp counting down) and stops when it is still.
+- The level is information, not decoration, so it still moves under reduced motion; nothing else
+  animates. Forced colours: the bar in `Highlight`, the tick and the lamp in `CanvasText`.
+
+#### Canvas sugar: `CanvasTools`, `useAddAt`, `useFollowFit`
+
+Beside the app's own `<ReactFlow>`, inside its `ReactFlowProvider`.
+
+**`CanvasTools`**, a child of `<ReactFlow>`: a `ToolGroup` (one Tab stop, arrow keys between
+tools, 40 px tools on touch) in React Flow's `<Panel>`, and React Flow's `<MiniMap>` while the
+minimap is on.
+
+| Prop | Settled |
+|---|---|
+| `position?` | The panel's `PanelPosition`, `"bottom-left"` |
+| `fitOptions?` | React Flow's `FitViewOptions` for the fit tool |
+| `onFit?` | Replaces the fit tool's own `fitView` (pass `useFollowFit`'s `fit`, so the tool also resumes following) |
+| `onTidy?` | The tidy tool, shown only when given (the layout is the app's) |
+| `minimap?`, `onMinimap?` | The minimap tool (`aria-pressed`), shown only with `onMinimap`; `<MiniMap>` drawn while `minimap` is true |
+| `minimapNodeClassName?` | `string \| (node) → string`, passed to `<MiniMap nodeClassName>`, so the app colours the minimap by its nodes' state |
+| `keyShortcuts?` | Partial `{ zoomIn, zoomOut, fit, tidy, minimap }` of `aria-keyshortcuts` strings: the app's own bindings, shown, not bound |
+| `labels?` | Partial `{ toolbar, zoomIn, zoomOut, fit, tidy, minimap }`, English defaults (`defaultCanvasToolsLabels`: "Canvas", "Zoom in", "Zoom out", "Fit the view", "Tidy the layout", "Minimap") |
+| `children?` | More tools (`IconButton`s) after patchbay's |
+
+Zoom and fit move over `--pb-motion-slow`'s 180 ms, at once under reduced motion.
+
+**`useAddAt(onAddAt, options?)`** → `{ flowProps }`. `onAddAt(point, from?)`: `point` in flow
+coordinates; `from` a `PortRef` plus `side` when a wire was dropped on empty canvas, absent for a
+double-click on empty canvas. `flowProps` holds `onDoubleClick` (only on the pane, not on a node,
+edge or panel), `onConnectStart`, `onConnectEnd` (a drop where no handle took it, on the pane; a
+touch drop reads `changedTouches`) and `zoomOnDoubleClick: false`. `options.enabled` (true)
+switches it off, as while the graph is read-only. A double-click has no keyboard path; the app's
+own add command (a palette entry, a button) is that path.
+
+**`useFollowFit({ key, fitOptions?, onFitted? })`** → `{ following, fit, flowProps }`. While
+following (from the start), the view fits again whenever `key` changes (the app's value that
+changes when nodes are added, removed or laid out) and whenever the canvas changes size, each time
+once every node is measured. The person moving the view (`onMoveStart` with an event; a move made
+by code has none) stops following; `fit()` fits now and follows again. `onFitted(viewport)` is
+called after each fit has landed, in the frame after the viewport is set: an app, or its browser
+tests, can mark the layout ready on it instead of waiting on a timer. `flowProps` holds
+`onMoveStart`. Automatic fits are instant; `fit()` moves as the fit tool does.
+
+#### Out of scope
+
+Layout, for the first version: an app lays out its graph with the library it prefers (dagre, ELK,
+or places the person dragged to) and hands React Flow the positions, sizing nodes with
+`nodeBoxSize`.
 
 ### 4.5 Hooks (`/hooks`)
 
