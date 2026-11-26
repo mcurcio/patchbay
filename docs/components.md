@@ -7,7 +7,7 @@ for every field.
 
 ```ts
 import { Button, Field, TextInput } from "@mcurcio/patchbay/primitives";
-import { useLiveValue, useMediaBreakpoint, usePersistentState, useShortcuts, useTheme } from "@mcurcio/patchbay/hooks";
+import { useLiveValue, useMediaBreakpoint, usePersistentState, useShortcuts, useTheme, useToasts } from "@mcurcio/patchbay/hooks";
 ```
 
 Importing a layer loads its stylesheet (`dist/primitives.css`); an app loads the tokens and its
@@ -259,6 +259,40 @@ props (name it with `aria-label`).
   reader reads a change when it is free; it stays in the page while empty, ready for the next
   change. The dots are drawn, not read.
 
+**`Toaster`**: a stack of toasts, short news that comes and goes (a refused edit, a lost connection,
+a saved file), each on a raised, shadowed surface with a stripe in its tone at the start, as
+`Banner`'s. The queue is the app's ([`useToasts`](#usetoasts) holds one, and its `toasterProps`
+are this component's props): `toasts: { id, tone, text, count?, action? }[]` (the shown ones,
+oldest first; tones `"ok" | "warn" | "err" | "quiet" | "off"`, open, one it does not know drawn
+with a plain stripe; `text` any node; `action: { label, run }`), `more?` (how many older ones are
+folded away), `onDismiss(id)`, `onHold?(held)`, `placement?`, and the words `label?`
+("Notifications", the region's name), `dismissLabel?` ("Dismiss"), `moreLabel?(more)` ("and n
+more"), `countLabel?(count)` ("n times"), plus native `section` props.
+
+- **Placement:** `"bottom-end"` (the default), `"bottom-start"`, `"bottom"`, `"top-end"`,
+  `"top-start"` or `"top"` sit at that corner or edge of the nearest positioned container (the
+  app's workspace), padded by the safe-area insets; start and end follow the text's direction.
+  `"inline"`, and a placement it does not know, draws it in the flow where the app put it (inside
+  a canvas's own panel). The newest is nearest the edge: last at the bottom, first at the top,
+  in the reading order as on screen, with "and n more" at the far end. It is at most 420 px wide,
+  and the container's width less the gutters on a phone. It draws nothing with no toasts.
+- **Each toast** says its text, then `×n` when it was shown n times (read as ", n times"), then
+  its action (a press runs it and dismisses the toast) and a Dismiss button, which the text
+  describes, so several read apart. The text is its own live region, without the buttons: an `err`
+  toast's is `role="alert"`, read at once, every other `role="status"`. The region is not a live
+  region, so nothing is read twice.
+- **Hold:** while a mouse or pen is over the stack, or the focus is in it, `onHold(true)`; leaving
+  it, the focus going elsewhere, the stack emptying under the pointer or the focus, or the
+  toaster unmounting calls `onHold(false)`. A touch over it does not hold it; a tap that focuses
+  one of its buttons does, as any focus in it.
+- **Keyboard:** the buttons are in the Tab order. Escape on a focused toast dismisses it, and is
+  not passed on (so a sheet or dialog behind it stays open). After a toast that held the focus is
+  dismissed, the focus moves to the toast beside it, or back to where it came from into the stack
+  when none is left.
+- The buttons are `Button`s, so they keep a 36 px target on touch. A toast rises in over
+  `--pb-motion-slow`, still under reduced motion; under forced colours the stripe stays, in the
+  system's text colour.
+
 ### Code
 
 **`DiffView`**: unified diff text, drawn line by line in code type on the code surface. Either
@@ -377,3 +411,29 @@ returns and passes it to `onValue`, which paints it through refs (sets a text no
   ref or memo).
 - It throttles nothing: `onValue` runs on every notification. A painter that needs a frame asks for
   one itself, as [`Meter`](graph.md#meter) does.
+
+### `useToasts`
+
+`useToasts({ duration?, coalesceWindow?, visible?, now? })` holds a queue of toasts and returns
+`{ toasts, show, dismiss, clear, toasterProps }`; `<Toaster {...toasts.toasterProps} />` draws it
+([`Toaster`](#news-and-state)). The wording is the app's; the queue's mechanics are here.
+
+- **`show({ tone, text, key?, action?, duration? })`** adds a toast as the newest and returns its
+  id. `text` is any node. A toast shown under the same `key` within `coalesceWindow` (5000 ms) of
+  that key's last showing is the same toast: its count goes up (drawn `×n`), it takes the newest
+  tone, text and action, becomes the newest and starts its time afresh. Without a key a toast never
+  coalesces.
+- **Expiry:** each toast lasts `duration` (8000 ms), or its own `duration` (`Infinity` keeps it until
+  dismissed), on the monotonic clock (`performance.now`, or `now` in tests); one timer waits for the
+  soonest. While the `Toaster` holds the queue (hovered or focused) none expires; letting go moves
+  each expiry on by the time it was held (since the hold began, or since it was last shown if that
+  came later), so no toast goes while the person reads it.
+- **Shown:** the newest `visible` (4), oldest first, are `toasterProps.toasts`; the older ones are
+  counted in `toasterProps.more` ("and n more") and still expire.
+- `toasts` is the whole queue, oldest first; `dismiss(id)` and `clear()` take toasts away. `show`,
+  `dismiss`, `clear` and `toasterProps` keep their identity while nothing changes.
+
+The queue is pure and exported for use outside React: `addToast`, `dismissToast`, `clearToasts`,
+`holdToasts`, `expireToasts`, `nextToastExpiry` and `visibleToasts` each take the queue (from
+`emptyToastQueue`) and the time and return a new queue, and `toastDefaults` holds the three
+defaults.

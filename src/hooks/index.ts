@@ -4,3 +4,4 @@ export * from "./use-media-breakpoint";
 export * from "./use-persistent-state";
 export * from "./use-shortcuts";
 export * from "./use-theme";
+export * from "./use-toasts";

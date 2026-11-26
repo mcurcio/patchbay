@@ -3,3 +3,4 @@
 export * from "./banner";
 export * from "./diff-view";
 export * from "./status-words";
+export * from "./toaster";
