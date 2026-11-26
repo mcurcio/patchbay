@@ -2,18 +2,26 @@
 
 What patchbay has built of `/graph`, the parts an app draws its graph with. They keep the rules
 every component keeps ([`components.md`](components.md#rules-every-component-keeps)); Storybook
-shows every state of each under the base theme and the example brands, light and dark.
+shows every state of each under the base theme and the example brands, light and dark. The graph
+stories draw two neutral node shapes: a level node (title "Tone 1", subtitle "oscillator", a `Pill`
+status, outputs with a [`Meter`](#meter) each, a footer of badges) and a staged-edit node (title
+"mix-2", subtitle "mixer", `change: "added"`, typed ports side by side, one with a problem, drawn
+while a wire is dragged).
 
 ```ts
 import "@xyflow/react/dist/style.css";
-import { ConnectHints, GhostWire, mergeFlowProps, Meter, NodeBox, nodeBoxSize, PortRow, useConnectHints, Wire } from "@mcurcio/patchbay/graph";
+import { CanvasTools, ConnectHints, GhostWire, mergeFlowProps, Meter, NodeBox, nodeBoxSize, PortRow, useAddAt, useConnectHints, useFollowFit, Wire } from "@mcurcio/patchbay/graph";
 ```
 
 Importing the layer loads its stylesheet (`dist/graph.css`) and imports `@xyflow/react` (React Flow
-12), a peer dependency of this layer only: an app that uses `/graph` installs it, and loads React
-Flow's own stylesheet as above. patchbay draws the nodes and edges React Flow places, not a wrapper
-around the canvas: the app renders React Flow's `<ReactFlow>` itself, turns its graph into React
-Flow nodes and edges, lays them out and handles the events. `tokens.css` points React Flow's own variables at the tokens
+12.1.0 or newer, below 13: `useAddAt` reads the connection state `onConnectEnd` passes, first in
+12.1.0), a peer dependency of this layer only: an app that uses `/graph` installs it, and loads React
+Flow's own stylesheet as above. patchbay draws the nodes and edges React Flow places, and the
+canvas's tools and hooks beside it (the hooks that need React Flow live here, not in `/hooks`), not a
+wrapper around the canvas: the app renders React Flow's
+`<ReactFlow>` itself, inside its `ReactFlowProvider`, turns its graph into React Flow nodes and
+edges, lays them out (with the library it prefers, sizing nodes with [`nodeBoxSize`](#geometry))
+and handles the events. `tokens.css` points React Flow's own variables at the tokens
 ([`tokens.md`](tokens.md#the-tokens)).
 
 ## `Meter`
@@ -264,3 +272,77 @@ removes it when the request is answered: how long a refused one stays is the app
   no hit path, and takes no pointer events: it is a sign of a request, not a thing to act on. Its
   drawing is `aria-hidden`; React Flow's wrapper names the edge as it names any.
 - **Forced colours:** the dashes in `GrayText`, `CanvasText` when refused.
+
+## `CanvasTools`
+
+A canvas's tools, as a child of the app's `<ReactFlow>`: zoom in, zoom out, fit, and when the app
+gives them, tidy and the minimap, as one [`ToolGroup`](components.md#layout) in React Flow's
+`<Panel>` (one Tab stop, the arrow keys between the tools, 40 px tools on touch), and React Flow's
+`<MiniMap>` while the minimap is on.
+
+```tsx
+const follow = useFollowFit({ key: layoutKey, onFitted });
+<ReactFlow {...mergeFlowProps(follow.flowProps, addAt.flowProps)} … >
+  <CanvasTools onFit={follow.fit} onTidy={tidy} minimap={minimap} onMinimap={setMinimap} />
+</ReactFlow>
+```
+
+| Prop | What it is |
+|---|---|
+| `position?` | The panel's place, React Flow's `PanelPosition`: `"bottom-left"` by default. One it does not know is passed on, and React Flow places nothing |
+| `fitOptions?` | React Flow's `FitViewOptions` for the fit tool |
+| `onFit?` | Replaces the fit tool's own fit; pass `useFollowFit`'s `fit`, so the tool also follows again |
+| `onTidy?` | The tidy tool, shown only when given: the layout is the app's |
+| `minimap?`, `onMinimap?` | The minimap tool, shown only with `onMinimap(next)`, pressed (`aria-pressed`) while `minimap` is true; `<MiniMap>` is drawn while `minimap` is true, named by the tool's word |
+| `minimapNodeClassName?` | `string` or `(node) → string`, React Flow's `<MiniMap nodeClassName>`, so the app colours the minimap by its nodes' state |
+| `keyShortcuts?` | Partial `{ zoomIn, zoomOut, fit, tidy, minimap }` of `aria-keyshortcuts` values: the app's own bindings, set on the tools and shown in their tooltips ("Fit the view (F)"), not bound |
+| `labels?` | Partial `CanvasToolsLabels` `{ toolbar, zoomIn, zoomOut, fit, tidy, minimap }`; the defaults, `defaultCanvasToolsLabels`, are "Canvas", "Zoom in", "Zoom out", "Fit the view", "Tidy the layout" and "Minimap" |
+| `className?` | Added to the panel's `pb-canvas-tools` |
+| `children?` | More tools (`IconButton`s) after patchbay's, in the same group |
+
+- **Motion.** Zoom and the fit tool's own fit move over `--pb-motion-slow`, read from the canvas's
+  element at each move, so a brand's duration holds and reduced motion (where `tokens.css` sets it
+  to 0 ms) moves at once; without the tokens loaded, 180 ms, or none under reduced motion.
+- The minimap is React Flow's, coloured by `tokens.css`'s `--xy-minimap-*` map, framed in
+  `--pb-line` with the group's radius and shadow (`pb-canvas-minimap`). **Forced colours:** the
+  frame in `CanvasText`.
+- The glyphs are SVG, hidden from screen readers; each tool is named by its word.
+
+## `useAddAt`
+
+Adding a node at a place on the canvas: `useAddAt(onAddAt, options?)` → `{ flowProps }`.
+
+- **`onAddAt(point, from?)`.** `point` is in flow coordinates (React Flow's
+  `screenToFlowPosition`). A double-click on empty canvas gives no `from`. A wire dropped on empty
+  canvas, where no handle took it, gives `from`, the [`PortRef`](#useconnecthints) the wire began
+  at with its `side` (`"output"` or `"input"`). What to add, and whether to join it, is the app's.
+- **Only empty canvas.** A double-click counts only on React Flow's pane, not on a node, an edge, a
+  handle or a panel; a drop counts only where no handle took it (React Flow's `toHandle` is none)
+  and the pane is under the drop. A touch drop's point is read from `changedTouches`, and the
+  element under it from the page, as a touch's end is on the element it began on.
+- **`flowProps`**: `onDoubleClick`, `onConnectStart`, `onConnectEnd` and `zoomOnDoubleClick:
+  false`, for `<ReactFlow>` (with others through [`mergeFlowProps`](#mergeflowprops)). React Flow's
+  zoom on double-click stays off, as the double-click is the add. The object is the same across
+  renders, and the newest `onAddAt` is called.
+- **`options.enabled`** (`true`) switches adding off, as while the graph is read-only: neither a
+  double-click nor a drop adds, and a double-click does not zoom either.
+- A double-click has no keyboard path; the app's own add command (a palette entry, a button) is
+  that path.
+
+## `useFollowFit`
+
+Keeping the whole graph in view until the person takes the view over:
+`useFollowFit({ key, fitOptions?, onFitted? })` → `{ following, fit, flowProps }`.
+
+- **Following** (from the start), the view fits again whenever `key` changes (`Object.is`; the
+  app's value that changes when nodes are added, removed or laid out) and whenever the canvas
+  changes size, each time once every shown node is measured. These fits are instant.
+- **The person's move stops it.** `flowProps` holds `onMoveStart`: a move with an event (a drag, a
+  wheel, a pinch) sets `following` to false; a move made by code has none and changes nothing, so
+  CanvasTools' zoom tools do not stop following. `fit()` fits now, moving as the fit tool does (over
+  `--pb-motion-slow`), and follows again.
+- **`onFitted(viewport)`** is called after each fit has landed, in the frame after the viewport is
+  set, with React Flow's viewport: an app, or its browser tests, can mark the layout ready on it
+  instead of waiting on a timer. With no node there is nothing to fit; the view stays, and
+  `onFitted` is still called.
+- `fitOptions` (React Flow's `FitViewOptions`) apply to every fit, the newest each time.

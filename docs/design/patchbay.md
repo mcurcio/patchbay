@@ -88,82 +88,17 @@ and a drawer along the bottom:
 
 ### 4.4 Graph (`/graph`)
 
-On React Flow 12 (a peer dependency of `/graph` only). patchbay provides the node and edge
-components and sugar for the canvas, not a wrapper around it: the app renders React Flow's own
-`<ReactFlow>`, so every React Flow prop and future feature stays within reach, turns its graph into
-React Flow nodes and edges, lays them out and handles the events (decided by the owner,
-2026-11-25). Only `/graph` imports `@xyflow/react`; the hooks below that need React Flow live in
-`/graph`, not `/hooks`.
-
-The props below are settled for build (owner, 2026-11-26: patchbay's model is the standard, the
-correct general model rather than one app's habits). Each part keeps the rules every component
-keeps (open enums drawn neutrally, slots over flags, tokens only, words as props with English
-defaults, keyboard, touch, reduced motion and forced colours); what is built moves to
-[`docs/graph.md`](../graph.md), where `Meter`, the node geometry, `NodeBox`, `PortRow`,
-`useConnectHints`, `Wire` and `GhostWire` already are. The props were checked against two neutral
-node shapes, which the stories draw:
-
-- **A level node**: title "Tone 1", subtitle "oscillator", a `Pill` status, two outputs ("left",
-  "right"), each with a [`Meter`](../graph.md#meter) as its trailing slot, and a footer of badges
-  ("48 kHz", "2 ch").
-- **A staged-edit node**: title "mix-2", subtitle "mixer", `change: "added"`, typed ports
-  ("in · audio", "side · control", "out · audio") with inputs and outputs side by side, one port
-  with a problem, drawn while a wire is dragged (its ports' hints).
+Built: [`docs/graph.md`](../graph.md). What is left of its design is the check on the React Flow
+range below.
 
 #### Supported React Flow
 
-`@xyflow/react` 12.1.0 or newer, below 13. `useAddAt` reads the connection state that
-`onConnectEnd` passes, first in 12.1.0, so the peer range narrows from `^12.0.0` to `^12.1.0`
-when `useAddAt` ships. `tokens.css`'s `--xy-*` map sets 18 of React Flow's variables; every one is
-declared in React Flow's stylesheet from 12.0.0 through 12.12.1, whose variable sets are identical
-(85 names; checked 2026-11-26). The check that keeps this true (pb-nx9.39) is a unit test that
-every `--xy-*` name `tokens.css` sets is declared in the installed React Flow's `style.css`, run
-against the dev dependency, kept at the newest supported minor; `docs/tokens.md` states the range.
-
-#### Canvas sugar: `CanvasTools`, `useAddAt`, `useFollowFit`
-
-Beside the app's own `<ReactFlow>`, inside its `ReactFlowProvider`.
-
-**`CanvasTools`**, a child of `<ReactFlow>`: a `ToolGroup` (one Tab stop, arrow keys between
-tools, 40 px tools on touch) in React Flow's `<Panel>`, and React Flow's `<MiniMap>` while the
-minimap is on.
-
-| Prop | Settled |
-|---|---|
-| `position?` | The panel's `PanelPosition`, `"bottom-left"` |
-| `fitOptions?` | React Flow's `FitViewOptions` for the fit tool |
-| `onFit?` | Replaces the fit tool's own `fitView` (pass `useFollowFit`'s `fit`, so the tool also resumes following) |
-| `onTidy?` | The tidy tool, shown only when given (the layout is the app's) |
-| `minimap?`, `onMinimap?` | The minimap tool (`aria-pressed`), shown only with `onMinimap`; `<MiniMap>` drawn while `minimap` is true |
-| `minimapNodeClassName?` | `string \| (node) → string`, passed to `<MiniMap nodeClassName>`, so the app colours the minimap by its nodes' state |
-| `keyShortcuts?` | Partial `{ zoomIn, zoomOut, fit, tidy, minimap }` of `aria-keyshortcuts` strings: the app's own bindings, shown, not bound |
-| `labels?` | Partial `{ toolbar, zoomIn, zoomOut, fit, tidy, minimap }`, English defaults (`defaultCanvasToolsLabels`: "Canvas", "Zoom in", "Zoom out", "Fit the view", "Tidy the layout", "Minimap") |
-| `children?` | More tools (`IconButton`s) after patchbay's |
-
-Zoom and fit move over `--pb-motion-slow`'s 180 ms, at once under reduced motion.
-
-**`useAddAt(onAddAt, options?)`** → `{ flowProps }`. `onAddAt(point, from?)`: `point` in flow
-coordinates; `from` a `PortRef` plus `side` when a wire was dropped on empty canvas, absent for a
-double-click on empty canvas. `flowProps` holds `onDoubleClick` (only on the pane, not on a node,
-edge or panel), `onConnectStart`, `onConnectEnd` (a drop where no handle took it, on the pane; a
-touch drop reads `changedTouches`) and `zoomOnDoubleClick: false`. `options.enabled` (true)
-switches it off, as while the graph is read-only. A double-click has no keyboard path; the app's
-own add command (a palette entry, a button) is that path.
-
-**`useFollowFit({ key, fitOptions?, onFitted? })`** → `{ following, fit, flowProps }`. While
-following (from the start), the view fits again whenever `key` changes (the app's value that
-changes when nodes are added, removed or laid out) and whenever the canvas changes size, each time
-once every node is measured. The person moving the view (`onMoveStart` with an event; a move made
-by code has none) stops following; `fit()` fits now and follows again. `onFitted(viewport)` is
-called after each fit has landed, in the frame after the viewport is set: an app, or its browser
-tests, can mark the layout ready on it instead of waiting on a timer. `flowProps` holds
-`onMoveStart`. Automatic fits are instant; `fit()` moves as the fit tool does.
-
-#### Out of scope
-
-Layout, for the first version: an app lays out its graph with the library it prefers (dagre, ELK,
-or places the person dragged to) and hands React Flow the positions, sizing nodes with
-[`nodeBoxSize`](../graph.md#geometry).
+[`docs/graph.md`](../graph.md) states the range, `@xyflow/react` 12.1.0 or newer, below 13.
+`tokens.css`'s `--xy-*` map sets 18 of React Flow's variables; every one is declared in React
+Flow's stylesheet from 12.0.0 through 12.12.1, whose variable sets are identical (85 names; checked
+2026-11-26). The check that keeps this true (pb-nx9.39) is a unit test that every `--xy-*` name
+`tokens.css` sets is declared in the installed React Flow's `style.css`, run against the dev
+dependency, kept at the newest supported minor; `docs/tokens.md` points at the range.
 
 ### 4.5 Hooks (`/hooks`)
 
@@ -191,7 +126,7 @@ Storybook is the catalogue, the documentation and the test surface.
   mode. Subpath exports: `tokens.css`, `base.css`, `primitives`, `composites`, `shell`, `graph`,
   `hooks`. Each layer's CSS is a file of its own beside its JS. Brands are the app's own
   stylesheets ([`docs/tokens.md`](../tokens.md)); patchbay ships none.
-- **Peer dependencies:** React 19 and React DOM 19 for all; `@xyflow/react` 12 for `/graph`;
+- **Peer dependencies:** React 19 and React DOM 19 for all; `@xyflow/react` 12 (12.1.0 or newer) for `/graph`;
   `knobly`, optional, for `/composites`' built-in knobly highlighting. None is bundled.
 - **Releases:** semantic-release on `main` from Conventional Commits, publishing to npm with
   provenance; how it works is in [`CONTRIBUTING.md`](../../CONTRIBUTING.md#releases).
