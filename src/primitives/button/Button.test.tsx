@@ -109,6 +109,114 @@ describe("Button", () => {
     expect(css).toMatch(/\.pb-button > \.pb-button-spinner \{\s*position: absolute;/);
   });
 
+  it("with a busyLabel shows those words while busy, named by them, and the idle words while not", () => {
+    const { rerender } = render(<Button busyLabel="Saving">Save</Button>);
+    const button = screen.getByRole("button", { name: "Save" });
+    expect(screen.getByText("Save")).not.toHaveAttribute("aria-hidden");
+    expect(screen.getByText("Saving", { selector: ".pb-button-busy" })).toHaveAttribute("aria-hidden", "true");
+
+    rerender(
+      <Button busy busyLabel="Saving">
+        Save
+      </Button>,
+    );
+    expect(button).toHaveAccessibleName("Saving");
+    expect(button).toHaveAttribute("aria-busy", "true");
+    expect(screen.getByText("Save")).toHaveAttribute("aria-hidden", "true");
+    expect(screen.getByText("Saving", { selector: ".pb-button-busy" })).not.toHaveAttribute("aria-hidden");
+    expect(button.querySelector(".pb-button-busy > .pb-spinner")).not.toBeNull();
+    // The spinner sits beside the busy words, not over them.
+    expect(button.querySelector(".pb-button-spinner")).toBeNull();
+  });
+
+  it("with a busyLabel holds its width: both labels stay in one grid cell, the one not shown only hidden", () => {
+    render(
+      <Button busy busyLabel="Saving every change">
+        Save
+      </Button>,
+    );
+    const stack = screen.getByRole("button").querySelector(".pb-button-stack");
+    expect(stack?.children).toHaveLength(2);
+    expect(css).toMatch(/\.pb-button-stack \{\s*display: inline-grid;/);
+    expect(css).toMatch(/\.pb-button-stack > \.pb-button-content \{\s*grid-area: 1 \/ 1;/);
+    expect(css).toMatch(/\.pb-button-stack > \[aria-hidden="true"\] \{\s*visibility: hidden;/);
+  });
+
+  it("announces the busy words politely when it turns busy, and empties the announcement when done", () => {
+    const { rerender } = render(<Button busyLabel="Saving">Save</Button>);
+    const region = document.querySelector(".pb-button-announce");
+    expect(region).toHaveAttribute("aria-live", "polite");
+    expect(region).toBeEmptyDOMElement();
+    rerender(
+      <Button busy busyLabel="Saving">
+        Save
+      </Button>,
+    );
+    expect(region).toHaveTextContent("Saving");
+    rerender(<Button busyLabel="Saving">Save</Button>);
+    expect(region).toBeEmptyDOMElement();
+    expect(css).toMatch(/\.pb-button-announce \{[^}]*clip-path: inset\(50%\)/);
+  });
+
+  it("keeps the focus and ignores presses while busy with a busyLabel", async () => {
+    const onClick = vi.fn();
+    const { rerender } = render(
+      <Button busyLabel="Saving" onClick={onClick}>
+        Save
+      </Button>,
+    );
+    const button = screen.getByRole("button");
+    button.focus();
+    rerender(
+      <Button busy busyLabel="Saving" onClick={onClick}>
+        Save
+      </Button>,
+    );
+    expect(button).toHaveFocus();
+    const user = userEvent.setup();
+    await user.keyboard("{Enter}");
+    await user.click(button);
+    expect(onClick).not.toHaveBeenCalled();
+    rerender(
+      <Button busyLabel="Saving" onClick={onClick}>
+        Save
+      </Button>,
+    );
+    expect(button).toHaveFocus();
+    await user.keyboard("{Enter}");
+    expect(onClick).toHaveBeenCalledOnce();
+  });
+
+  it("without a busyLabel, or with an empty one, adds no live region and keeps the spinner over its words", () => {
+    render(
+      <>
+        <Button busy>Save</Button>
+        <Button busy busyLabel="">
+          Load
+        </Button>
+      </>,
+    );
+    expect(document.querySelector(".pb-button-announce")).toBeNull();
+    expect(screen.getByRole("button", { name: "Load" }).querySelector(".pb-button-spinner")).not.toBeNull();
+  });
+
+  it("named by aria-label, takes the busyLabel as its name while busy instead of showing it", () => {
+    const { rerender } = render(
+      <Button aria-label="Refresh" busyLabel="Refreshing">
+        R
+      </Button>,
+    );
+    const button = screen.getByRole("button", { name: "Refresh" });
+    expect(button.querySelector(".pb-button-stack")).toBeNull();
+    rerender(
+      <Button aria-label="Refresh" busy busyLabel="Refreshing">
+        R
+      </Button>,
+    );
+    expect(button).toHaveAccessibleName("Refreshing");
+    expect(document.querySelector(".pb-button-announce")).toHaveTextContent("Refreshing");
+  });
+
   it("does not call onClick when disabled", async () => {
     const onClick = vi.fn();
     render(

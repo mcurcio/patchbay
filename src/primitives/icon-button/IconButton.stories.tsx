@@ -50,6 +50,15 @@ export const Busy: Story = {
   },
 };
 
+/** Busy with a busyLabel: the glyph stays under the spinner, and the name and tooltip become the busy words. */
+export const BusyLabel: Story = {
+  args: { busy: true, label: "Refresh", busyLabel: "Refreshing" },
+  play: async ({ canvas }) => {
+    const button = canvas.getByRole("button", { name: "Refreshing" });
+    await expect(button).toHaveAttribute("title", "Refreshing");
+  },
+};
+
 /** A row of tools, as in a canvas's tool group. */
 export const Row: Story = {
   render: (args) => (
@@ -70,9 +79,8 @@ export const Row: Story = {
   ),
 };
 
-/** Every tone and state together, under the example harbor brand in dark, so the accessibility check covers its contrast. */
-export const AllHarborDark: Story = {
-  globals: { brand: "harbor", theme: "dark" },
+/** Every tone and state together, for a glance under each brand and theme. */
+export const All: Story = {
   render: (args) => (
     <div style={{ display: "flex", gap: "8px" }}>
       <IconButton {...args} />
@@ -80,7 +88,14 @@ export const AllHarborDark: Story = {
       <IconButton {...args} tone="danger" label="Remove" />
       <IconButton {...args} aria-pressed label="Minimap" />
       <IconButton {...args} busy label="Refresh" />
+      <IconButton {...args} busy label="Sync" busyLabel="Syncing" />
       <IconButton {...args} disabled label="Undo" />
     </div>
   ),
 };
+
+/** The same set under the example harbor brand in dark, so the accessibility check covers its contrast too. */
+export const AllHarborDark: Story = { ...All, globals: { brand: "harbor", theme: "dark" } };
+
+/** And under the example ember brand in light. */
+export const AllEmberLight: Story = { ...All, globals: { brand: "ember", theme: "light" } };

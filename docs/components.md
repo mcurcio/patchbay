@@ -60,7 +60,7 @@ every other native prop through, `ref` included (React 19's `ref` as a prop).
 ### Actions
 
 **`Button`**: a push button. `tone?: "neutral" | "primary" | "danger"` (neutral by default; one
-primary per view), `size?`, `busy?`, plus native button props.
+primary per view), `size?`, `busy?`, `busyLabel?`, plus native button props.
 
 - `type` defaults to `"button"`, so a button in a form never submits it unless asked
   (`type="submit"`).
@@ -68,12 +68,21 @@ primary per view), `size?`, `busy?`, plus native button props.
   accessible name is kept. The button says `aria-busy` and `aria-disabled` and ignores presses (a
   busy submit button does not submit), but stays focusable, so focus is not lost while a request
   is on its way.
+- **`busyLabel`** (a string, such as "Saving") is shown beside the spinner while busy, in place of
+  the words, and names the button then. Both labels share one grid cell, the one not shown hidden
+  from sight and from the name, so the width is the wider label's and does not jump either way. A
+  polite live region beside the button, there from the start, says the busy words when it turns
+  busy and empties when it is done; the focus stays on the button throughout. Without it (or with
+  an empty one) nothing is announced and busy is as above. A button named by `aria-label` has no
+  words to swap, so the busy label names it while busy instead of being shown.
 - `aria-pressed` draws it in the accent on the sunken face: a toggle.
 - Disabled drops the tone. On touch it is at least 36 px tall.
 
-**`IconButton`**: a square glyph button on `Button`'s rules (`tone`, `size`, `busy`, pressed).
-`label` (required) is its accessible name and, unless `title` is given, its tooltip; `children` is
-the glyph, hidden from screen readers. 28 px (22 px when `sm`), borderless until hovered, pressed or
+**`IconButton`**: a square glyph button on `Button`'s rules (`tone`, `size`, `busy`, `busyLabel`,
+pressed). `label` (required) is its accessible name and, unless `title` is given, its tooltip;
+`children` is the glyph, hidden from screen readers. A glyph has no words to swap, so while busy a
+`busyLabel` becomes its name and (unless `title` is given) its tooltip, and is announced as on
+`Button`; the spinner covers the glyph as without one. 28 px (22 px when `sm`), borderless until hovered, pressed or
 toned; 36 px on touch, 40 px in a `ToolGroup`.
 
 **`ThemeSwitch`**: one button that cycles system, light and dark. `choice`, `onChoose(next)`,
