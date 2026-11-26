@@ -2,6 +2,8 @@
 // and each example brand's (examples/brands/, which hold a brand to the rules an app's own brand must keep), every
 // text, tone, on-strong and code pair at 4.5:1 for the base and each example brand in each theme (through the check
 // apps run, @mcurcio/patchbay/testing), and no colour, duration, radius or shadow of its own in a component.
+import { readFileSync } from "node:fs";
+import { createRequire } from "node:module";
 import { describe, expect, it } from "vitest";
 import {
   cssBlocks,
@@ -81,6 +83,17 @@ describe("the tokens", () => {
     const values = [...customProperties(flow)];
     expect(values.length).toBeGreaterThan(0);
     expect(values.filter(([name, value]) => !name.startsWith("--xy-") || !value.includes("var(--pb-"))).toEqual([]);
+  });
+
+  it("sets only React Flow variables the installed React Flow reads", () => {
+    // React Flow's style.css reads each variable it offers (var(--xy-edge-stroke, var(--xy-edge-stroke-default))). The
+    // dev dependency is kept at the newest supported minor (docs/graph.md states the range), so a name React Flow
+    // renamed or dropped fails here rather than leaving the canvas unthemed.
+    const flowCss = readFileSync(createRequire(import.meta.url).resolve("@xyflow/react/dist/style.css"), "utf8");
+    const read = new Set([...stripComments(flowCss).matchAll(/var\(\s*(--xy-[\w-]+)/g)].map((match) => match[1]));
+    const set = [...customProperties(findBlock(cssBlocks(tokensCss), null, ".react-flow")).keys()];
+    expect(set.length).toBeGreaterThan(0);
+    expect(set.filter((name) => !read.has(name))).toEqual([]);
   });
 });
 

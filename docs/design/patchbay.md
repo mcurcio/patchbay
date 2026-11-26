@@ -81,17 +81,7 @@ and a drawer along the bottom:
 
 ### 4.4 Graph (`/graph`)
 
-Built: [`docs/graph.md`](../graph.md). What is left of its design is the check on the React Flow
-range below.
-
-#### Supported React Flow
-
-[`docs/graph.md`](../graph.md) states the range, `@xyflow/react` 12.1.0 or newer, below 13.
-`tokens.css`'s `--xy-*` map sets 18 of React Flow's variables; every one is declared in React
-Flow's stylesheet from 12.0.0 through 12.12.1, whose variable sets are identical (85 names; checked
-2026-11-26). The check that keeps this true (pb-nx9.39) is a unit test that every `--xy-*` name
-`tokens.css` sets is declared in the installed React Flow's `style.css`, run against the dev
-dependency, kept at the newest supported minor; `docs/tokens.md` points at the range.
+Built: [`docs/graph.md`](../graph.md).
 
 ### 4.5 Hooks (`/hooks`)
 
