@@ -13,9 +13,9 @@ app keeps its own look, and accessible components that work from the keyboard an
 patchbay draws and handles interaction. Your app keeps its data, its protocol and its editing
 model: components take props and report what the person did through callbacks.
 
-**Status:** early (0.x). The tokens, the primitives and the first hooks are built; composites, the
-app shell and the React Flow graph components are designed in
-[`docs/design/patchbay.md`](docs/design/patchbay.md) and not built yet. Expect breaking changes
+**Status:** early (0.x). The tokens, the primitives, the first composites and hooks and the level
+meter are built; the rest of the composites, the app shell and the React Flow graph components are
+designed in [`docs/design/patchbay.md`](docs/design/patchbay.md) and not built yet. Expect breaking changes
 between minor versions until 1.0.
 
 ## Install

@@ -101,11 +101,11 @@ React Flow nodes and edges, lays them out and handles the events (decided by the
 The props below are settled for build (owner, 2026-11-26: patchbay's model is the standard, the
 correct general model rather than one app's habits). Each part keeps the rules every component
 keeps (open enums drawn neutrally, slots over flags, tokens only, words as props with English
-defaults, keyboard, touch, reduced motion and forced colours); what is built moves to a new
-`docs/graph.md`. The props were checked against two neutral node shapes, which the stories draw:
+defaults, keyboard, touch, reduced motion and forced colours); what is built moves to
+[`docs/graph.md`](../graph.md), where `Meter` already is. The props were checked against two neutral node shapes, which the stories draw:
 
 - **A level node**: title "Tone 1", subtitle "oscillator", a `Pill` status, two outputs ("left",
-  "right"), each with a `Meter` as its trailing slot, and a footer of badges ("48 kHz", "2 ch").
+  "right"), each with a [`Meter`](../graph.md#meter) as its trailing slot, and a footer of badges ("48 kHz", "2 ch").
 - **A staged-edit node**: title "mix-2", subtitle "mixer", `change: "added"`, typed ports
   ("in · audio", "side · control", "out · audio") with inputs and outputs side by side, one port
   with a problem, drawn while a wire is dragged (its ports' hints).
@@ -268,32 +268,6 @@ dashed in `--pb-quiet` at reduced opacity; `refused` in `--pb-err`; one it does 
 `pending`). It takes no pointer events. How long a refused one stays is the app's: it removes the
 edge.
 
-#### `Meter`
-
-A level bar on a decibel scale, painted through refs (it never re-renders through React), built on
-`useLiveValue` ([4.5](#45-hooks-hooks)).
-
-| Prop | Settled |
-|---|---|
-| `subscribe` | `(listener: () => void) → unsubscribe`: the listener means a new value is ready |
-| `read` | `() → readonly [peak, rms]`, linear amplitude, 1.0 = 0 dBFS. Not a number, or 0 and below, is silence |
-| `orientation?` | `"horizontal" \| "vertical"` (open; one it does not know is horizontal). Horizontal fills its container's width (48 px when it has none) and is 6 px thick; vertical the other way |
-| `floor?` | dBFS at the bar's empty end, -60. The full end is 0 dBFS |
-| `zones?` | `[mid, hot]` in dBFS, `[-18, -6]`: below `mid` the bar is `--pb-meter-low`, from `mid` `--pb-meter-mid`, from `hot` `--pb-meter-hot` (set as fractions in CSS variables) |
-| `holdMs?` | 1500: the peak tick (`--pb-meter-peak`) holds the highest peak this long |
-| `fallDbPerS?` | 20: then the tick falls at this rate until it meets the current peak |
-| `clipAt?` | 1.0 (0 dBFS), linear: a peak at or above it lights the clip lamp (`--pb-meter-hot`) |
-| `clipHoldMs?` | 2000: how long the lamp stays lit after the last such peak |
-| `label?` | Its accessible name (`role="img"`), "Level" by default; the numbers are never announced |
-| `title?` | `(peakDb, rmsDb, clipped) → string`, the tooltip; the English default reads "peak -12.0 dB, rms -18.3 dB" (−∞ for silence). Refreshed on pointer entry and at most every 250 ms while hovered |
-| `ref?` | `MeterHandle`: `reset()` empties the bar and clears the hold and the clip lamp (when the source closes) |
-
-- The bar's length is the RMS; the tick is the held peak. Times come from `performance.now()`, a
-  monotonic clock. `requestAnimationFrame` runs only while something moves (a new value, a falling
-  tick, a lit lamp counting down) and stops when it is still.
-- The level is information, not decoration, so it still moves under reduced motion; nothing else
-  animates. Forced colours: the bar in `Highlight`, the tick and the lamp in `CanvasText`.
-
 #### Canvas sugar: `CanvasTools`, `useAddAt`, `useFollowFit`
 
 Beside the app's own `<ReactFlow>`, inside its `ReactFlowProvider`.
@@ -341,14 +315,13 @@ or places the person dragged to) and hands React Flow the positions, sizing node
 
 ### 4.5 Hooks (`/hooks`)
 
-`useTheme`, `usePersistentState`, `useShortcuts` and `useMediaBreakpoint` are built:
+`useTheme`, `usePersistentState`, `useShortcuts`, `useMediaBreakpoint` and `useLiveValue` are built:
 [`docs/components.md`](../components.md#hooks-hooks).
 Still to build:
 
 | Hook | What it does |
 |---|---|
 | `useToasts()` | `show({ tone, text, action? })`, where `action: { label, run }` |
-| `useLiveValue(subscribe, read)` | For hot values outside React state; what `Meter` uses |
 
 ## 5. Storybook
 

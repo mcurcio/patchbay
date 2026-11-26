@@ -7,7 +7,7 @@ for every field.
 
 ```ts
 import { Button, Field, TextInput } from "@mcurcio/patchbay/primitives";
-import { useMediaBreakpoint, usePersistentState, useShortcuts, useTheme } from "@mcurcio/patchbay/hooks";
+import { useLiveValue, useMediaBreakpoint, usePersistentState, useShortcuts, useTheme } from "@mcurcio/patchbay/hooks";
 ```
 
 Importing a layer loads its stylesheet (`dist/primitives.css`); an app loads the tokens and its
@@ -361,3 +361,19 @@ not touch.
 
 `narrowBelow` (760), `phoneBelow` (600), `mediaQueries` (the three queries, for an app's own
 stylesheet or `matchMedia`), `widthOf(px)` and `readBreakpoint()` are exported too.
+
+### `useLiveValue`
+
+`useLiveValue(subscribe, read, onValue?)` reads a hot value (one that changes many times a second:
+a level, a rate) outside React state, so the component never re-renders for it. `subscribe(listener)`
+adds a listener that means a new value is ready and returns what removes it; `read()` returns the
+value. On subscribing, and on every call of the listener, it reads the value, keeps it in the ref it
+returns and passes it to `onValue`, which paints it through refs (sets a text node, a CSS variable).
+
+- It subscribes in a layout effect, so the first paint shows the value, and unsubscribes on
+  unmount; a call that comes after that is ignored.
+- `read` and `onValue` may change every render without subscribing again. A new `subscribe`
+  subscribes afresh and reads at once, so pass a stable one (a store's own method, or one kept in a
+  ref or memo).
+- It throttles nothing: `onValue` runs on every notification. A painter that needs a frame asks for
+  one itself, as [`Meter`](graph.md#meter) does.
