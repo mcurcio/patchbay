@@ -8,7 +8,24 @@ const meta = {
   component: Badge,
   args: { tone: "ok", children: "live" },
   argTypes: {
-    tone: { control: "select", options: ["ok", "warn", "err", "quiet", "off", "unknown-tone"] },
+    tone: {
+      control: "select",
+      options: [
+        "ok",
+        "warn",
+        "err",
+        "quiet",
+        "off",
+        "accent",
+        "muted",
+        "added",
+        "removed",
+        "renamed",
+        "changed",
+        "unknown-tone",
+      ],
+    },
+    variant: { control: "inline-radio", options: ["outlined", "filled"] },
   },
 } satisfies Meta<typeof Badge>;
 
@@ -20,6 +37,22 @@ export const Warn: Story = { args: { tone: "warn", children: "3 retries" } };
 export const Err: Story = { args: { tone: "err", children: "failing" } };
 export const Quiet: Story = { args: { tone: "quiet", children: "idle" } };
 export const Off: Story = { args: { tone: "off", children: "off" } };
+export const Accent: Story = { args: { tone: "accent", children: "selected" } };
+export const Muted: Story = { args: { tone: "muted", children: "read-only" } };
+
+/** The change tones: an edit not yet applied. */
+export const Added: Story = { args: { tone: "added", children: "added" } };
+export const Removed: Story = { args: { tone: "removed", children: "removed" } };
+export const Renamed: Story = { args: { tone: "renamed", children: "renamed" } };
+export const Changed: Story = { args: { tone: "changed", children: "changed" } };
+
+/** Filled: the tone's colour under on-strong words, for a fact that must stand out. */
+export const Filled: Story = {
+  args: { tone: "err", variant: "filled", children: "not ready" },
+  play: async ({ canvasElement }) => {
+    await expect(within(canvasElement).getByText("not ready")).toHaveAttribute("data-variant", "filled");
+  },
+};
 
 /** A tone the badge does not know: muted, with a plain line. */
 export const UnknownTone: Story = { args: { tone: "mystery", children: "new" } };
@@ -44,16 +77,40 @@ export const WithWarnMark: Story = {
   },
 };
 
-/** Every tone side by side, for comparing brands and themes. */
-export const AllTones: Story = {
+const tones = [
+  ["ok", "live"],
+  ["warn", "3 retries"],
+  ["err", "failing"],
+  ["quiet", "idle"],
+  ["off", "off"],
+  ["accent", "selected"],
+  ["muted", "read-only"],
+  ["added", "added"],
+  ["removed", "removed"],
+  ["renamed", "renamed"],
+  ["changed", "changed"],
+  ["mystery", "new"],
+] as const;
+
+/** Every tone, outlined and filled, for a glance under each brand and theme. */
+export const All: Story = {
   render: () => (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-      <Badge tone="ok">live</Badge>
-      <Badge tone="warn">3 retries</Badge>
-      <Badge tone="err">failing</Badge>
-      <Badge tone="quiet">idle</Badge>
-      <Badge tone="off">off</Badge>
-      <Badge tone="mystery">new</Badge>
+    <div style={{ display: "grid", gap: 8 }}>
+      {(["outlined", "filled"] as const).map((variant) => (
+        <div key={variant} style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+          {tones.map(([tone, words]) => (
+            <Badge key={tone} tone={tone} variant={variant}>
+              {words}
+            </Badge>
+          ))}
+        </div>
+      ))}
     </div>
   ),
 };
+
+/** The same set under the example harbor brand in dark, so the accessibility check covers its contrast too. */
+export const AllHarborDark: Story = { ...All, globals: { brand: "harbor", theme: "dark" } };
+
+/** And under the example ember brand in light. */
+export const AllEmberLight: Story = { ...All, globals: { brand: "ember", theme: "light" } };

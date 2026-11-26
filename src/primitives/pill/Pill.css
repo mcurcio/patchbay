@@ -43,6 +43,15 @@
   color: var(--pb-off);
 }
 
+.pb-pill[data-tone="accent"] {
+  color: var(--pb-accent);
+}
+
+/* Muted by name: the neutral look, chosen rather than fallen back to. */
+.pb-pill[data-tone="muted"] {
+  color: var(--pb-muted);
+}
+
 .pb-pill-detail {
   font-family: var(--pb-font-code);
   font-weight: normal;
@@ -63,5 +72,14 @@
 @media (prefers-reduced-motion: reduce) {
   .pb-pill[data-pulse] .pb-pill-dot {
     animation: none;
+  }
+}
+
+/* Forced colours replace the dot's fill with the canvas, so it vanishes; it keeps its shape in the system's text colour
+   (the word, as ever, carries the state). */
+@media (forced-colors: active) {
+  .pb-pill-dot {
+    forced-color-adjust: none;
+    background: CanvasText;
   }
 }

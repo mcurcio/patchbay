@@ -86,16 +86,26 @@ word gives way to the icon alone. 36 px on touch. The choice is the app's, kept 
 ### State
 
 **`Pill`**: a state as a dot and its word, both in the state's tone, so the state never rests on
-colour alone (a node's state). `tone: "ok" | "warn" | "err" | "quiet" | "off"` (open), `label` (the
-word), `pulse?` (the dot pulses, never the word, while the state is on its way; still under reduced
-motion), `title?`, `detail?` (a slot after the word in code type: a failure's code).
+colour alone (a node's state). `tone: "ok" | "warn" | "err" | "quiet" | "off" | "accent" | "muted"`
+(open: any other string is drawn as `muted`), `label` (the word), `pulse?` (the dot pulses, never
+the word, while the state is on its way; still under reduced motion), `title?`, `detail?` (a slot
+after the word in code type: a failure's code). Under forced colours the dot keeps its shape in the
+system's text colour.
 
-**`Badge`**: a short word or count in a chip of its tone, outlined on the sunken surface (warn and
-err on their soft surfaces). `tone` (as `Pill`'s), `children`, `title?`.
+**`Badge`**: a short word or count in a chip of its tone. `tone` (`Pill`'s tones, plus the changes
+`"added" | "removed" | "renamed" | "changed"`, drawn in `--pb-added`, `--pb-removed`,
+`--pb-renamed` and `--pb-warn`; open: any other string is drawn neutrally), `variant?:
+"outlined" | "filled"`, `children`, `title?`.
+
+- Outlined (the default): text and border in the tone on the sunken surface; warn, err and changed
+  on their soft surfaces. A tone it does not know, and `off`, have a plain line.
+- Filled: the tone's colour as the fill, the words in `--pb-on-strong`, for a fact that must stand
+  out. A tone it does not know is filled with `--pb-muted`. Under forced colours the fill gives way
+  to the border, which stays.
 
 **`WarnMark`**: an "!" in a circle for something that rose lately, beside a badge's words.
 `label` is what a screen reader reads in its place (the glyph is hidden); `title?` is the hover
-text.
+text. Under forced colours the circle stays, in the system's text colour.
 
 **`Spinner`**: the busy mark, an open ring in the current text colour, turning once per
 `--pb-motion-spin` and still under reduced motion. Without `label` it is decoration, hidden from
@@ -232,9 +242,9 @@ on a raised surface with a stripe in its tone at the start (warn and err on thei
   `IconButton`, so it keeps a 36 px target on touch.
 
 **`StatusWords`**: a short row of states, each a word in its tone, a dot between each two (a pane's
-"2 errors · 1 warning · saved"). `items: { tone, label, title? }[]` (tones as `Pill`'s, open),
-drawn in the order given, which is most urgent first, plus native `ul` props (name it with
-`aria-label`).
+"2 errors · 1 warning · saved"). `items: { tone, label, title? }[]` (tones `"ok" | "warn" | "err" |
+"quiet" | "off"`, open), drawn in the order given, which is most urgent first, plus native `ul`
+props (name it with `aria-label`).
 
 - The list is one `aria-live="polite"` region (an app may pass another `aria-live`), so a screen
   reader reads a change when it is free; it stays in the page while empty, ready for the next

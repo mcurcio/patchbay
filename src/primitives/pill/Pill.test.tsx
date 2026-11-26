@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { Pill } from "./Pill";
+import { Pill, type PillTone } from "./Pill";
 import pillCss from "./Pill.css?raw";
 
 describe("Pill", () => {
@@ -18,7 +18,19 @@ describe("Pill", () => {
     // Only the known tones have a colour of their own; anything else keeps the pill's muted default.
     expect(pillCss).not.toContain('[data-tone="sleeping"]');
     const tones = new Set([...pillCss.matchAll(/data-tone="([^"]+)"/g)].map((match) => match[1]));
-    expect([...tones].sort()).toEqual(["err", "off", "ok", "quiet", "warn"]);
+    expect([...tones].sort()).toEqual(["accent", "err", "muted", "off", "ok", "quiet", "warn"]);
+  });
+
+  it("takes any string as a tone, as its open type says", () => {
+    const tone: PillTone = "anything-an-app-names";
+    render(<Pill tone={tone} label="open" />);
+    expect(screen.getByText("open")).toHaveAttribute("data-tone", "anything-an-app-names");
+  });
+
+  it("keeps the dot visible under forced colours", () => {
+    expect(pillCss).toMatch(
+      /forced-colors: active\)\s*\{\s*\.pb-pill-dot\s*\{\s*forced-color-adjust: none;\s*background: CanvasText;/,
+    );
   });
 
   it("pulses only when asked", () => {

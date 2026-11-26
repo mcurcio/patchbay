@@ -1,15 +1,22 @@
-/* A badge: text and border in its tone; warn and err on their soft surfaces, the rest on the sunken one. A tone it
-   does not know is muted with a plain line. */
+/* A badge. Outlined: text and border in its tone, on the sunken surface (warn, err and changed on their soft
+   surfaces). Filled: the tone's colour as the fill and border, under on-strong text. A tone it does not know is muted
+   with a plain line, or filled with the muted colour.
+
+   Each tone sets the badge's ink and, where it has one, its soft surface, in two custom properties private to this
+   stylesheet (--_pb-badge-*: not tokens, and not for an app to set); the variants draw from them. */
 .pb-badge {
+  --_pb-badge-ink: var(--pb-muted);
+  --_pb-badge-soft: var(--pb-sunken);
+
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
   gap: var(--pb-space-2);
   padding: 0 6px;
-  border: 1px solid var(--pb-line);
+  border: 1px solid currentColor;
   border-radius: var(--pb-radius-pill);
-  background: var(--pb-sunken);
-  color: var(--pb-muted);
+  background: var(--_pb-badge-soft);
+  color: var(--_pb-badge-ink);
   font-family: var(--pb-font-ui);
   font-size: var(--pb-text-sm);
   font-weight: 600;
@@ -17,28 +24,75 @@
   white-space: nowrap;
 }
 
-.pb-badge[data-tone="ok"] {
+/* The neutral badge (a tone it does not know) and off keep a plain line rather than one in their colour. */
+.pb-badge:not([data-variant]) {
+  border-color: var(--pb-line);
+}
+
+.pb-badge[data-tone="ok"],
+.pb-badge[data-tone="warn"],
+.pb-badge[data-tone="err"],
+.pb-badge[data-tone="quiet"],
+.pb-badge[data-tone="accent"],
+.pb-badge[data-tone="muted"],
+.pb-badge[data-tone="added"],
+.pb-badge[data-tone="removed"],
+.pb-badge[data-tone="renamed"],
+.pb-badge[data-tone="changed"] {
   border-color: currentColor;
-  color: var(--pb-ok);
+}
+
+.pb-badge[data-tone="ok"] {
+  --_pb-badge-ink: var(--pb-ok);
 }
 
 .pb-badge[data-tone="warn"] {
-  border-color: currentColor;
-  background: var(--pb-warn-soft);
-  color: var(--pb-warn);
+  --_pb-badge-ink: var(--pb-warn);
+  --_pb-badge-soft: var(--pb-warn-soft);
 }
 
 .pb-badge[data-tone="err"] {
-  border-color: currentColor;
-  background: var(--pb-err-soft);
-  color: var(--pb-err);
+  --_pb-badge-ink: var(--pb-err);
+  --_pb-badge-soft: var(--pb-err-soft);
 }
 
 .pb-badge[data-tone="quiet"] {
-  border-color: currentColor;
-  color: var(--pb-quiet);
+  --_pb-badge-ink: var(--pb-quiet);
 }
 
 .pb-badge[data-tone="off"] {
-  color: var(--pb-off);
+  --_pb-badge-ink: var(--pb-off);
+}
+
+.pb-badge[data-tone="accent"] {
+  --_pb-badge-ink: var(--pb-accent);
+}
+
+.pb-badge[data-tone="muted"] {
+  --_pb-badge-ink: var(--pb-muted);
+}
+
+.pb-badge[data-tone="added"] {
+  --_pb-badge-ink: var(--pb-added);
+}
+
+.pb-badge[data-tone="removed"] {
+  --_pb-badge-ink: var(--pb-removed);
+}
+
+.pb-badge[data-tone="renamed"] {
+  --_pb-badge-ink: var(--pb-renamed);
+}
+
+/* A change that is neither an addition, a removal nor a rename: drawn as a warning, on its soft surface. */
+.pb-badge[data-tone="changed"] {
+  --_pb-badge-ink: var(--pb-warn);
+  --_pb-badge-soft: var(--pb-warn-soft);
+}
+
+/* Filled: the ink becomes the fill and the border; the words are on-strong. */
+.pb-badge[data-variant="filled"] {
+  border-color: var(--_pb-badge-ink);
+  background: var(--_pb-badge-ink);
+  color: var(--pb-on-strong);
 }
