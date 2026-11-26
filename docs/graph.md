@@ -332,14 +332,17 @@ Adding a node at a place on the canvas: `useAddAt(onAddAt, options?)` → `{ flo
 ## `useFollowFit`
 
 Keeping the whole graph in view until the person takes the view over:
-`useFollowFit({ key, fitOptions?, onFitted? })` → `{ following, fit, flowProps }`.
+`useFollowFit({ key, fitOptions?, onFitted? })` → `{ following, fit, stop, flowProps }`.
 
 - **Following** (from the start), the view fits again whenever `key` changes (`Object.is`; the
   app's value that changes when nodes are added, removed or laid out) and whenever the canvas
   changes size, each time once every shown node is measured. These fits are instant.
-- **The person's move stops it.** `flowProps` holds `onMoveStart`: a move with an event (a drag, a
-  wheel, a pinch) sets `following` to false; a move made by code has none and changes nothing, so
-  CanvasTools' zoom tools do not stop following. `fit()` fits now, moving as the fit tool does (over
+- **The person's move stops it.** `flowProps` holds `onMoveStart` and `onMoveEnd`: a move with an
+  event (a drag, a wheel, a pinch) that ends with the viewport changed sets `following` to false. A
+  press that moves nothing (React Flow starts a move on every press on the pane, so a click to
+  deselect or a double-click to add) keeps following, and a move made by code has no event and
+  changes nothing, so CanvasTools' zoom tools do not stop following. `stop()` stops following as
+  the person's move does, for an app that moves the view itself (going to a node). `fit()` fits now, moving as the fit tool does (over
   `--pb-motion-slow`), and follows again.
 - **`onFitted(viewport)`** is called after each fit has landed, in the frame after the viewport is
   set, with React Flow's viewport: an app, or its browser tests, can mark the layout ready on it
