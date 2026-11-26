@@ -1,0 +1,135 @@
+/* A wire: the stroke in its tone (React Flow's edge stroke when it has none it knows), the accent when selected. A level
+   is --pb-wire-emphasis, 0 to 1, set on the group: 1.5 px to 3.5 px thick and dim to full, so a change of level restyles
+   the path rather than rebuilding it. */
+.pb-wire {
+  --pb-wire-color: var(--xy-edge-stroke);
+}
+
+.pb-wire[data-tone="ok"] {
+  --pb-wire-color: var(--pb-ok);
+}
+
+.pb-wire[data-tone="warn"],
+.pb-wire[data-tone="changed"] {
+  --pb-wire-color: var(--pb-warn);
+}
+
+.pb-wire[data-tone="err"],
+.pb-wire[data-tone="refused"] {
+  --pb-wire-color: var(--pb-err);
+}
+
+.pb-wire[data-tone="quiet"],
+.pb-wire[data-tone="pending"] {
+  --pb-wire-color: var(--pb-quiet);
+}
+
+.pb-wire[data-tone="off"] {
+  --pb-wire-color: var(--pb-off);
+}
+
+.pb-wire[data-tone="accent"] {
+  --pb-wire-color: var(--pb-accent);
+}
+
+.pb-wire[data-tone="muted"] {
+  --pb-wire-color: var(--pb-muted);
+}
+
+.pb-wire[data-tone="added"] {
+  --pb-wire-color: var(--pb-added);
+}
+
+.pb-wire[data-tone="removed"] {
+  --pb-wire-color: var(--pb-removed);
+}
+
+/* After the tones, so a selected wire is the accent whatever its tone. */
+.pb-wire[data-selected] {
+  --pb-wire-color: var(--pb-accent);
+}
+
+/* Two classes, so it outweighs React Flow's own .react-flow__edge-path stroke. */
+.pb-wire .react-flow__edge-path.pb-wire-path {
+  stroke: var(--pb-wire-color);
+  stroke-width: 1.5px;
+  transition:
+    stroke-width var(--pb-motion-fast),
+    stroke-opacity var(--pb-motion-fast);
+}
+
+.pb-wire[data-emphasis] .react-flow__edge-path.pb-wire-path {
+  stroke-width: calc(1.5px + 2px * var(--pb-wire-emphasis));
+  stroke-opacity: calc(0.45 + 0.55 * var(--pb-wire-emphasis));
+}
+
+.pb-wire[data-dashed] .react-flow__edge-path.pb-wire-path {
+  stroke-dasharray: 6 4;
+}
+
+/* The flow: round dots 12 px apart moving from the output toward the input, one period per --pb-motion-flow. */
+.pb-wire-flow {
+  stroke: var(--pb-raised);
+  stroke-width: 2px;
+  stroke-linecap: round;
+  stroke-dasharray: 0 12;
+  pointer-events: none;
+  animation: pb-wire-flow var(--pb-motion-flow) linear infinite;
+}
+
+@keyframes pb-wire-flow {
+  to {
+    stroke-dashoffset: -12;
+  }
+}
+
+/* Drawn by the wire rather than an SVG marker, so it takes the tone. */
+.pb-wire-arrow {
+  fill: var(--pb-wire-color);
+  stroke: none;
+  pointer-events: none;
+}
+
+.pb-wire-label {
+  position: absolute;
+  pointer-events: none;
+  padding: 0 var(--pb-space-2);
+  border: 1px solid var(--pb-line);
+  border-radius: var(--pb-radius-pill);
+  background: var(--pb-raised);
+  color: var(--pb-text);
+  font-family: var(--pb-font-ui);
+  font-size: var(--pb-text-sm);
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+/* The flow's duration is not zeroed under reduced motion (an infinite animation would churn): its dots go instead. */
+@media (prefers-reduced-motion: reduce) {
+  .pb-wire-flow {
+    display: none;
+  }
+}
+
+/* Forced colours: the stroke and the arrow in the system's text colour, the highlight when selected; dashes stay. */
+@media (forced-colors: active) {
+  .pb-wire .react-flow__edge-path.pb-wire-path {
+    stroke: CanvasText;
+  }
+
+  .pb-wire-arrow {
+    fill: CanvasText;
+  }
+
+  .pb-wire[data-selected] .react-flow__edge-path.pb-wire-path {
+    stroke: Highlight;
+  }
+
+  .pb-wire[data-selected] .pb-wire-arrow {
+    fill: Highlight;
+  }
+
+  .pb-wire-label {
+    border-color: CanvasText;
+  }
+}

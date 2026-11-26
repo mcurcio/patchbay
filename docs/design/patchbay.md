@@ -99,8 +99,9 @@ The props below are settled for build (owner, 2026-11-26: patchbay's model is th
 correct general model rather than one app's habits). Each part keeps the rules every component
 keeps (open enums drawn neutrally, slots over flags, tokens only, words as props with English
 defaults, keyboard, touch, reduced motion and forced colours); what is built moves to
-[`docs/graph.md`](../graph.md), where `Meter`, the node geometry, `NodeBox` and `PortRow` already
-are. The props were checked against two neutral node shapes, which the stories draw:
+[`docs/graph.md`](../graph.md), where `Meter`, the node geometry, `NodeBox`, `PortRow`,
+`useConnectHints`, `Wire` and `GhostWire` already are. The props were checked against two neutral
+node shapes, which the stories draw:
 
 - **A level node**: title "Tone 1", subtitle "oscillator", a `Pill` status, two outputs ("left",
   "right"), each with a [`Meter`](../graph.md#meter) as its trailing slot, and a footer of badges
@@ -118,61 +119,6 @@ declared in React Flow's stylesheet from 12.0.0 through 12.12.1, whose variable 
 (85 names; checked 2026-11-26). The check that keeps this true (pb-nx9.39) is a unit test that
 every `--xy-*` name `tokens.css` sets is declared in the installed React Flow's `style.css`, run
 against the dev dependency, kept at the newest supported minor; `docs/tokens.md` states the range.
-
-#### `useConnectHints`
-
-One rule for which ports may be joined, used both for the hints while a wire is dragged and for
-React Flow's own check on the drop.
-
-```tsx
-const hints = useConnectHints(canConnect);
-<ConnectHints value={hints.value}>
-  <ReactFlow {...mergeFlowProps(hints.flowProps, addAt.flowProps)} … />
-</ConnectHints>
-```
-
-- `canConnect(from: PortRef, to: PortRef) → true | false | string`, where
-  `PortRef = { nodeId, handleId: string | null }`. `from` is always the output and `to` the input,
-  whichever end the drag began at. `true` accepts; `false` refuses; a string refuses and is the
-  reason. Called at most once per candidate handle per drag.
-- `flowProps`: `onConnectStart`, `onConnectEnd` and `isValidConnection` (`canConnect(...) === true`
-  on React Flow's source and target), for `<ReactFlow>`. State changes twice per drag, at its start
-  and end, never per pointer move.
-- `value` goes to `<ConnectHints>`, a context every `PortRow` reads: the origin is `origin`, each
-  handle on the other side `ok` or `no` with its reason, handles on the origin's side `null` (not
-  candidates, in React Flow's strict connection mode).
-  A [`PortRow`](../graph.md#portrow) given its own `hint` keeps it: the prop wins over the
-  context.
-- `mergeFlowProps(...objects)`: one object whose handlers call each object's handler in order, for
-  `useConnectHints`, `useAddAt`, `useFollowFit` and the app's own.
-
-#### `Wire` and `GhostWire`
-
-Edge types the app registers in `edgeTypes`; their props arrive as React Flow's edge `data`
-(`WireData`, `type WireEdge = Edge<WireData, "wire">`). Both draw with React Flow's `BaseEdge`, so
-its `react-flow__edge-path` and `react-flow__edge-interaction` classes, its interaction width and
-its selection stay. The path is React Flow's bezier, rebuilt only when an end moves.
-
-| `WireData` | Settled |
-|---|---|
-| `tone?` | `Pill`'s tones, the changes (`added`, `removed`, `changed` in `--pb-warn`), `pending` (`--pb-quiet`) and `refused` (`--pb-err`); open. None, or one it does not know, is `--xy-edge-stroke` (`--pb-muted`). Selected: `--pb-accent` |
-| `emphasis?` | `0..1` (clamped; not a number is 0): the signal's level as thickness (1.5 px to 3.5 px) and brightness, set as `--pb-wire-emphasis` on the edge, so a change of level restyles without rebuilding the path |
-| `dashed?` | Dashes: an edit not yet saved |
-| `flow?` | Dots move along the wire toward the input, one cycle per `--pb-motion-flow`; under reduced motion the dots are not drawn |
-| `arrow?` | An arrowhead at the input end, drawn by `Wire` facing the handle's side (not an SVG `<marker>`, so CSS colours it with the tone) |
-| `label?` | `ReactNode` at the midpoint, on the raised surface in `--pb-text-sm`, through React Flow's `EdgeLabelRenderer`; it takes no pointer events |
-| `title?` | `string`, a `<title>` on the interaction path: the wire's tooltip |
-
-- A wire drawn by its signal's level and a dashed wire for an edit not yet saved are one `Wire`
-  with different props; a queued edit is drawn with `tone` (a change) and `dashed`.
-- Forced colours: the stroke is `CanvasText` (`Highlight` selected); dashes and the arrow stay.
-
-**`GhostWire`**: a request on its way, before the app's graph holds the edge. The app adds it as an
-edge of type `ghost` between the two handle ids, with `selectable`, `focusable` and `deletable`
-false; `data: { tone?: "pending" | "refused" | (string & {}), label? }` (`pending` by default,
-dashed in `--pb-quiet` at reduced opacity; `refused` in `--pb-err`; one it does not know as
-`pending`). It takes no pointer events. How long a refused one stays is the app's: it removes the
-edge.
 
 #### Canvas sugar: `CanvasTools`, `useAddAt`, `useFollowFit`
 

@@ -14,9 +14,9 @@ machine or person's setup. Examples use neutral data; anything that varies betwe
 a token or a brand. `README.md` is for users, `CONTRIBUTING.md` for contributors.
 
 The tokens, the primitives, the first composites and hooks, and the graph layer's `Meter`,
-`NodeBox` and `PortRow` are built; [`docs/README.md`](docs/README.md) indexes their docs. The
-design for the rest is [`docs/design/patchbay.md`](docs/design/patchbay.md); read both before any
-change.
+`NodeBox`, `PortRow`, `Wire`, `GhostWire` and `useConnectHints` are built;
+[`docs/README.md`](docs/README.md) indexes their docs. The design for the rest is
+[`docs/design/patchbay.md`](docs/design/patchbay.md); read both before any change.
 
 ## Rules of the repo
 

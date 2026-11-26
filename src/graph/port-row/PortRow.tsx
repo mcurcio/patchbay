@@ -1,9 +1,10 @@
 // One port of a node (docs/graph.md#portrow): its React Flow handle at the box's edge and its words. NodeBox draws its
 // rows with it; an app drawing a box of its own may use it alone, inside a React Flow node. React Flow's own handle
 // classes stay on the handle, so its connection logic and connectionRadius work as on any handle.
-import { Handle, Position } from "@xyflow/react";
+import { Handle, Position, useNodeId } from "@xyflow/react";
 import type { ReactNode } from "react";
 import { WarnMark } from "../../primitives";
+import { useConnectHintsValue } from "../connect-hints/useConnectHints";
 import "./PortRow.css";
 
 /** Which side of the box a port is on: an input is a target handle on the left edge, an output a source on the right. */
@@ -24,7 +25,7 @@ export type PortRowProps = {
   label: ReactNode;
   /** After the label in the muted code face: the port's type. */
   typeLabel?: ReactNode;
-  /** While a wire is dragged: `origin`, `ok`, `no`, or `null` for no drag. */
+  /** While a wire is dragged: `origin`, `ok`, `no`, or `null` for no drag. Given, it wins over `<ConnectHints>`'. */
   hint?: PortHint;
   /** Why the port refuses the wire: the handle's and the row's tooltip while `hint` is `no`. */
   reason?: string;
@@ -44,14 +45,23 @@ export function PortRow({
   side,
   label,
   typeLabel,
-  hint = null,
-  reason,
+  hint: ownHint,
+  reason: ownReason,
   problem,
   trailing,
   connectable = true,
 }: PortRowProps) {
-  const shown = hint !== null && knownHints.includes(hint) ? hint : undefined;
   const isInput = side !== "output";
+  const drag = useConnectHintsValue();
+  const nodeId = useNodeId();
+  // A hint given as a prop wins; otherwise the drag in progress says, judged once per drag for this handle.
+  const fromDrag =
+    ownHint === undefined && drag !== null && nodeId !== null
+      ? drag.hintFor({ nodeId, handleId: id }, isInput ? "input" : "output")
+      : undefined;
+  const hint = fromDrag === undefined ? (ownHint ?? null) : fromDrag.hint;
+  const reason = fromDrag === undefined ? ownReason : (fromDrag.reason ?? ownReason);
+  const shown = hint !== null && knownHints.includes(hint) ? hint : undefined;
   const refused = shown === "no" && reason !== undefined ? reason : undefined;
   return (
     <div
