@@ -365,6 +365,16 @@ describe("AppShell", () => {
     expect(css).toMatch(/min-height: var\(--pb-bar\)/);
     expect(css).not.toMatch(/\b(animation|transition)\s*:/);
   });
+
+  it("pads each side by that side's own inset, also in right-to-left text", () => {
+    // The insets are physical, so a logical padding would put the left inset on the right under dir="rtl".
+    const declarations = css.split(";").filter((part) => /env\(safe-area-inset-(left|right)\)/.test(part));
+    expect(declarations.length).toBeGreaterThan(0);
+    for (const part of declarations) {
+      const side = /safe-area-inset-(left|right)/.exec(part)?.[1];
+      expect(part.trim()).toMatch(new RegExp(`^padding-${side ?? ""}:`));
+    }
+  });
 });
 
 describe("the bounds", () => {

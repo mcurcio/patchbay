@@ -1,7 +1,9 @@
 /* The shell (AppShell.tsx): a column the screen's height (100dvh, falling back to 100vh) of the top bar, the main row
    (the workspace, and the inspector at its inline end) and the drawer. Each edge pads itself by its safe-area inset
    (the app's page sets viewport-fit=cover for the insets to be non-zero), so the bar's and the drawer's faces reach
-   the screen's edges while their contents stay clear of a notch or a home indicator. It sets its own box and type. */
+   the screen's edges while their contents stay clear of a notch or a home indicator. The insets are physical (left,
+   right), so the side paddings are too: in right-to-left text a logical padding would put the left inset on the
+   right. It sets its own box and type. */
 .pb-shell {
   display: flex;
   flex-direction: column;
@@ -28,8 +30,8 @@
   box-sizing: content-box;
   min-height: var(--pb-bar);
   padding-top: env(safe-area-inset-top);
-  padding-inline: calc(var(--pb-space-3) + env(safe-area-inset-left))
-    calc(var(--pb-space-3) + env(safe-area-inset-right));
+  padding-left: calc(var(--pb-space-3) + env(safe-area-inset-left));
+  padding-right: calc(var(--pb-space-3) + env(safe-area-inset-right));
   background: var(--pb-raised);
   border-bottom: 1px solid var(--pb-line);
 }
@@ -60,7 +62,8 @@
   display: flex;
   flex: 1 1 auto;
   min-height: 0;
-  padding-inline: env(safe-area-inset-left) env(safe-area-inset-right);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 
 .pb-shell:not([data-drawer]) .pb-shell-main {
@@ -123,8 +126,8 @@
   gap: var(--pb-space-3);
   box-sizing: border-box;
   min-height: var(--pb-bar);
-  padding-inline: calc(var(--pb-space-3) + env(safe-area-inset-left))
-    calc(var(--pb-space-3) + env(safe-area-inset-right));
+  padding-left: calc(var(--pb-space-3) + env(safe-area-inset-left));
+  padding-right: calc(var(--pb-space-3) + env(safe-area-inset-right));
 }
 
 .pb-shell-drawer[data-open] .pb-shell-drawer-head {
@@ -153,7 +156,8 @@
   flex: 1 1 auto;
   flex-direction: column;
   min-height: 0;
-  padding-inline: env(safe-area-inset-left) env(safe-area-inset-right);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
   overflow: auto;
 }
 

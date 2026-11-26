@@ -10,7 +10,10 @@ import { IconButton, Sheet, Splitter } from "../../primitives";
 import { clampDrawerHeight, clampInspectorWidth, drawerBounds, drawerMaxHeight, inspectorBounds } from "./bounds";
 import "./AppShell.css";
 
-/** The top bar's slots, drawn left to right: the brand, a status, the app's controls, and controls at the far end. */
+/**
+ * The top bar's slots, drawn in reading order (left to right in left-to-right text): the brand, a status, the app's
+ * controls, and controls at the far end.
+ */
 export type AppShellTopBar = {
   /** The app's mark or name, first. */
   brand?: ReactNode;

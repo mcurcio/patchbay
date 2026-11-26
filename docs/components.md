@@ -487,10 +487,10 @@ right in left-to-right text) and a drawer along the bottom, filling the screen.
 </AppShell>
 ```
 
-- **`topBar?`**: slots drawn left to right: `brand` (the app's mark or name), `status` (a short
-  state, a connection's `Pill`), `start` (the app's controls, taking the free width and giving it
-  up first) and `end` (at the far end: a theme switch, a menu). The bar is `--pb-bar` high (44 px)
-  and a `<header>`. Without `topBar` there is no bar.
+- **`topBar?`**: slots drawn in reading order (left to right in left-to-right text): `brand` (the
+  app's mark or name), `status` (a short state, a connection's `Pill`), `start` (the app's
+  controls, taking the free width and giving it up first) and `end` (at the far end: a theme
+  switch, a menu). The bar is `--pb-bar` high (44 px) and a `<header>`. Without `topBar` there is no bar.
 - **`children`**: the canvas, filling the workspace, a `<main>`; the app's `<ReactFlow>` goes
   here.
 - **`inspector?`**: `content` (usually a [`Panel`](#layout), which scrolls on its own), `open`,
@@ -534,8 +534,9 @@ Escape in the inspector is the app's.
 **The whole screen.** The shell is `100dvh` high (`100vh` where `dvh` is unknown), so a phone's
 browser bars never hide its foot. Each edge pads itself by its safe-area inset (the bar the top,
 the drawer the bottom, both and the workspace the sides), so the bar's and the drawer's faces reach
-the screen's edges while their contents clear a notch or a home indicator. The insets are non-zero
-only when the app's page asks for them: `<meta name="viewport" content="width=device-width,
+the screen's edges while their contents clear a notch or a home indicator; the left and right
+insets pad the left and right sides in right-to-left text too. The insets are non-zero only when
+the app's page asks for them: `<meta name="viewport" content="width=device-width,
 initial-scale=1, viewport-fit=cover">`.
 
 **It keeps no data.** Sizes and open states are the app's props; an app keeps them across visits
