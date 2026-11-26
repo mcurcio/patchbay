@@ -70,6 +70,22 @@ describe("Sheet", () => {
     expect(rule('.pb-sheet[data-side="start"]:dir(rtl)')).toMatch(/--pb-sheet-from: var\(--pb-space-5\)/);
   });
 
+  it("draws its actions in the header row, after the title and before the close button", () => {
+    render(
+      <Sheet open onClose={() => undefined} title="transform_1" actions={<button type="button">More</button>}>
+        x
+      </Sheet>,
+    );
+    const head = screen.getByRole("heading", { name: "transform_1" }).parentElement;
+    expect(head).toHaveClass("pb-sheet-head");
+    expect([...(head?.children ?? [])].map((child) => child.getAttribute("aria-label") ?? child.textContent)).toEqual([
+      "transform_1",
+      "More",
+      "Close",
+    ]);
+    expect(head?.lastElementChild).toBe(screen.getByRole("button", { name: "Close" }));
+  });
+
   it("does not take the focus on opening", () => {
     render(
       <>

@@ -181,6 +181,54 @@ describe("AppShell", () => {
     });
   });
 
+  describe("with the inspector's title and actions", () => {
+    const titled = () =>
+      inspectorOf({ title: "transform_1", actions: <button type="button">More</button>, content: <p>Settings</p> });
+
+    it("draws one header row on a wide window, a Panel's, with the content as its body", () => {
+      windowOf("wide");
+      render(
+        <AppShell inspector={titled()}>
+          <div />
+        </AppShell>,
+      );
+      const inspector = screen.getByRole("complementary", { name: "Inspector" });
+      const panel = within(inspector).getByRole("region", { name: "transform_1" });
+      expect(within(inspector).getAllByRole("heading")).toHaveLength(1);
+      expect(within(panel).getByRole("button", { name: "More" }).closest(".pb-panel-header")).not.toBeNull();
+      expect(within(panel).getByText("Settings").closest(".pb-panel-body")).not.toBeNull();
+    });
+
+    for (const width of ["narrow", "phone"] as const) {
+      it(`draws one header row in the ${width} window's sheet, its title, actions and close button`, () => {
+        windowOf(width);
+        render(
+          <AppShell inspector={titled()}>
+            <div />
+          </AppShell>,
+        );
+        const sheet = screen.getByRole("dialog", { name: "transform_1" });
+        expect(within(sheet).getAllByRole("heading")).toHaveLength(1);
+        expect(sheet.querySelector(".pb-panel")).toBeNull();
+        const head = within(sheet).getByRole("button", { name: "Close" }).parentElement;
+        expect(head).toHaveClass("pb-sheet-head");
+        expect(head).toContainElement(within(sheet).getByRole("heading", { name: "transform_1" }));
+        expect(head).toContainElement(within(sheet).getByRole("button", { name: "More" }));
+        expect(within(sheet).getByText("Settings").closest(".pb-sheet-body")).not.toBeNull();
+      });
+    }
+
+    it("draws the content as given, with no header of its own, without either", () => {
+      windowOf("wide");
+      render(
+        <AppShell inspector={inspectorOf()}>
+          <div />
+        </AppShell>,
+      );
+      expect(screen.getByRole("complementary").querySelector(".pb-panel")).toBeNull();
+    });
+  });
+
   it("raises the inspector from the bottom on a phone", () => {
     windowOf("phone");
     render(

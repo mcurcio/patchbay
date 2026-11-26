@@ -45,6 +45,8 @@ export type SheetProps = {
   title?: ReactNode;
   /** The sheet's name for screen readers when it has no title. */
   label?: string;
+  /** Slot in the header row, at its far end before the close button: buttons, a count. */
+  actions?: ReactNode;
   children: ReactNode;
   /** An inline sheet's width in px, held to 280–560 px and to 48 px short of its container. */
   width?: number;
@@ -59,6 +61,7 @@ function OpenSheet({
   side = "end",
   title,
   label,
+  actions,
   children,
   width,
   labels,
@@ -114,6 +117,7 @@ function OpenSheet({
             {title}
           </h2>
         )}
+        {actions !== undefined && <div className="pb-sheet-actions">{actions}</div>}
         <IconButton className="pb-sheet-close" label={words.close} onClick={onClose}>
           <CloseGlyph />
         </IconButton>

@@ -67,6 +67,13 @@
   font-weight: 600;
 }
 
+.pb-sheet-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--pb-space-2);
+}
+
 /* The close button is an IconButton, drawn in the muted colour until hovered. */
 .pb-button.pb-sheet-close {
   flex: none;

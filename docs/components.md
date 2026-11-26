@@ -235,15 +235,15 @@ canvas's zoom, fit and minimap. Its tools are `IconButton`s (or plain buttons na
 
 **`Sheet`**: a panel over its container's inline end (or start) edge, or rising from its bottom, as
 an inspector on a narrow window or a phone. `open`, `onClose`, `side?: "end" | "start" | "bottom"`
-(`end` by default), `title?` (or `label?`, its name without one), `children`, `width?` (an inline
-sheet's width in px, held to 280–560 px and 48 px short of its container; 360 by default),
-`labels?` (its words, [rule 8](#rules-every-component-keeps): `close`, "Close").
+(`end` by default), `title?` (or `label?`, its name without one), `actions?` (a slot in the header
+row, at its far end before the close button), `children`, `width?` (an inline sheet's width in px,
+held to 280–560 px and 48 px short of its container; 360 by default), `labels?` (its words, [rule
+8](#rules-every-component-keeps): `close`, "Close").
 
 - **`side` is logical**, as `Splitter`'s `edge` is: `end` is the container's inline end, the right
   edge in left-to-right text and the left edge in right-to-left text, and `start` the other. It is
   placed with logical properties (`inset-inline-end`, `border-inline-start`), so it follows the
   direction the browser lays its container out in, and slides in from the edge it is on.
-
 - It is not modal: the page stays live, and opening it does not take the focus. Escape inside it
   and its close button call `onClose`; if it closes holding the focus, the focus goes back to where
   it came from.
@@ -484,7 +484,7 @@ right in left-to-right text) and a drawer along the bottom, filling the screen.
 ```tsx
 <AppShell
   topBar={{ brand, status, start, end }}
-  inspector={{ content, open, onOpen, width, onWidth }}
+  inspector={{ title, actions, content, open, onOpen, width, onWidth }}
   drawer={{ header, content, open, onOpen, height, onHeight }}
   labels={labels}
 >
@@ -498,8 +498,13 @@ right in left-to-right text) and a drawer along the bottom, filling the screen.
   switch, a menu). The bar is `--pb-bar` high (44 px) and a `<header>`. Without `topBar` there is no bar.
 - **`children`**: the canvas, filling the workspace, a `<main>`; the app's `<ReactFlow>` goes
   here.
-- **`inspector?`**: `content` (usually a [`Panel`](#layout), which scrolls on its own), `open`,
-  `onOpen(open)`, `width` (px) and `onWidth(px)`. On a wide window, while open, it is a region
+- **`inspector?`**: `title?`, `actions?`, `content`, `open`, `onOpen(open)`, `width` (px) and
+  `onWidth(px)`. With a `title` (the selection's name) or `actions`, the shell draws the inspector's
+  one header row itself and `content` is the body under it: on a wide window a [`Panel`](#layout)'s
+  header (the title as its h2, the actions at its far end); in the narrow window's sheet the
+  sheet's own header row, the title, the actions and the close button side by side, never a close
+  row above another header. Without either, `content` is drawn as given (usually a `Panel`, which
+  scrolls on its own). On a wide window, while open, it is a region
   named "Inspector" beside the canvas, `width` px wide, with a vertical [`Splitter`](#layout) on its
   inline start edge that calls `onWidth`; while closed it is not drawn. The app shows and hides it
   with its own control (in the top bar, or on a selection); the shell draws no button of its own
@@ -522,13 +527,14 @@ written back: `onWidth` and `onHeight` are called only when the person moves a s
 `clampInspectorWidth(px)`, `drawerMaxHeight(windowHeight)` and `clampDrawerHeight(px,
 windowHeight)` are the same rules, for an app's own checks.
 
-**Narrow windows.** It reads [`useMediaBreakpoint`](#usemediabreakpoint): below 760 px the
-inspector is a [`Sheet`](#overlays) over the canvas's inline end (the left in right-to-left text,
-where the wide inspector is too), `width` px wide (and 48 px short of the canvas); below 600 px it rises from the bottom, at most 62 % of the workspace. The sheet has
-no splitter; its close button and Escape inside it call `onOpen(false)`. Moving between widths
-draws the inspector's `content` afresh (it moves between the region and the sheet), so state it
-must keep belongs to the app. The root has `data-layout` (`wide`, `narrow` or `phone`) for the
-app's own stylesheet.
+**Narrow windows.** It reads [`useMediaBreakpoint`](#usemediabreakpoint): below 760 px the inspector
+is a [`Sheet`](#overlays) over the canvas's inline end (the left in right-to-left text, where the
+wide inspector is too), `width` px wide (and 48 px short of the canvas); below 600 px it rises from
+the bottom, at most 62 % of the workspace. The sheet is named by the inspector's `title`, or by
+`labels.inspector` without one, and has no splitter; its close button and Escape inside it call
+`onOpen(false)`. Moving between widths draws the inspector's `content` afresh (it moves between the
+region and the sheet), so state it must keep belongs to the app. The root has `data-layout` (`wide`,
+`narrow` or `phone`) for the app's own stylesheet.
 
 **Escape.** The shell's only Escape is the inspector sheet's, and it acts while the focus is in the
 sheet. A `Dialog`, a `CommandPalette` or a `ShortcutSheet` the app opens is modal and holds the
