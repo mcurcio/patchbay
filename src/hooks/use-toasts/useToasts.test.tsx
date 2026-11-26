@@ -48,6 +48,25 @@ describe("useToasts", () => {
     expect(result.current.toasts).toEqual([]);
   });
 
+  it("sets its timer again when it fires before the clock says the toast is over", () => {
+    let now = 0;
+    const { result } = renderHook(() => useToasts({ now: () => now, duration: 100 }));
+    act(() => {
+      result.current.show({ tone: "ok", text: "One." });
+    });
+    // The timer fires (at 101 ms on the timers) while the app's clock still reads 50.
+    now = 50;
+    act(() => {
+      vi.advanceTimersByTime(101);
+    });
+    expect(result.current.toasts).toHaveLength(1);
+    now = 101;
+    act(() => {
+      vi.advanceTimersByTime(52);
+    });
+    expect(result.current.toasts).toEqual([]);
+  });
+
   it("reads its own clock and duration when given", () => {
     let now = 0;
     const { result } = renderHook(() => useToasts({ now: () => now, duration: 100 }));

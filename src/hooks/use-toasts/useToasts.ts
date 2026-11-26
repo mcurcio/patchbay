@@ -82,16 +82,23 @@ export function useToasts(options: UseToastsOptions = {}): UseToastsResult {
   const clear = useCallback(() => void update(clearToasts), [update]);
   const hold = useCallback((held: boolean) => void update((queue, at) => holdToasts(queue, held, at)), [update]);
 
-  // One timer, for the soonest expiry; a millisecond past it, so a timer that fires on the dot never finds the toast
-  // not yet over, which would set no timer again.
+  // One timer, for the soonest expiry, a millisecond past it. A timer that still finds nothing over (it fired early
+  // against the clock, or the app's clock lags the timers') is set again, or the toast would never go.
   const at = nextToastExpiry(queue);
+  const [rearm, setRearm] = useState(0);
   useEffect(() => {
     if (at === undefined) return undefined;
-    const timer = setTimeout(() => void update(expireToasts), Math.max(0, Math.ceil(at - latest.current.now()) + 1));
+    const timer = setTimeout(
+      () => {
+        const before = current.current;
+        if (update(expireToasts) === before) setRearm((count) => count + 1);
+      },
+      Math.max(0, Math.ceil(at - latest.current.now()) + 1),
+    );
     return () => {
       clearTimeout(timer);
     };
-  }, [at, update]);
+  }, [at, rearm, update]);
 
   const toasterProps = useMemo(() => {
     const { shown, more } = visibleToasts(queue, visible);
