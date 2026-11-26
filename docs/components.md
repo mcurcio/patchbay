@@ -457,9 +457,11 @@ props.
   moving end. `caretAt(text, offset)` and `offsetAt(text, line, column)` are the conversions, and
   `shownText`, `codeRuns`, `gutterRows` and `markLevel` the other steps, exported and pure.
 - **The gutter** numbers every line in `--pb-muted` on `--pb-sunken`, as wide as the widest
-  number. On touch the text (and the gutter's) is 16 px, as `--pb-code-size` is there; the marks
-  are a pointer shortcut, and the keyboard reaches each diagnostic by its line and column. It does
-  not animate, so there is nothing to stop under reduced motion.
+  number. On touch the text (and the gutter's) is 16 px, as `--pb-code-size` is there, and each
+  mark's hit area is 36 px square, centred on it (where marks sit on neighbouring lines they share
+  the overlap, and the gutter's edge clips it), while the mark drawn stays 7 px. The marks are a
+  pointer shortcut; the keyboard reaches each diagnostic by its line and column. It does not
+  animate, so there is nothing to stop under reduced motion.
 
 **`CodeText`**: read-only highlighted text, in code type on the read-only code surface. `value`,
 `language?: "knobly"`, `highlight?` (highlighted as `CodeEditor` is, `highlight` winning), plus

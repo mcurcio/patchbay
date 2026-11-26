@@ -134,6 +134,52 @@ export const Diagnostics: Story = {
   },
 };
 
+/** The page's own rule for a mark's touch hit area, from the coarse-pointer block of the editor's stylesheet. */
+function touchHitRule(): string {
+  for (const sheet of document.styleSheets) {
+    for (const rule of sheet.cssRules) {
+      if (!(rule instanceof CSSMediaRule) || !rule.conditionText.includes("pointer: coarse")) continue;
+      for (const inner of rule.cssRules) {
+        if (inner instanceof CSSStyleRule && inner.selectorText === ".pb-code-gutter-mark[data-mark]::after") {
+          return inner.cssText;
+        }
+      }
+    }
+  }
+  throw new Error("no touch hit area rule");
+}
+
+/**
+ * On a touch screen a mark is hit 36 px square while it is drawn 7 px. A desktop browser matches no coarse pointer, so
+ * the story applies the stylesheet's own coarse-pointer rule to the page while it measures the mark, then a press 15
+ * px above the mark's centre, on the line above, which has no mark, still lands on it.
+ */
+export const TouchHitArea: Story = {
+  args: { diagnostics: [{ line: 3, severity: "error", message: "a name must be one word" }] },
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    const mark = canvasElement.querySelector<HTMLElement>('.pb-code-gutter-mark[data-mark="error"]');
+    if (mark === null) throw new Error("no error mark");
+    const style = document.createElement("style");
+    style.textContent = touchHitRule();
+    document.head.append(style);
+    try {
+      const hit = getComputedStyle(mark, "::after");
+      await expect(hit.width).toBe("36px");
+      await expect(hit.height).toBe("36px");
+      const drawn = mark.getBoundingClientRect();
+      await expect(drawn.width).toBeLessThan(8);
+      const x = drawn.left + drawn.width / 2;
+      const y = drawn.top + drawn.height / 2 - 15;
+      await expect(document.elementFromPoint(x, y)).toBe(mark);
+      await userEvent.pointer({ keys: "[MouseLeft]", target: mark, coords: { clientX: x, clientY: y } });
+      await expect(canvas.getByRole("textbox", { name: "Settings" })).toHaveFocus();
+      await expect(args.onCaret).toHaveBeenLastCalledWith({ line: 3, column: 1, offset: sample.indexOf("\n\n") + 1 });
+    } finally {
+      style.remove();
+    }
+  },
+};
+
 /** Read-only: the read-only surface, no edits, and Tab moves on. */
 export const ReadOnly: Story = {
   args: { readOnly: true },
