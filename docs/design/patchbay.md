@@ -57,27 +57,7 @@ build:
 
 ### 4.3 Shell (`/shell`)
 
-`AppShell` is the usual layout of a graph editor: a top bar, the canvas, an inspector on the right
-and a drawer along the bottom:
-
-```tsx
-<AppShell
-  topBar={{ brand, status, start, end }}           // slots, left to right
-  inspector={{ content, width, onWidth, open, onOpen }}
-  drawer={{ header, content, height, onHeight, open, onOpen }}
->
-  {canvas}
-</AppShell>
-```
-
-- Sizes are bounded (inspector 280–560 px, drawer 120 px to 70 % of the window) and dragged by a
-  `Splitter`.
-- **Narrow windows:** below 760 px the inspector is a sheet over the canvas's right edge; below
-  600 px it rises from the bottom (at most 62 % of the workspace). Escape closes it after the
-  palette and the shortcut sheet.
-- **The whole screen:** `100dvh`, padded by the safe-area insets (`viewport-fit=cover`).
-- The shell keeps no data. Its sizes and open states are props; `usePersistentState`
-  ([`docs/components.md`](../components.md#usepersistentstate)) is how an app keeps them.
+Built: [`docs/components.md`](../components.md#shell-shell).
 
 ### 4.4 Graph (`/graph`)
 

@@ -1,0 +1,172 @@
+/* The shell (AppShell.tsx): a column the screen's height (100dvh, falling back to 100vh) of the top bar, the main row
+   (the workspace, and the inspector at its inline end) and the drawer. Each edge pads itself by its safe-area inset
+   (the app's page sets viewport-fit=cover for the insets to be non-zero), so the bar's and the drawer's faces reach
+   the screen's edges while their contents stay clear of a notch or a home indicator. It sets its own box and type. */
+.pb-shell {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  font-family: var(--pb-font-ui);
+  font-size: var(--pb-text-md);
+  color: var(--pb-text);
+  background: var(--pb-surface);
+}
+
+.pb-shell:not([data-bar]) {
+  padding-top: env(safe-area-inset-top);
+}
+
+/* The top bar: --pb-bar high (44 px; a brand may change it) below the top inset. */
+.pb-shell-bar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--pb-space-3);
+  box-sizing: content-box;
+  min-height: var(--pb-bar);
+  padding-top: env(safe-area-inset-top);
+  padding-inline: calc(var(--pb-space-3) + env(safe-area-inset-left))
+    calc(var(--pb-space-3) + env(safe-area-inset-right));
+  background: var(--pb-raised);
+  border-bottom: 1px solid var(--pb-line);
+}
+
+.pb-shell-brand,
+.pb-shell-status,
+.pb-shell-end {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--pb-space-2);
+}
+
+.pb-shell-brand {
+  font-weight: 600;
+}
+
+/* The app's controls take the free width, and give it up first when the bar is short of room. */
+.pb-shell-start {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: var(--pb-space-2);
+  min-width: 0;
+}
+
+.pb-shell-main {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding-inline: env(safe-area-inset-left) env(safe-area-inset-right);
+}
+
+.pb-shell:not([data-drawer]) .pb-shell-main {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* The workspace holds the canvas and, on a narrow window, the inspector's sheet over it (the sheet is placed
+   absolutely, so the workspace is positioned). */
+.pb-shell-workspace {
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.pb-shell-workspace > :not(.pb-sheet) {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* The inspector, at the main row's inline end, its splitter on its inline start edge. */
+.pb-shell-inspector {
+  position: relative;
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  box-sizing: border-box;
+  min-height: 0;
+  background: var(--pb-raised);
+  border-inline-start: 1px solid var(--pb-line);
+}
+
+.pb-shell-inspector-body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  overflow: auto;
+}
+
+/* The drawer: its header always, its body while open; its splitter on its top edge. */
+.pb-shell-drawer {
+  position: relative;
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  box-sizing: border-box;
+  min-height: 0;
+  padding-bottom: env(safe-area-inset-bottom);
+  background: var(--pb-raised);
+  border-top: 1px solid var(--pb-line);
+}
+
+.pb-shell-drawer-head {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--pb-space-3);
+  box-sizing: border-box;
+  min-height: var(--pb-bar);
+  padding-inline: calc(var(--pb-space-3) + env(safe-area-inset-left))
+    calc(var(--pb-space-3) + env(safe-area-inset-right));
+}
+
+.pb-shell-drawer[data-open] .pb-shell-drawer-head {
+  border-bottom: 1px solid var(--pb-line);
+}
+
+.pb-shell-drawer-header {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: var(--pb-space-2);
+  min-width: 0;
+}
+
+.pb-button.pb-shell-drawer-toggle {
+  flex: none;
+  color: var(--pb-muted);
+}
+
+.pb-button.pb-shell-drawer-toggle:hover {
+  color: var(--pb-text);
+}
+
+.pb-shell-drawer-body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  padding-inline: env(safe-area-inset-left) env(safe-area-inset-right);
+  overflow: auto;
+}
+
+.pb-shell-drawer-body[hidden] {
+  display: none;
+}
+
+/* Forced colours: the edges between the bar, the panes and the canvas stay drawn in the system's colours. */
+@media (forced-colors: active) {
+  .pb-shell-bar,
+  .pb-shell-inspector,
+  .pb-shell-drawer,
+  .pb-shell-drawer[data-open] .pb-shell-drawer-head {
+    border-color: CanvasText;
+  }
+}

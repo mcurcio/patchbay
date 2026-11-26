@@ -462,6 +462,93 @@ native `pre` props (`ref` included; name it with `aria-label` where no heading d
 LF; lines are kept as written, and a wide one scrolls sideways; the box is a tab stop, so it
 scrolls from the keyboard too. It has no words of its own, so no `labels`.
 
+## Shell (`/shell`)
+
+```ts
+import { AppShell, clampDrawerHeight, clampInspectorWidth, drawerBounds, inspectorBounds } from "@mcurcio/patchbay/shell";
+```
+
+The shell is drawn with primitives and hooks: importing `/shell` loads `/primitives` and its
+stylesheet, and `/hooks`.
+
+### `AppShell`
+
+The usual layout of a graph editor: a top bar, the canvas, an inspector at the inline end (the
+right in left-to-right text) and a drawer along the bottom, filling the screen.
+
+```tsx
+<AppShell
+  topBar={{ brand, status, start, end }}
+  inspector={{ content, open, onOpen, width, onWidth }}
+  drawer={{ header, content, open, onOpen, height, onHeight }}
+  labels={labels}
+>
+  {canvas}
+</AppShell>
+```
+
+- **`topBar?`**: slots drawn left to right: `brand` (the app's mark or name), `status` (a short
+  state, a connection's `Pill`), `start` (the app's controls, taking the free width and giving it
+  up first) and `end` (at the far end: a theme switch, a menu). The bar is `--pb-bar` high (44 px)
+  and a `<header>`. Without `topBar` there is no bar.
+- **`children`**: the canvas, filling the workspace, a `<main>`; the app's `<ReactFlow>` goes
+  here.
+- **`inspector?`**: `content` (usually a [`Panel`](#layout), which scrolls on its own), `open`,
+  `onOpen(open)`, `width` (px) and `onWidth(px)`. On a wide window, while open, it is a region
+  named "Inspector" beside the canvas, `width` px wide, with a vertical [`Splitter`](#layout) on its
+  inline start edge that calls `onWidth`; while closed it is not drawn. The app shows and hides it
+  with its own control (in the top bar, or on a selection); the shell draws no button of its own
+  for it on a wide window.
+- **`drawer?`**: `header` (beside its show and hide button), `content`, `open`, `onOpen(open)`,
+  `height` (px, the open drawer's whole height, header included) and `onHeight(px)`. Its header is
+  always shown; its button ("Show the drawer" or "Hide the drawer", with `aria-expanded`) calls
+  `onOpen(!open)`. While open, a horizontal `Splitter` on its top edge calls `onHeight`. While
+  closed its body stays mounted, hidden, so what it holds (a draft, a caret, a scroll position) is
+  there when it opens. It spans the window's width, under the canvas and the inspector.
+- **`labels?`** (its words, [rule 8](#rules-every-component-keeps)): `inspector` ("Inspector"),
+  `drawer` ("Drawer"), `resizeInspector` ("Resize the inspector"), `resizeDrawer` ("Resize the
+  drawer"), `showDrawer` ("Show the drawer"), `hideDrawer` ("Hide the drawer") and `close`
+  ("Close", the inspector sheet's close button). `className?` is added to its own.
+
+**Sizes.** The inspector is held to 280–560 px (`inspectorBounds`), the drawer to 120 px and 70 %
+of the window's height (`drawerBounds`, followed as the window resizes). A size out of bounds, or
+not a finite number (one kept from a larger window), is drawn within them, in whole px, and not
+written back: `onWidth` and `onHeight` are called only when the person moves a splitter.
+`clampInspectorWidth(px)`, `drawerMaxHeight(windowHeight)` and `clampDrawerHeight(px,
+windowHeight)` are the same rules, for an app's own checks.
+
+**Narrow windows.** It reads [`useMediaBreakpoint`](#usemediabreakpoint): below 760 px the
+inspector is a [`Sheet`](#overlays) over the canvas's right edge, `width` px wide (and 48 px short
+of the canvas); below 600 px it rises from the bottom, at most 62 % of the workspace. The sheet has
+no splitter; its close button and Escape inside it call `onOpen(false)`. Moving between widths
+draws the inspector's `content` afresh (it moves between the region and the sheet), so state it
+must keep belongs to the app. The root has `data-layout` (`wide`, `narrow` or `phone`) for the
+app's own stylesheet.
+
+**Escape.** The shell's only Escape is the inspector sheet's, and it acts while the focus is in the
+sheet. A `Dialog`, a `CommandPalette` or a `ShortcutSheet` the app opens is modal and holds the
+focus, so Escape goes to it first and closes it, and the sheet stays; each marks the press handled,
+so the app's own [`useShortcuts`](#useshortcuts) Escape does not act on it either. On a wide window
+Escape in the inspector is the app's.
+
+**The whole screen.** The shell is `100dvh` high (`100vh` where `dvh` is unknown), so a phone's
+browser bars never hide its foot. Each edge pads itself by its safe-area inset (the bar the top,
+the drawer the bottom, both and the workspace the sides), so the bar's and the drawer's faces reach
+the screen's edges while their contents clear a notch or a home indicator. The insets are non-zero
+only when the app's page asks for them: `<meta name="viewport" content="width=device-width,
+initial-scale=1, viewport-fit=cover">`.
+
+**It keeps no data.** Sizes and open states are the app's props; an app keeps them across visits
+with [`usePersistentState`](#usepersistentstate), checking a kept width with
+`clampInspectorWidth` (Storybook's `Kept` story).
+
+- **Keyboard:** the splitters as `Splitter`'s keys (arrows, Home, End; in right-to-left text the
+  inspector is on the left and its splitter mirrors); the drawer's button and the sheet's close
+  button are buttons.
+- **Touch:** the splitters' hit areas are 36 px and the drawer's button 36 px, as the primitives'.
+- **Motion:** the shell animates nothing of its own; the sheet's entrance stops under reduced
+  motion. Forced-colours mode draws its edges in the system's colours.
+
 ## Hooks (`/hooks`)
 
 ### `usePersistentState`
