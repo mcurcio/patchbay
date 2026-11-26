@@ -240,7 +240,7 @@ describe("Meter", () => {
     const title = vi.fn(
       (peak: number, rms: number, clipped: boolean) => `${peak.toFixed(0)} ${rms.toFixed(0)} ${clipped}`,
     );
-    render(<Meter subscribe={hot.subscribe} read={hot.read} title={title} />);
+    render(<Meter subscribe={hot.subscribe} read={hot.read} labels={{ title }} />);
     frame();
     expect(meter()).not.toHaveAttribute("title");
     fireEvent.pointerEnter(meter());

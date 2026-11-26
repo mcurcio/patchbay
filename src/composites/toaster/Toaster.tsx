@@ -39,19 +39,30 @@ export type ToasterProps = Omit<ComponentPropsWithRef<"section">, "children"> & 
    * direction), or "inline": in the flow, where the app put it (in a canvas's own panel).
    */
   placement?: ToasterPlacement;
-  /** The region's name, "Notifications" by default. */
-  label?: string;
-  /** The words on each Dismiss button, "Dismiss" by default. */
-  dismissLabel?: string;
-  /** The words for the folded toasts, "and n more" by default. */
-  moreLabel?: (more: number) => ReactNode;
-  /** What a screen reader reads for a count in place of "×n", "n times" by default. */
-  countLabel?: (count: number) => string;
+  /** Words to replace; the rest keep their defaults. */
+  labels?: Partial<ToasterLabels>;
+};
+
+/** The toaster's own words, each replaceable. */
+export interface ToasterLabels {
+  /** The stack's region name: "Notifications". An `aria-label` the app gives wins. */
+  region: string;
+  /** The words on each Dismiss button: "Dismiss". */
+  dismiss: string;
+  /** The words for the folded toasts: "and n more". */
+  more: (more: number) => ReactNode;
+  /** What a screen reader reads for a count in place of "×n": "n times". */
+  count: (count: number) => string;
+}
+
+export const defaultToasterLabels: ToasterLabels = {
+  region: "Notifications",
+  dismiss: "Dismiss",
+  more: (more) => `and ${more} more`,
+  count: (count) => `${count} times`,
 };
 
 const placements = new Set(["top-start", "top", "top-end", "bottom-start", "bottom", "bottom-end", "inline"]);
-const defaultMoreLabel = (more: number) => `and ${more} more`;
-const defaultCountLabel = (count: number) => `${count} times`;
 
 /** News put into a live region: a toast's words, and its count, when it first shows or its count goes up. */
 type Said = { seq: number; id: number; alert: boolean; text: ReactNode; count: number };
@@ -65,10 +76,7 @@ export function Toaster({
   onDismiss,
   onHold,
   placement = "bottom-end",
-  label = "Notifications",
-  dismissLabel = "Dismiss",
-  moreLabel = defaultMoreLabel,
-  countLabel = defaultCountLabel,
+  labels,
   className,
   onPointerEnter,
   onPointerLeave,
@@ -76,6 +84,7 @@ export function Toaster({
   onBlur,
   ...rest
 }: ToasterProps) {
+  const words = { ...defaultToasterLabels, ...labels };
   const ids = useId();
   const drawn = placements.has(placement) ? placement : "inline";
   const top = drawn.startsWith("top");
@@ -121,7 +130,7 @@ export function Toaster({
       .map((one) => (
         <p key={one.seq}>
           {one.text}
-          {one.count > 1 && `, ${countLabel(one.count)}`}
+          {one.count > 1 && `, ${words.count(one.count)}`}
         </p>
       ));
   const regions = (
@@ -185,13 +194,13 @@ export function Toaster({
 
   if (empty) return regions;
 
-  const moreLine = more > 0 && <p className="pb-toaster-more">{moreLabel(more)}</p>;
+  const moreLine = more > 0 && <p className="pb-toaster-more">{words.more(more)}</p>;
   return (
     <>
       {regions}
       <section
         {...rest}
-        aria-label={rest["aria-label"] ?? label}
+        aria-label={rest["aria-label"] ?? words.region}
         className={className === undefined ? "pb-toaster" : `pb-toaster ${className}`}
         data-placement={drawn}
         onPointerEnter={(event) => {
@@ -238,7 +247,7 @@ export function Toaster({
                   {count > 1 && (
                     <span className="pb-toast-count">
                       <span aria-hidden="true"> ×{count}</span>
-                      <span className="pb-toast-hidden">, {countLabel(count)}</span>
+                      <span className="pb-toast-hidden">, {words.count(count)}</span>
                     </span>
                   )}
                 </div>
@@ -261,7 +270,7 @@ export function Toaster({
                       dismiss(toast.id);
                     }}
                   >
-                    {dismissLabel}
+                    {words.dismiss}
                   </Button>
                 </div>
               </li>

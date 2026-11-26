@@ -1,5 +1,5 @@
-export { defaultChangeLabels, NodeBox } from "./NodeBox";
-export type { NodeBoxChange, NodeBoxChangeLabels, NodeBoxProps, NodeBoxTone, PortSpec } from "./NodeBox";
+export { defaultNodeBoxLabels, NodeBox } from "./NodeBox";
+export type { NodeBoxChange, NodeBoxLabels, NodeBoxProps, NodeBoxTone, PortSpec } from "./NodeBox";
 export {
   HANDLE_HIT,
   HANDLE_SIZE,

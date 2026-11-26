@@ -73,6 +73,26 @@ export const Folded: Story = {
   },
 };
 
+/** The app's words, through `labels`: the region's name, Dismiss, the fold and the count. */
+export const Labels: Story = {
+  args: {
+    more: 2,
+    toasts: [{ id: 1, tone: "ok", text: "Gespeichert.", count: 3 }],
+    labels: {
+      region: "Meldungen",
+      dismiss: "Schließen",
+      more: (more) => `und ${more} weitere`,
+      count: (count) => `${count} Mal`,
+    },
+  },
+  play: async ({ canvas }) => {
+    // The toast fades in from transparent, so these ask for presence, not visibility.
+    await expect(canvas.getByRole("region", { name: "Meldungen" })).toBeInTheDocument();
+    await expect(canvas.getByRole("button", { name: "Schließen" })).toBeInTheDocument();
+    await expect(canvas.getByText("und 2 weitere")).toBeInTheDocument();
+  },
+};
+
 /** A tone it does not know: drawn with a plain stripe. */
 export const UnknownTone: Story = {
   args: { toasts: [{ id: 1, tone: "sleeping", text: "Nothing has run for an hour." }] },

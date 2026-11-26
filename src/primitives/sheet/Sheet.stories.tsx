@@ -68,7 +68,7 @@ export const Long: Story = {
 export const Closed: Story = { args: { open: false } };
 
 /** The app's word for Close. */
-export const Labels: Story = { args: { closeLabel: "Fermer" } };
+export const Labels: Story = { args: { labels: { close: "Fermer" } } };
 
 /** Held by the story: Escape inside closes it, and the focus goes back to the opener. */
 export const OpenAndClose: Story = {

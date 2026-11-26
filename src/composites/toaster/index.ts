@@ -1,2 +1,2 @@
-export { Toaster } from "./Toaster";
-export type { ToasterPlacement, ToasterProps, ToasterToast } from "./Toaster";
+export { defaultToasterLabels, Toaster } from "./Toaster";
+export type { ToasterLabels, ToasterPlacement, ToasterProps, ToasterToast } from "./Toaster";

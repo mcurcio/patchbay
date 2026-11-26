@@ -201,7 +201,7 @@ describe("Dialog", () => {
 
   it("takes the app's word for Close and its own class", () => {
     render(
-      <Dialog open onClose={() => undefined} title="T" closeLabel="Fermer" className="mine">
+      <Dialog open onClose={() => undefined} title="T" labels={{ close: "Fermer" }} className="mine">
         x
       </Dialog>,
     );

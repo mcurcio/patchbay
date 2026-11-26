@@ -55,7 +55,7 @@ const meta = {
     orientation: { control: "inline-radio", options: ["horizontal", "vertical"] },
     subscribe: { control: false },
     read: { control: false },
-    title: { control: false },
+    labels: { control: false },
   },
   decorators: [
     (Story) => (
@@ -120,11 +120,13 @@ export const Vertical: Story = {
 /** An orientation it does not know is drawn horizontal. */
 export const UnknownOrientation: Story = { args: { orientation: "diagonal" } };
 
-/** The tooltip's words are the app's: here in the app's own phrasing. */
-export const OwnTitle: Story = {
+/** The tooltip's words are the app's, through `labels`: here in the app's own phrasing. */
+export const Labels: Story = {
   args: {
-    title: (peak, rms, clipped) =>
-      `${clipped ? "Clipped. " : ""}Peak ${peak.toFixed(0)} dBFS, average ${rms.toFixed(0)} dBFS`,
+    labels: {
+      title: (peak, rms, clipped) =>
+        `${clipped ? "Clipped. " : ""}Peak ${peak.toFixed(0)} dBFS, average ${rms.toFixed(0)} dBFS`,
+    },
   },
   play: async ({ canvas, userEvent }) => {
     const meter = canvas.getByRole("img");

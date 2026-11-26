@@ -9,6 +9,16 @@ import "./Banner.css";
 /** The tones a banner draws; any other string is drawn neutrally. */
 export type BannerTone = "ok" | "warn" | "err" | "quiet" | "off" | (string & {});
 
+/** The banner's own words, each replaceable. */
+export interface BannerLabels {
+  /** The close button's name: "Dismiss". */
+  dismiss: string;
+}
+
+export const defaultBannerLabels: BannerLabels = {
+  dismiss: "Dismiss",
+};
+
 export type BannerProps = Omit<ComponentPropsWithRef<"div">, "role"> & {
   /** What the news is, by colour: the stripe's, and the surface's for warn and err. */
   tone: BannerTone;
@@ -18,19 +28,12 @@ export type BannerProps = Omit<ComponentPropsWithRef<"div">, "role"> & {
   actions?: ReactNode;
   /** Shows a close button, which asks the app to take the banner away. */
   onDismiss?: () => void;
-  /** The close button's name, "Dismiss" by default. */
-  dismissLabel?: string;
+  /** Words to replace; the rest keep their defaults. */
+  labels?: Partial<BannerLabels>;
 };
 
-export function Banner({
-  tone,
-  children,
-  actions,
-  onDismiss,
-  dismissLabel = "Dismiss",
-  className,
-  ...rest
-}: BannerProps) {
+export function Banner({ tone, children, actions, onDismiss, labels, className, ...rest }: BannerProps) {
+  const words = { ...defaultBannerLabels, ...labels };
   return (
     <div
       {...rest}
@@ -41,7 +44,7 @@ export function Banner({
       <div className="pb-banner-text">{children}</div>
       {actions !== undefined && <div className="pb-banner-actions">{actions}</div>}
       {onDismiss !== undefined && (
-        <IconButton className="pb-banner-dismiss" size="sm" label={dismissLabel} onClick={onDismiss}>
+        <IconButton className="pb-banner-dismiss" size="sm" label={words.dismiss} onClick={onDismiss}>
           <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
             <path d="M3 3l10 10M13 3L3 13" fill="none" stroke="currentColor" strokeWidth="1.75" />
           </svg>

@@ -130,16 +130,18 @@ describe("Toaster", () => {
     expect(onDismiss).toHaveBeenCalledWith(7);
   });
 
-  it("takes its words as props", () => {
+  it("takes its words through labels", () => {
     render(
       <Toaster
         toasts={[{ id: 1, tone: "ok", text: "Gespeichert.", count: 2 }]}
         more={1}
         onDismiss={() => {}}
-        label="Meldungen"
-        dismissLabel="Schließen"
-        moreLabel={(more) => `und ${more} weitere`}
-        countLabel={(count) => `${count} Mal`}
+        labels={{
+          region: "Meldungen",
+          dismiss: "Schließen",
+          more: (more) => `und ${more} weitere`,
+          count: (count) => `${count} Mal`,
+        }}
       />,
     );
     expect(screen.getByRole("region", { name: "Meldungen" })).toBeInTheDocument();

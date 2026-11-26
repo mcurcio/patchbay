@@ -96,6 +96,26 @@ export const NoMatch: Story = {
   },
 };
 
+/** The app's words, through `labels`: the name, the placeholder, no match, and the keys' names. */
+export const Labels: Story = {
+  args: {
+    labels: {
+      palette: "Befehle",
+      placeholder: "Befehl eingeben",
+      noMatch: (query) => `Kein Befehl passt zu „${query}“`,
+      keyNames: { Delete: "Entf", Backspace: "Rück" },
+    },
+  },
+  play: async ({ userEvent }) => {
+    // The palette fades in from transparent, so this asks for presence, not visibility.
+    await expect(screen.getByRole("dialog", { name: "Befehle" })).toBeInTheDocument();
+    await expect(screen.getByRole("combobox")).toHaveAttribute("placeholder", "Befehl eingeben");
+    await expect(screen.getByRole("option", { name: /Delete the selection/ })).toHaveTextContent("Entf");
+    await userEvent.keyboard("qqq");
+    await expect(screen.getByRole("status")).toHaveTextContent("Kein Befehl passt zu „qqq“");
+  },
+};
+
 /** No commands at all. */
 export const Empty: Story = { args: { commands: [] } };
 

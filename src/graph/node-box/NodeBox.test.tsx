@@ -4,7 +4,7 @@
 import { render, screen, within } from "@testing-library/react";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { Flow, installFlowMeasuring } from "../../test/flow";
-import { defaultChangeLabels, NodeBox, type PortSpec } from "./NodeBox";
+import { defaultNodeBoxLabels, NodeBox, type PortSpec } from "./NodeBox";
 import css from "./NodeBox.css?raw";
 
 const updateNodeInternals = vi.fn();
@@ -68,19 +68,19 @@ describe("NodeBox", () => {
     expect(badge).toHaveAttribute("data-tone", change);
   });
 
-  it("takes the change's words from changeLabels, English for the rest", () => {
+  it("takes the change's words through labels, English for the rest", () => {
     const { rerender } = render(
       <Flow>
-        <NodeBox title="n" change="added" changeLabels={{ added: "new" }} />
+        <NodeBox title="n" change="added" labels={{ added: "new" }} />
       </Flow>,
     );
     expect(within(box()).getByText("new")).toHaveClass("pb-badge");
     rerender(
       <Flow>
-        <NodeBox title="n" change="removed" changeLabels={{ added: "new" }} />
+        <NodeBox title="n" change="removed" labels={{ added: "new" }} />
       </Flow>,
     );
-    expect(within(box()).getByText(defaultChangeLabels.removed)).toHaveClass("pb-badge");
+    expect(within(box()).getByText(defaultNodeBoxLabels.removed)).toHaveClass("pb-badge");
   });
 
   it("draws no badge without a change", () => {

@@ -56,7 +56,7 @@ describe("Banner", () => {
     await userEvent.click(screen.getByRole("button", { name: "Dismiss" }));
     expect(onDismiss).toHaveBeenCalledOnce();
     rerender(
-      <Banner tone="ok" onDismiss={onDismiss} dismissLabel="Hide">
+      <Banner tone="ok" onDismiss={onDismiss} labels={{ dismiss: "Hide" }}>
         Saved.
       </Banner>,
     );
