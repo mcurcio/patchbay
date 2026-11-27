@@ -15,8 +15,9 @@ cite them. How to read a rule (Built, The app's, Not yet):
   gutter mark is the caret moved by line and column ([`components.md`](components.md#code),
   CodeEditor); connecting two ports is the inspector's "Connect to" choice for each port
   ([patterns](patterns.md#connecting)); moving a node, where dragging is allowed, is React Flow's
-  arrow keys on the selected node. **Not yet:** patchbay gives no list of the ports `canConnect`
-  accepts for one port, which the "Connect to" choice needs: pb-nx9.81.
+  arrow keys on the selected node. **Built:** [`connectTargets`](graph.md#connecttargets) lists the
+  ports `canConnect` accepts for one port, for the "Connect to" choice; `NodeBox` leaves React
+  Flow's keys to move a node. **The app's:** the choice and what it does.
 - **U3. A group of tools is one Tab stop.** Arrows move within it and wrap, Home and End go to the
   ends, arrows swap in right-to-left text, and the last focused item keeps the stop. **Built:**
   Toolbar, ToolGroup, CanvasTools ([`components.md`](components.md#layout)).
@@ -224,8 +225,8 @@ are F10's:
 - **U56. One rule judges the hint, the drop and the keyboard.** The app's `canConnect` marks each
   handle while a wire is dragged, checks the drop, and lists the ports the "Connect to" choice
   offers (U2), so a hint never promises what the drop refuses. **Built:** useConnectHints for the
-  hint and the drop ([`graph.md`](graph.md#useconnecthints)). **Not yet:** the keyboard's list:
-  pb-nx9.81.
+  hint and the drop ([`graph.md`](graph.md#useconnecthints)), and `connectTargets` for the
+  keyboard's list ([`graph.md`](graph.md#connecttargets)).
 - **U57. While dragging, every port says yes or no.** The origin is ringed in the accent; an
   accepting handle grows and goes `ok`; a refusing one goes `off` with muted words and a
   not-allowed cursor; ports on the origin's side are not candidates. **Built:** PortRow.

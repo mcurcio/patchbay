@@ -80,8 +80,8 @@ unplaced nodes by its layout, and puts an added node at the point it was asked.
 
 **From the keyboard:** in the inspector, a node's subject lists its ports, each with a "Connect
 to" [`Select`](components.md#forms) of the ports on the other side that `canConnect` accepts for it
-(U56). Choosing one makes the same request or queued change as a drop. A connection's subject has
-Remove. patchbay's list of those ports: not yet, pb-nx9.81.
+(U56), listed by [`connectTargets`](graph.md#connecttargets). Choosing one makes the same request or
+queued change as a drop. A connection's subject has Remove.
 
 **States:** dragging (the origin ringed, candidates marked), pending (the ghost), live, refused
 (the ghost `refused`, the reason in a toast, U44), queued (a dashed change tone).

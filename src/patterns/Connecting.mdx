@@ -42,7 +42,9 @@ A refused request's reason goes in a toast, the ghost going with it:
 
 <Canvas of={ToasterStories.BottomEnd} story={{ inline: false, height: "320px" }} />
 
-## Not built yet
+## From the keyboard
 
-- The ports `canConnect` accepts for one port, for the inspector's "Connect to" Select (the
-  keyboard path): `pb-nx9.81`.
+In the inspector, each port has a "Connect to" Select of the ports `connectTargets` accepts for
+it, judged by the same rule as the drag; choosing one makes the connection:
+
+<Canvas of={ConnectHintsStories.ConnectTo} />

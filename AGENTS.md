@@ -14,7 +14,7 @@ machine or person's setup. Examples use neutral data; anything that varies betwe
 a token or a brand. `README.md` is for users, `CONTRIBUTING.md` for contributors.
 
 The tokens, the primitives, the first composites and hooks, the shell (`AppShell`) and the graph
-layer (`Meter`, `NodeBox`, `PortRow`, `Wire`, `GhostWire`, `useConnectHints`, `ConnectStatus`,
+layer (`Meter`, `NodeBox`, `PortRow`, `Wire`, `GhostWire`, `useConnectHints`, `connectTargets`, `ConnectStatus`,
 `CanvasTools`, `useAddAt`, `useFollowFit`) are built;
 [`docs/README.md`](docs/README.md) indexes their docs. The design for the rest is
 [`docs/design/patchbay.md`](docs/design/patchbay.md); read both before any change.

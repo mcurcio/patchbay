@@ -193,15 +193,24 @@ export const UnknownLayout: Story = { args: { ...stagedNode, ports: "diagonal" }
 /** A wider box, by the width prop. */
 export const Wide: Story = { args: { ...levelNode, width: 320 } };
 
-/** The keyboard: React Flow's node wrapper takes the focus and the box shows it; the box adds no tab stop. */
+/**
+ * The keyboard: React Flow's node wrapper takes the focus and the box shows it; the box adds no tab stop, and leaves
+ * React Flow's keys alone, so Enter selects the node and an arrow key moves it.
+ */
 export const Keyboard: Story = {
   args: { ...stagedNode },
   play: async ({ canvas, userEvent }) => {
     const box = await canvas.findByRole("group", { name: "mix-2" });
     await userEvent.tab();
-    await expect(document.activeElement).toBe(box.parentElement);
+    const wrapper = box.parentElement;
+    await expect(document.activeElement).toBe(wrapper);
     await expect(getComputedStyle(box).outlineStyle).toBe("solid");
     await expect(box.querySelectorAll("[tabindex], a, button, input, select, textarea")).toHaveLength(0);
+    const before = wrapper?.style.transform;
+    await userEvent.keyboard("{Enter}");
+    await waitFor(() => expect(wrapper).toHaveClass("selected"));
+    await userEvent.keyboard("{ArrowRight}");
+    await waitFor(() => expect(wrapper?.style.transform).not.toBe(before));
   },
 };
 

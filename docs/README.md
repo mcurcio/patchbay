@@ -12,7 +12,7 @@ part is and takes).
 | [`patterns.md`](patterns.md) | Editing a live graph: the two commit models, adding, placing, connecting, inspecting, editing text, saving or queuing, refusals, following the view, going to a node, read-only, empty and offline, narrow and phone |
 | [`tokens.md`](tokens.md) | The design tokens, the light and dark themes, writing a brand and checking its contrast (`/testing`), the base stylesheet, and the tests that hold them |
 | [`components.md`](components.md) | The rules every component keeps, and each built component, the shell and each hook: what it is for, its props, its keyboard and touch behaviour |
-| [`graph.md`](graph.md) | The graph layer's built parts (`Meter`, the node geometry, `NodeBox`, `PortRow`, `useConnectHints`, `ConnectStatus`, `Wire`, `GhostWire`, `CanvasTools`, `useAddAt`, `useFollowFit`): props, how they move, and how they draw |
+| [`graph.md`](graph.md) | The graph layer's built parts (`Meter`, the node geometry, `NodeBox`, `PortRow`, `useConnectHints`, `connectTargets`, `ConnectStatus`, `Wire`, `GhostWire`, `CanvasTools`, `useAddAt`, `useFollowFit`): props, how they move, and how they draw |
 | [`design/`](design/patchbay.md) | Designs for work not built yet (`SchemaForm`, Storybook's screenshots, the overlay helper); when a part is built it moves into the pages above |
 
 A rule the code does not follow yet says so ("Not yet") and names the bead that holds the change.

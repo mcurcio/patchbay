@@ -10,7 +10,7 @@ while a wire is dragged).
 
 ```ts
 import "@xyflow/react/dist/style.css";
-import { CanvasTools, ConnectHints, ConnectStatus, GhostWire, mergeFlowProps, Meter, NodeBox, nodeBoxSize, PortRow, useAddAt, useConnectHints, useFollowFit, Wire } from "@mcurcio/patchbay/graph";
+import { CanvasTools, ConnectHints, ConnectStatus, connectTargets, GhostWire, mergeFlowProps, Meter, NodeBox, nodeBoxSize, PortRow, useAddAt, useConnectHints, useFollowFit, Wire } from "@mcurcio/patchbay/graph";
 ```
 
 Importing the layer loads its stylesheet (`dist/graph.css`) and imports `@xyflow/react` (React Flow
@@ -227,7 +227,35 @@ const hints = useConnectHints(canConnect);
   `PortRef` and `side`; `value.hintFor(port, side)` is the hint for one handle, as `PortRow` asks.
 - It draws nothing and has no keyboard path of its own: React Flow's connections are made with a
   pointer (or touch), and the keyboard's is the inspector's "Connect to"
-  ([patterns](patterns.md#connecting)).
+  ([patterns](patterns.md#connecting)), listed by [`connectTargets`](#connecttargets) from the
+  same rule.
+
+### `connectTargets`
+
+`connectTargets(port, side, candidates, canConnect) → { accepted, refused }` lists the ports one
+port may be joined to, for the inspector's "Connect to" [`Select`](components.md#forms), the
+keyboard's path for connecting ([U2](ux-rules.md#focus-and-keyboard),
+[U56](ux-rules.md#live-pending-queued-refused)). It judges by the same
+`canConnect` and the same verdicts as the hints and the drop, so the choice never offers what a
+drag would refuse.
+
+```tsx
+const { accepted } = connectTargets(port, "input", graphPorts, canConnect);
+<Select onChange={(e) => connect(e.target.value)}>{accepted.map((p) => <option key={key(p)} value={key(p)}>{name(p)}</option>)}</Select>
+```
+
+- **`port`** is a [`PortRef`](#useconnecthints) and `side` its side; **`candidates`** are the
+  app's ports as `ConnectCandidate`s (`PortRef` with its `side`), any type that carries those, so
+  each keeps the app's own fields (a label) through the lists.
+- **The verdicts.** The rule is asked with the output first, whichever side `port` is on, as a
+  drag would ask it: `true` accepts; `false` refuses; a string refuses and is the reason.
+  Candidates on `port`'s own side are not candidates, as in React Flow's strict connection mode,
+  and are in neither list. Each pair is asked once.
+- **`accepted`** is the accepted candidates in the order given; **`refused`** the refused ones on
+  the other side, in order, each `{ port, reason? }` with the rule's string when it gave one.
+- It is pure and draws nothing. The `Select`, its words and what choosing does (a request, or a
+  queued change, as a drop) are the app's. Moving a node from the keyboard is React Flow's own:
+  Enter selects the focused node and the arrow keys move it, which `NodeBox` leaves alone.
 
 ### `mergeFlowProps`
 

@@ -1,10 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import "@xyflow/react/dist/style.css";
 import { addEdge, type Connection, type Edge, ReactFlow, ReactFlowProvider, useEdgesState } from "@xyflow/react";
-import { expect, fireEvent, waitFor } from "storybook/test";
+import { useState } from "react";
+import { expect, fireEvent, userEvent, waitFor, within } from "storybook/test";
+import { Field, Panel, Select } from "../../primitives";
 import { measuredHandle } from "../../test/measured-handle";
 import { type BoxNode, storyNodeTypes } from "../../test/story-canvas";
 import { Wire } from "../wire";
+import { type ConnectCandidate, connectTargets } from "./connectTargets";
 import { mergeFlowProps } from "./mergeFlowProps";
 import { type CanConnect, ConnectHints, useConnectHints } from "./useConnectHints";
 
@@ -139,3 +142,124 @@ export const DragHarborDark: Story = { globals: { brand: "harbor", theme: "dark"
 
 /** And under the example ember brand in light. */
 export const DragEmberLight: Story = { globals: { brand: "ember", theme: "light" } };
+
+/** Every port on the canvas, as the app's graph lists them: the candidates a "Connect to" choice is judged from. */
+const ports: (ConnectCandidate & { label: string })[] = nodes.flatMap((node) => [
+  ...(node.data.inputs ?? []).map((p) => ({
+    nodeId: node.id,
+    handleId: p.id,
+    side: "input" as const,
+    label: p.label as string,
+  })),
+  ...(node.data.outputs ?? []).map((p) => ({
+    nodeId: node.id,
+    handleId: p.id,
+    side: "output" as const,
+    label: p.label as string,
+  })),
+]);
+
+const nameOf = (port: ConnectCandidate) => {
+  const node = nodes.find((n) => n.id === port.nodeId);
+  const label = ports.find((p) => p.nodeId === port.nodeId && p.handleId === port.handleId)?.label ?? "";
+  return `${typeof node?.data.title === "string" ? node.data.title : port.nodeId}: ${label}`;
+};
+
+/**
+ * The keyboard's path: an inspector for one node lists its ports, each with a "Connect to" Select of the ports
+ * `connectTargets` accepts for it, judged by the same rule as the drag. Choosing one makes the connection.
+ */
+function ConnectToDemo() {
+  const [edges, setEdges, onEdgesChange] = useEdgesState(startEdges);
+  const hints = useConnectHints(canConnect);
+  const [chosen, setChosen] = useState<Record<string, string>>({});
+  const mix = ports.filter((p) => p.nodeId === "mix");
+  const connect = (into: ConnectCandidate, key: string) => {
+    const from = ports.find((p) => `${p.nodeId}/${p.handleId ?? ""}` === key);
+    if (from === undefined) return;
+    setEdges((current) =>
+      addEdge(
+        {
+          source: from.nodeId,
+          sourceHandle: from.handleId,
+          target: into.nodeId,
+          targetHandle: into.handleId,
+          type: "wire",
+        },
+        current,
+      ),
+    );
+    setChosen((c) => ({ ...c, [into.handleId ?? ""]: "" }));
+  };
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) 280px", gap: "12px" }}>
+      <ConnectHints value={hints.value}>
+        <ReactFlowProvider>
+          <div style={{ width: "100%", height: "260px" }}>
+            <ReactFlow
+              defaultNodes={nodes}
+              edges={edges}
+              onEdgesChange={onEdgesChange}
+              nodeTypes={storyNodeTypes}
+              edgeTypes={edgeTypes}
+              defaultViewport={{ x: 24, y: 24, zoom: 0.8 }}
+              {...hints.flowProps}
+            />
+          </div>
+        </ReactFlowProvider>
+      </ConnectHints>
+      <Panel title="mix-2">
+        {mix.map((into) => {
+          const { accepted } = connectTargets(into, into.side, ports, canConnect);
+          return (
+            <Field key={into.handleId} label={`${into.label}: connect to`}>
+              <Select
+                value={chosen[into.handleId ?? ""] ?? ""}
+                disabled={accepted.length === 0}
+                onChange={(event) => {
+                  connect(into, event.target.value);
+                }}
+              >
+                <option value="">{accepted.length === 0 ? "No port takes it" : "Choose a port"}</option>
+                {accepted.map((from) => (
+                  <option key={`${from.nodeId}/${from.handleId ?? ""}`} value={`${from.nodeId}/${from.handleId ?? ""}`}>
+                    {nameOf(from)}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+          );
+        })}
+      </Panel>
+    </div>
+  );
+}
+
+/** Each input's choice lists only the outputs the rule accepts; choosing one draws the wire, as a drop would. */
+export const ConnectTo: Story = {
+  render: () => <ConnectToDemo />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const into = canvas.getByRole("combobox", { name: "in: connect to" });
+    const side = canvas.getByRole("combobox", { name: "side: connect to" });
+    await expect(
+      within(into)
+        .getAllByRole("option")
+        .map((o) => o.textContent),
+    ).toEqual(["Choose a port", "Tone 1: left", "Tone 1: right"]);
+    await expect(
+      within(side)
+        .getAllByRole("option")
+        .map((o) => o.textContent),
+    ).toEqual(["Choose a port", "Tone 1: gate"]);
+    await userEvent.selectOptions(into, "src/right");
+    await waitFor(() => expect(canvasElement.querySelectorAll(".pb-wire")).toHaveLength(1));
+    await expect(into).toHaveValue("");
+  },
+};
+
+/** Under the example harbor brand in dark. */
+export const ConnectToHarborDark: Story = { ...ConnectTo, globals: { brand: "harbor", theme: "dark" } };
+
+/** And under the example ember brand in light. */
+export const ConnectToEmberLight: Story = { ...ConnectTo, globals: { brand: "ember", theme: "light" } };
