@@ -1,0 +1,67 @@
+/* A ghost node (GhostNode.tsx): plainly a request and not yet a node. A dashed border in the quiet tone, faint (60 %),
+   with no surface of its own and no shadow, its words in the muted colour; as GhostWire, it is never under the
+   pointer. Its size is set by the component, from nodeBoxSize; the border is drawn inward so the size holds. */
+.pb-ghost-node {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  border: 1px dashed var(--pb-quiet);
+  border-radius: var(--pb-radius-box);
+  color: var(--pb-muted);
+  font-family: var(--pb-font-ui);
+  font-size: var(--pb-text-md);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* React Flow's wrapper takes pointer events when the app gives the canvas node handlers; a ghost never does. */
+.react-flow__node:has(> .pb-ghost-node) {
+  pointer-events: none !important;
+}
+
+.pb-ghost-node-header {
+  box-sizing: border-box;
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  height: var(--pb-node-header);
+  padding-inline: calc(4px + var(--pb-space-3)) var(--pb-space-3);
+}
+
+.pb-ghost-node-title,
+.pb-ghost-node-subtitle,
+.pb-ghost-node-line {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pb-ghost-node-title {
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.pb-ghost-node-subtitle {
+  font-size: var(--pb-text-sm);
+  line-height: 1.3;
+}
+
+.pb-ghost-node-line {
+  box-sizing: border-box;
+  flex: none;
+  height: var(--pb-node-line);
+  padding-inline: calc(4px + var(--pb-space-3)) var(--pb-space-3);
+  font-size: var(--pb-text-sm);
+  line-height: var(--pb-node-line);
+}
+
+/* Forced colours: the dashes stay, in the system's grey, as a ghost wire's. */
+@media (forced-colors: active) {
+  .pb-ghost-node {
+    border-color: GrayText;
+    color: GrayText;
+  }
+}

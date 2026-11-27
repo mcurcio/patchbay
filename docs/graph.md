@@ -10,7 +10,7 @@ while a wire is dragged).
 
 ```ts
 import "@xyflow/react/dist/style.css";
-import { CanvasTools, ConnectHints, ConnectStatus, connectTargets, EmptyCanvasHint, GhostWire, mergeFlowProps, Meter, NodeBox, nodeBoxSize, PortRow, useAddAt, useConnectHints, useFollowFit, Wire } from "@mcurcio/patchbay/graph";
+import { CanvasTools, ConnectHints, ConnectStatus, connectTargets, EmptyCanvasHint, GhostNode, GhostWire, mergeFlowProps, Meter, NodeBox, nodeBoxSize, PortRow, useAddAt, useConnectHints, useFollowFit, Wire } from "@mcurcio/patchbay/graph";
 ```
 
 Importing the layer loads its stylesheet (`dist/graph.css`) and imports `@xyflow/react` (React Flow
@@ -314,7 +314,7 @@ drawn on the canvas itself in React Flow's `<Panel>`, gone with the first node
 | Prop | What it is |
 |---|---|
 | `children?` | The app's own words, above the gestures; none by default |
-| `empty?` | Whether the graph is empty; without it, while React Flow holds no nodes. An app that draws a node that is not yet the graph's (a ghost of a node being added) passes it |
+| `empty?` | Whether the graph is empty; without it, while React Flow holds no nodes. An app that draws a node that is not yet the graph's (a [`GhostNode`](#ghostnode)) passes it |
 | `add?` | Whether adding is on, so the gestures are said; `true` by default. Pass `useAddAt`'s `enabled`, so a read-only graph keeps the app's words alone. With neither words nor gestures it draws nothing |
 | `keys?` | The app's add key, a key string as [`useShortcuts`](components.md#useshortcuts) takes it (`"A"`), written through `keyLabel` after the gestures; the hint binds nothing |
 | `platform?` | The platform the key is written for; the browser's by default |
@@ -389,6 +389,33 @@ removes it when the request is answered; a refused one goes with the toast that 
   no hit path, and takes no pointer events: it is a sign of a request, not a thing to act on. Its
   drawing is `aria-hidden`; React Flow's wrapper names the edge as it names any.
 - **Forced colours:** the dashes in `GrayText`, `CanvasText` when refused.
+
+## `GhostNode`
+
+An add on its way, before the app's graph holds the node: a node type the app registers as
+`ghost` (`nodeTypes={{ ghost: GhostNode }}`) and places at the point the add was asked, with
+`selectable`, `focusable`, `deletable`, `draggable` and `connectable` false, removing it when the
+request is answered ([U51, U52](ux-rules.md#live-pending-queued-refused)). `data` is a
+`GhostNodeData` (`type GhostNodeNode = Node<GhostNodeData, "ghost">`):
+
+| `GhostNodeData` | What it is |
+|---|---|
+| `title` | `ReactNode`, the node's name as it will be (`type 2`); one line, cut with an ellipsis |
+| `subtitle?` | `ReactNode`, the second header line (its type) |
+| `line?` | `ReactNode`, one row under the header ("Adding"); none by default |
+| `inputs?`, `outputs?`, `ports?`, `footer?`, `width?` | The shape of the node it stands for, as [`nodeBoxSize`](#geometry) takes it (no ports, stacked, no footer, `NODE_WIDTH` by default), so the ghost takes the room the node will |
+
+- **Size.** `ghostNodeSize(data)` is `nodeBoxSize` of that shape, its `line` counting as the node's
+  line row; the ghost is drawn at that size, its 1 px border inside it, so a layout that sized the
+  node sizes the ghost.
+- **Look.** A 1 px dashed border in `--pb-quiet` with the box radius, no surface and no shadow, its
+  words in `--pb-muted` (the title at weight 600, the subtitle and line in `--pb-text-sm`), at 60 %
+  opacity, as a pending [`GhostWire`](#ghostwire) is ([F9](foundations.md#tones)). It has no
+  handles and no tone: a refused add's reason stays where it was asked (the form), and the ghost
+  goes. **Forced colours:** the dashes and the words in `GrayText`.
+- **Not a thing.** It takes no pointer events, nor does React Flow's wrapper round it (even when
+  the app gives the canvas node handlers), so a press on it reaches the canvas. Its drawing is
+  `aria-hidden`: the busy button that sent the request says it is on its way. It does not animate.
 
 ## `CanvasTools`
 

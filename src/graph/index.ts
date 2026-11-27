@@ -7,6 +7,7 @@ export * from "./connect-hints";
 export * from "./connect-status";
 export * from "./empty-canvas-hint";
 export * from "./follow-fit";
+export * from "./ghost-node";
 export * from "./ghost-wire";
 export * from "./meter";
 export * from "./node-box";

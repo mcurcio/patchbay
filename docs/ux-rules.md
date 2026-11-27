@@ -208,15 +208,16 @@ are F10's:
 | State | Means | A wire | A node | A button or text |
 |---|---|---|---|---|
 | Live | The source holds it | [`Wire`](graph.md#wire) in its tone | [`NodeBox`](graph.md#nodebox) in its tone | — |
-| Pending | Asked, no answer yet | [`GhostWire`](graph.md#ghostwire) `pending` | A ghost NodeBox (not yet: pb-nx9.82) | Button `busy` with `busyLabel` |
+| Pending | Asked, no answer yet | [`GhostWire`](graph.md#ghostwire) `pending` | [`GhostNode`](graph.md#ghostnode) | Button `busy` with `busyLabel` |
 | Queued | Changed here, not saved | Wire in a change tone, `dashed` | NodeBox `change` | A "queued" or "unsaved" status word |
 | Refused | The source or a check said no | GhostWire `refused`, or a queued wire in `err` | NodeBox `failed` and its `line` | Field `error`, Banner, toast |
 | Stale | Changed underneath what is being edited | — | — | A `warn` Banner with the recovery |
 
 - **U51. Draw the asking, never the answer.** A pending request is drawn as a request until the
-  source answers. **Built:** GhostWire; **the app's:** removing it when answered.
+  source answers. **Built:** GhostWire, GhostNode; **the app's:** removing it when answered.
 - **U52. A ghost is not a thing.** It is drawn dashed and faint, takes no pointer events, and is not
-  selectable, focusable or deletable. **Built:** GhostWire ([`graph.md`](graph.md#ghostwire)).
+  selectable, focusable or deletable. **Built:** GhostWire ([`graph.md`](graph.md#ghostwire)),
+  GhostNode ([`graph.md`](graph.md#ghostnode)); **the app's:** the flags on its edge or node.
 - **U53. Queued is a change tone and dashes.** A queued wire is a change tone, dashed; a queued
   node has its change border and badge; removed strikes the title. **Built:** Wire, NodeBox.
 - **U54. Selected wins over tone.** **Built:** Wire.

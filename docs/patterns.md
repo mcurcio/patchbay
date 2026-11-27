@@ -36,8 +36,8 @@ Every pattern below holds in both; where they differ, it says so.
    Its name defaults to its type, numbered (`type 2`), so it never needs a name to be added.
 4. They add it. The node appears when the source holds it (U61), at the point it was asked.
 
-**States:** while the request is out, the form's Add button is busy (U5) and a ghost NodeBox
-stands at the point (not yet: pb-nx9.82). A refusal stays in the form, in words (U59).
+**States:** while the request is out, the form's Add button is busy (U5) and a
+[`GhostNode`](graph.md#ghostnode) stands at the point, in the room the node will take. A refusal stays in the form, in words (U59).
 
 **Keyboard and touch:** the palette's add commands and `A` are the double-click's keyboard path
 (U2). On touch a double-tap adds, and a wire dropped on empty canvas works by touch
