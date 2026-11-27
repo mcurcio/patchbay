@@ -292,6 +292,16 @@ describe("CommandPalette", () => {
     expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)[^@]*animation: none/);
     expect(css).toMatch(/@media \(forced-colors: active\)[^@]*Highlight/);
   });
+
+  it("writes the active row out whole, and every row on touch, where a tap runs a row before it is active", () => {
+    // The rows are measured in Chromium by the LongRows story; here, that the rules are there.
+    expect(css).toMatch(
+      /\[aria-selected="true"\] :is\(\.pb-palette-label, \.pb-palette-hint\) \{[^}]*white-space: normal/,
+    );
+    expect(css).toMatch(
+      /@media \(hover: none\) and \(pointer: coarse\)[^@]*\.pb-palette-hint \{[^}]*white-space: normal/,
+    );
+  });
 });
 
 describe("placePalette", () => {

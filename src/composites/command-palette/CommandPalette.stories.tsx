@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { expect, fn, screen, waitFor } from "storybook/test";
+import { underTouch } from "../../test/touch-rules";
 import { Button } from "../../primitives";
 import { type Command, type CommandPaletteProps, CommandPalette } from "./CommandPalette";
 
@@ -51,6 +52,56 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
+
+const long: Command[] = [
+  {
+    id: "route",
+    label: "Connect every selected output to the nearest free input of the same type on any node in view",
+    group: "Edit",
+    hint: "Joins the outputs of the three selected nodes, one wire each, skipping any input already taken",
+    keys: "Mod+J",
+    run: fn(),
+  },
+  {
+    id: "route-all",
+    label: "Connect every output in the whole graph to the nearest free input of the same type on any node",
+    group: "Edit",
+    hint: "Joins every output that has no wire yet, across the whole graph, one wire each, skipping any input already taken",
+    run: fn(),
+  },
+];
+
+/** True when an element's text is cut: wider than its box, on one line. */
+const cut = (element: Element | null | undefined) =>
+  element instanceof HTMLElement && element.scrollWidth > element.clientWidth;
+
+/**
+ * A row too long for the box: cut with an ellipsis at rest, and written out whole, wrapping, while it is the active
+ * row, so a keyboard user reads it without hovering (F20, U47). On touch, where a tap runs a row without making it
+ * active, every row is written out.
+ */
+export const LongRows: Story = {
+  args: { commands: long },
+  play: async ({ userEvent }) => {
+    const [first, second] = screen.getAllByRole("option");
+    await expect(first).toHaveAttribute("aria-selected", "true");
+    await expect(cut(first?.querySelector(".pb-palette-label"))).toBe(false);
+    await expect(cut(first?.querySelector(".pb-palette-hint"))).toBe(false);
+    await expect(cut(second?.querySelector(".pb-palette-label"))).toBe(true);
+    await expect(cut(second?.querySelector(".pb-palette-hint"))).toBe(true);
+    await expect(first?.getBoundingClientRect().height).toBeGreaterThan(second?.getBoundingClientRect().height ?? 0);
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(second).toHaveAttribute("aria-selected", "true");
+    await expect(cut(second?.querySelector(".pb-palette-label"))).toBe(false);
+    await expect(cut(first?.querySelector(".pb-palette-label"))).toBe(true);
+    await underTouch(async () => {
+      for (const option of [first, second]) {
+        await expect(cut(option?.querySelector(".pb-palette-label"))).toBe(false);
+        await expect(cut(option?.querySelector(".pb-palette-hint"))).toBe(false);
+      }
+    });
+  },
+};
 
 /** Centred near the top, every command in its group, the first active. */
 export const Centred: Story = {

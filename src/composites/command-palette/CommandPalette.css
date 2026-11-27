@@ -118,6 +118,15 @@
   white-space: nowrap;
 }
 
+/* The active row is written out whole, wrapping, so a label or hint cut in its resting row is read without hovering
+   (docs/foundations.md#type, F20; U47); the touch block below writes every row out, as a tap runs a row without making it
+   active first. */
+.pb-palette-option[aria-selected="true"] :is(.pb-palette-label, .pb-palette-hint) {
+  overflow: visible;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
 .pb-palette-label mark {
   color: var(--pb-accent);
   font-weight: 600;
@@ -176,6 +185,13 @@
 
   .pb-palette-option {
     min-height: 40px;
+  }
+
+  .pb-palette-label,
+  .pb-palette-hint {
+    overflow: visible;
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
 }
 

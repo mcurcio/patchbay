@@ -172,10 +172,10 @@ cite them. How to read a rule (Built, The app's, Not yet):
 - **U47. No fact only in a tooltip.** A native tooltip shows on neither touch nor keyboard focus, so
   whatever a `title` says is also in words elsewhere: the inspector, a node's line, or the canvas's
   status line, which also says why a port refuses while a wire is dragged (U59). Tooltips stay, as
-  a convenience. **Not yet:** a wire's `title`, a meter's numbers, the gutter mark's list of
+  a convenience. **Built:** CommandPalette, whose active row (every row on touch) is written out
+  whole (F20). **Not yet:** a wire's `title`, a meter's numbers, the gutter mark's list of
   diagnostics and a cut node title are in a tooltip only, with no place named for their words
-  (pb-nx9.79); the canvas has no status line (pb-nx9.78); a cut palette row
-  (pb-nx9.80).
+  (pb-nx9.79); the canvas has no status line (pb-nx9.78).
 
 ## Confirmation and undo
 

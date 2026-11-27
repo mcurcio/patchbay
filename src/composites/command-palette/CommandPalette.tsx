@@ -174,7 +174,10 @@ function OpenPalette({ onClose, commands, at, platform, labels, className }: Omi
   };
 
   const pageSize = () => {
-    const option = list.current?.querySelector<HTMLElement>('[role="option"]');
+    // A resting row: the active one is written out whole, so it may be taller.
+    const option =
+      list.current?.querySelector<HTMLElement>('[role="option"]:not([aria-selected="true"])') ??
+      list.current?.querySelector<HTMLElement>('[role="option"]');
     const rows =
       option && option.offsetHeight > 0 ? Math.floor((list.current?.clientHeight ?? 0) / option.offsetHeight) : 0;
     return Math.max(1, rows || fallbackPage);

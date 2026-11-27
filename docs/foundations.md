@@ -97,8 +97,10 @@ The change tones draw an edit that is queued, not true yet (F10):
 - **F20. One line truncates, and the whole is readable elsewhere.** A one-line label (a node's
   title and line, a port's label, a palette row's label and hint) ends in an ellipsis, and its
   whole text is written out somewhere a person can read it without hovering (U47): a node's in the
-  inspector, which the app titles with it. **Built:** NodeBox, PortRow (cut, with a tooltip).
-  **Not yet:** a cut palette row is whole only in its accessible name: pb-nx9.80.
+  inspector, which the app titles with it; a palette row's in the row itself while it is the
+  active one, and in every row on touch, where a tap runs a row before it is active. **Built:**
+  NodeBox, PortRow (cut, with a tooltip), CommandPalette
+  ([`components.md`](components.md#commands-and-keys)).
 
 ## Space
 

@@ -363,6 +363,10 @@ none by default) and `className?`.
   second line (what the command does, or what it acts on), shown but not matched. A `disabled`
   command is listed, dimmed and `aria-disabled`; the keys skip it and a press on it does nothing.
   An option's name is its words as shown: the label, the hint and the keys.
+- **Long rows.** A label or hint too long for its row ends in an ellipsis at rest, and the active
+  row writes both out whole, wrapping, so the keyboard reads a cut row by moving to it
+  ([F20](foundations.md#type)); on touch every row is written out, as a tap runs a row without
+  making it active first.
 - **Matching.** The query matches a label when its letters appear in it in order, in any case,
   white space ignored ("adn" matches "Add a node"). The best way the letters can be found is kept:
   the label's start and the start of a word (after a space or a mark, or a capital after a small
