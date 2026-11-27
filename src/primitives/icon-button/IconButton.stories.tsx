@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, fn } from "storybook/test";
+import { expect, fn, waitFor } from "storybook/test";
+import { tokenColor } from "../../test/token-color";
+import { underTouch } from "../../test/touch-rules";
 import { IconButton } from "./IconButton";
 
 const meta = {
@@ -21,6 +23,24 @@ export const Neutral: Story = {
     await expect(button).toHaveAttribute("title", "Zoom in");
     await userEvent.click(button);
     await expect(args.onClick).toHaveBeenCalledOnce();
+  },
+};
+
+/**
+ * On a touch screen, where nothing hovers, it is a 36 px target with its line-strong edge at rest, so it can be found.
+ * A desktop browser matches no coarse pointer, so the story applies the page's touch rules while it measures.
+ */
+export const Touch: Story = {
+  play: async ({ canvas, canvasElement }) => {
+    const button = canvas.getByRole("button", { name: "Zoom in" });
+    // Read once: tokenColor draws a probe, and a waitFor that drew one would wake itself on its own change.
+    const edge = tokenColor(canvasElement, "line-strong");
+    await expect(getComputedStyle(button).borderTopColor).not.toBe(edge);
+    await underTouch(async () => {
+      await expect(button.getBoundingClientRect().width).toBe(36);
+      // The edge fades in over --pb-motion-fast.
+      await waitFor(() => expect(getComputedStyle(button).borderTopColor).toBe(edge));
+    });
   },
 };
 

@@ -172,8 +172,9 @@ Reduced motion: [ux-rules](ux-rules.md#reduced-motion).
   `-webkit-tap-highlight-color: transparent`. **Built:** Button, ToolGroup, ThemeSwitch, Checkbox,
   RadioGroup, Splitter, DiffView.
 - **F40. A target can be found without hover.** On touch, an IconButton has its `line-strong` edge
-  at rest and a Splitter draws its grip (a short bar) at rest. **Not yet:** both appear only on
-  hover or touch: pb-nx9.85.
+  at rest and a Splitter draws its grip (a short bar) at rest. **Built:** IconButton, Splitter
+  ([`components.md`](components.md#actions), IconButton; [`components.md`](components.md#layout),
+  Splitter).
 
 ## Widths
 

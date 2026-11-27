@@ -1,8 +1,9 @@
 /* A splitter (Splitter.tsx): a 6 px bar straddling one edge of its positioned parent, placed by logical properties
    (a vertical one's start is the inline start, the right in right-to-left text), transparent until hovered, focused
    or dragged, when its accent fill is the cue. Focus also draws the 2 px accent ring every control has, 1 px clear of
-   the bar as a packed control's is (docs/ux-rules.md#focus-and-keyboard, U1). On touch its hit area grows to 36 px
-   while the bar drawn stays thin. */
+   the bar as a packed control's is (docs/ux-rules.md#focus-and-keyboard, U1). On touch, where nothing hovers, it
+   draws its grip at rest, a short bar in line-strong across its middle, so it can be found
+   (docs/foundations.md#density-and-touch, F40); its hit area grows to 36 px while the bar drawn stays thin. */
 .pb-splitter {
   position: absolute;
   z-index: 5;
@@ -52,8 +53,37 @@
   outline-offset: 1px;
 }
 
-/* Touch: an invisible hit area 36 px across, centred on the bar. */
+/* Touch: an invisible hit area 36 px across, centred on the bar, and the grip: 4 px by 32 px (32 by 4 when
+   horizontal), centred, gone while the bar fills. */
 @media (hover: none) and (pointer: coarse) {
+  .pb-splitter::after {
+    content: "";
+    position: absolute;
+    border-radius: var(--pb-radius-pill);
+    background: var(--pb-line-strong);
+    pointer-events: none;
+  }
+
+  .pb-splitter[data-orientation="vertical"]::after {
+    inset-block-start: calc(50% - 16px);
+    inset-inline-start: 1px;
+    width: 4px;
+    height: 32px;
+  }
+
+  .pb-splitter[data-orientation="horizontal"]::after {
+    inset-inline-start: calc(50% - 16px);
+    inset-block-start: 1px;
+    width: 32px;
+    height: 4px;
+  }
+
+  .pb-splitter:hover::after,
+  .pb-splitter:focus-visible::after,
+  .pb-splitter[data-dragging]::after {
+    display: none;
+  }
+
   .pb-splitter::before {
     content: "";
     position: absolute;
@@ -70,8 +100,13 @@
   }
 }
 
-/* Forced colours: the system's highlight marks the bar while it is the one in use. */
+/* Forced colours: the system's highlight marks the bar while it is the one in use; the touch grip is the text colour. */
 @media (forced-colors: active) {
+  .pb-splitter::after {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+
   .pb-splitter:hover,
   .pb-splitter:focus-visible,
   .pb-splitter[data-dragging] {

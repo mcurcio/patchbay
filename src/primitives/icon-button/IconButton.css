@@ -1,5 +1,6 @@
 /* A square glyph button (IconButton.tsx) on Button's rules: no face or edge until hovered, pressed or given a tone,
-   as in a tool group. */
+   as in a tool group. On touch, where nothing hovers, it has its line-strong edge at rest, so it can be found
+   (docs/foundations.md#density-and-touch, F40); a tool group's frame does that for its own. */
 .pb-button.pb-icon-button {
   width: 28px;
   min-width: 28px;
@@ -48,13 +49,17 @@
   line-height: 1;
 }
 
-/* Touch: a 36 px target whatever the size (a tool group makes its own 40). */
+/* Touch: a 36 px target whatever the size (a tool group makes its own 40), edged at rest. */
 @media (hover: none) and (pointer: coarse) {
   .pb-button.pb-icon-button,
   .pb-button.pb-icon-button[data-size="sm"] {
     width: 36px;
     min-width: 36px;
     height: 36px;
+  }
+
+  .pb-button.pb-icon-button:not(:disabled, [data-tone="primary"]) {
+    border-color: var(--pb-line-strong);
   }
 }
 

@@ -67,6 +67,10 @@ describe("IconButton", () => {
     const touch = /@media \(hover: none\) and \(pointer: coarse\)\s*\{([\s\S]*?)\n\}/.exec(css);
     expect(touch?.[1]).toMatch(/width: 36px/);
     expect(touch?.[1]).toMatch(/height: 36px/);
+    // Edged at rest on touch, where nothing hovers, so it can be found.
+    expect(touch?.[1]).toMatch(
+      /:not\(:disabled, \[data-tone="primary"\]\) \{\s*border-color: var\(--pb-line-strong\);/,
+    );
   });
 
   it("takes a tone it does not know, and its stylesheet styles only the ones Button knows", () => {

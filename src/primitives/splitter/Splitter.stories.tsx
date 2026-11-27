@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { expect, fn, waitFor } from "storybook/test";
 import { tokenColor } from "../../test/token-color";
+import { underTouch } from "../../test/touch-rules";
 import { Splitter, type SplitterProps } from "./Splitter";
 
 /** The splitter on the edge of a pane it resizes, inside a frame, with the size held by the story as an app holds it. */
@@ -179,6 +180,26 @@ export const Focused: Story = {
     await expect(style.outlineColor).toBe(accent);
     // The fill fades in over --pb-motion-fast.
     await waitFor(() => expect(getComputedStyle(splitter).backgroundColor).toBe(accent));
+  },
+};
+
+/**
+ * On a touch screen, where nothing hovers, the bar draws its grip at rest (a short line-strong bar across its middle),
+ * so it can be found; its hit area is 36 px across. A desktop browser matches no coarse pointer, so the story applies
+ * the page's touch rules while it measures.
+ */
+export const Touch: Story = {
+  play: async ({ canvas, canvasElement }) => {
+    const splitter = canvas.getByRole("separator");
+    const edge = tokenColor(canvasElement, "line-strong");
+    await expect(getComputedStyle(splitter, "::after").content).toBe("none");
+    await underTouch(async () => {
+      const grip = getComputedStyle(splitter, "::after");
+      await expect(grip.backgroundColor).toBe(edge);
+      await expect(grip.width).toBe("4px");
+      await expect(grip.height).toBe("32px");
+      await expect(getComputedStyle(splitter, "::before").width).toBe("36px");
+    });
   },
 };
 

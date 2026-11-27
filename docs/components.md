@@ -91,7 +91,9 @@ pressed). `label` (required) is its accessible name and, unless `title` is given
 `children` is the glyph, hidden from screen readers. A glyph has no words to swap, so while busy a
 `busyLabel` becomes its name and (unless `title` is given) its tooltip, and is announced as on
 `Button`; the spinner covers the glyph as without one. 28 px (22 px when `sm`), borderless until
-hovered, pressed or toned; 36 px on touch, 40 px in a `ToolGroup`.
+hovered, pressed or toned; 36 px on touch, edged in `--pb-line-strong` at rest there (not when
+disabled), as nothing hovers ([F40](foundations.md#density-and-touch)); 40 px in a `ToolGroup`,
+whose frame is the edge.
 
 **`ThemeSwitch`**: one button that cycles system, light and dark. `choice`, `onChoose(next)`,
 `labels?` (its words, [rule 8](#rules-every-component-keeps): `theme`, `system`, `light`, `dark`,
@@ -208,6 +210,9 @@ inspector"), `edge?: "start" | "end"` (which edge of the pane it sits on, `start
   `data-dragging` while dragging.
 - **Look:** transparent until hovered, focused or dragged, when the bar fills in the accent. Focus
   also draws the 2 px accent ring, 1 px clear of the bar ([U1](ux-rules.md#focus-and-keyboard)).
+  On touch, where nothing hovers, it draws its grip at rest: a 4 by 32 px bar in
+  `--pb-line-strong` across its middle, gone while it fills
+  ([F40](foundations.md#density-and-touch)).
 - It sits absolutely on one edge of its positioned parent, placed with logical properties
   (`inset-inline-start`, `inset-block-end`). The bar is 6 px; on touch its hit area is 36 px.
 

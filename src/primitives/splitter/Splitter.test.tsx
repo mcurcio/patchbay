@@ -250,5 +250,8 @@ describe("Splitter", () => {
     // 6 px bar, 15 px either side.
     expect(css).toMatch(/width: 6px/);
     expect(touch.match(/inset-(?:inline|block): -15px/g)).toHaveLength(2);
+    // The grip, drawn at rest so the bar can be found without hover, and gone while the bar fills.
+    expect(touch).toMatch(/\.pb-splitter::after \{[^}]*background: var\(--pb-line-strong\);/);
+    expect(touch).toMatch(/\.pb-splitter\[data-dragging\]::after \{\s*display: none;/);
   });
 });
