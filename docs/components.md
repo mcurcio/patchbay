@@ -345,7 +345,7 @@ none by default) and `className?`.
   the label's start and the start of a word (after a space or a mark, or a capital after a small
   letter) score more, letters together score more, gaps and a late start less. Each group's
   matches go best first and the groups by their best, ties in the order given; the matched letters
-  are drawn in `<mark>`, in the accent and bold (underlined under forced colours), so a match never
+  are drawn in `<mark>`, in the accent at weight 600 (underlined under forced colours), so a match never
   rests on colour alone. An empty query lists every command as given. `rankCommands(commands,
   query)`, `matchSubsequence(text, query)` and `markRuns(label, indices)` are the same steps,
   exported and pure.

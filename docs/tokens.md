@@ -180,8 +180,8 @@ blanks stylesheets otherwise) and fails:
   dependency is kept at the newest minor of the [supported range](graph.md#the-graph-layer));
 - when a stylesheet or component under `src/` outside `tokens/` (stories and tests aside) holds a
   colour of its own (a hex value, `rgb()`, `hsl()`, `white` or `black`); when a stylesheet holds a
-  duration of its own (`120ms`, `0.8s`), a radius other than a token or `0`, or a shadow other than
-  a token or `none`; or when a component sets a radius, shadow, transition or animation in an
-  inline style. `base.css` is held to the stylesheet rules.
+  duration of its own (`120ms`, `0.8s`), a radius other than a token or `0`, a shadow other than
+  a token or `none`, or a font weight above 600 (`bold` included); or when a component sets a
+  radius, shadow, transition or animation in an inline style. `base.css` is held to the stylesheet rules.
 
 A failing pair changes the value, not the rule.

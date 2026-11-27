@@ -83,8 +83,8 @@ The change tones draw an edit that is queued, not true yet (F10):
   text, badges, hints, ports and group headings ([`tokens.md`](tokens.md#the-tokens), Type).
 - **F15. Titles, headings and emphasis.** Panel, Dialog, Sheet, SectionTitle and NodeBox titles are
   `text-md` at weight 600. Group headings (a palette's, a shortcut sheet's) are `text-sm` at 600 in
-  `muted`. Emphasis is 600, never more. **Built:** their stylesheets. **Not yet:** the palette's
-  matched letters and WarnMark's "!" are at 700: pb-nx9.72.
+  `muted`. Emphasis is 600, never more, the palette's matched letters and WarnMark's "!" included
+  ([`tokens.md`](tokens.md#the-tests)). **Built:** their stylesheets.
 - **F16. Code face for code.** A value written as code takes `--pb-font-code`: `font="code"` on
   TextInput and Select, port types, a Pill's `detail`, key caps, code boxes.
 - **F17. One code size.** `--pb-code-size` is shared by a code box's textarea, highlighted copy and
