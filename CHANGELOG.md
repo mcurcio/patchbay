@@ -1,3 +1,16 @@
+## [0.10.0](https://github.com/mcurcio/patchbay/compare/v0.9.0...v0.10.0) (2026-11-27)
+
+### ⚠ BREAKING CHANGES
+
+* WireTone no longer includes "pending". Draw a request on its way as GhostWire tone="pending", and a queued wire as a change tone (added, removed, renamed or changed) with dashed: true.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01MtEdSTqe5tHiATcH6Si3jB
+
+### Features
+
+* tones, right-to-left and access fixes, connecting and adding parts, and one glyph grid ([#16](https://github.com/mcurcio/patchbay/issues/16)) ([044d5b1](https://github.com/mcurcio/patchbay/commit/044d5b1f477939bd3ba9eae94f491c0fbbe17617))
+
 ## [0.9.0](https://github.com/mcurcio/patchbay/compare/v0.8.0...v0.9.0) (2026-11-26)
 
 ### ⚠ BREAKING CHANGES
