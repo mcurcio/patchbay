@@ -46,7 +46,7 @@ export const UnknownTone: Story = {
 /** Every tone together, for a glance under each brand and theme. */
 export const All: Story = {
   args: {
-    items: ["err", "warn", "ok", "quiet", "off", "sleeping"].map((tone) => ({ tone, label: tone })),
+    items: ["err", "warn", "ok", "quiet", "off", "accent", "muted", "sleeping"].map((tone) => ({ tone, label: tone })),
   },
 };
 

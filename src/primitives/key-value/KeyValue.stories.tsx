@@ -35,6 +35,8 @@ export const Tones: Story = {
       { key: "Synced", value: "no", tone: "err", title: "Hover: why it matters" },
       { key: "Idle", value: "since 12:04", tone: "quiet" },
       { key: "Schedule", value: "off", tone: "off" },
+      { key: "Owner", value: "you", tone: "accent" },
+      { key: "Kind", value: "filter", tone: "muted" },
       { key: "Mystery", value: "plain", tone: "unheard-of" },
     ],
   },

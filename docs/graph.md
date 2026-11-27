@@ -234,7 +234,7 @@ const edge: WireEdge = { id, source, sourceHandle, target, targetHandle, type: "
 
 | `WireData` | What it is |
 |---|---|
-| `tone?` | [`Pill`](components.md#state)'s tones (`ok`, `warn`, `err`, `quiet`, `off`, `accent`, `muted`), the changes (`added` in `--pb-added`, `removed` in `--pb-removed`, `changed` in `--pb-warn`) and `refused` (`--pb-err`); open. None, or one it does not know, is React Flow's edge stroke (`--xy-edge-stroke`, which `tokens.css` points at `--pb-muted`). Selected, the wire is `--pb-accent` whatever its tone |
+| `tone?` | [`Pill`](components.md#state)'s tones (`ok`, `warn`, `err`, `quiet`, `off`, `accent`, `muted`), the changes (`added` in `--pb-added`, `removed` in `--pb-removed`, `renamed` in `--pb-renamed`, `changed` in `--pb-warn`) and `refused` (`--pb-err`); open. None, or one it does not know, is React Flow's edge stroke (`--xy-edge-stroke`, which `tokens.css` points at `--pb-muted`). Selected, the wire is `--pb-accent` whatever its tone |
 | `emphasis?` | The signal's level, `0` to `1` (clamped; not a number is `0`): 1.5 px to 3.5 px thick and from 45 % to full opacity. None is the plain wire, 1.5 px at full opacity |
 | `dashed?` | Dashes (6 on, 4 off). A queued edit is `tone` (a change) and `dashed`; a request on its way is a [`GhostWire`](#ghostwire), not a `Wire` |
 | `flow?` | Round dots 12 px apart moving along the wire toward the input, one period per `--pb-motion-flow` |

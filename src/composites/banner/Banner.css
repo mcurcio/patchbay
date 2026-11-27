@@ -38,6 +38,14 @@
   border-inline-start-color: var(--pb-off);
 }
 
+.pb-banner[data-tone="accent"] {
+  border-inline-start-color: var(--pb-accent);
+}
+
+.pb-banner[data-tone="muted"] {
+  border-inline-start-color: var(--pb-muted);
+}
+
 .pb-banner-text {
   flex: 1 1 12em;
   min-width: 0;

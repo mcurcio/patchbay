@@ -80,7 +80,7 @@ describe("Toaster", () => {
     expect(screen.getByRole("status")).toHaveTextContent("Idle.");
     expect(screen.getByRole("listitem")).toHaveAttribute("data-tone", "sleeping");
     const tones = new Set([...css.matchAll(/data-tone="([^"]+)"/g)].map((match) => match[1]));
-    expect([...tones].sort()).toEqual(["err", "off", "ok", "quiet", "warn"]);
+    expect([...tones].sort()).toEqual(["accent", "err", "muted", "off", "ok", "quiet", "warn"]);
   });
 
   it("puts the newest nearest the edge: last at the bottom, first at the top", () => {

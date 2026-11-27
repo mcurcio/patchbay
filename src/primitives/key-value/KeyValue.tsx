@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import "./KeyValue.css";
 
 /** The tones a value draws in; any other string leaves it plain. */
-export type KeyValueTone = "ok" | "warn" | "err" | "quiet" | "off" | (string & {});
+export type KeyValueTone = "ok" | "warn" | "err" | "quiet" | "off" | "accent" | "muted" | (string & {});
 
 export type KeyValueRow = {
   /** The fact's name. */

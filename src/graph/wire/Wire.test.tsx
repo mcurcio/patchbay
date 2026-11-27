@@ -54,7 +54,7 @@ describe("Wire", () => {
     expect(none.container.querySelector(".react-flow__edge-interaction")).toBeNull();
   });
 
-  it.each(["ok", "refused", "added", "maybe"])("marks the tone %s for the stylesheet", (tone) => {
+  it.each(["ok", "refused", "added", "renamed", "maybe"])("marks the tone %s for the stylesheet", (tone) => {
     const { container } = draw({ tone });
     expect(group(container)).toHaveAttribute("data-tone", tone);
   });
@@ -145,6 +145,24 @@ describe("Wire's stylesheet", () => {
   it("draws the level as width and brightness from the variable", () => {
     expect(plain).toMatch(/stroke-width: calc\(1\.5px \+ 2px \* var\(--pb-wire-emphasis\)\)/);
     expect(plain).toMatch(/stroke-opacity: calc\(0\.45 \+ 0\.55 \* var\(--pb-wire-emphasis\)\)/);
+  });
+
+  it("draws the seven state tones, the four change tones and refused", () => {
+    const tones = new Set([...plain.matchAll(/data-tone="([^"]+)"/g)].map((match) => match[1]));
+    expect([...tones].sort()).toEqual([
+      "accent",
+      "added",
+      "changed",
+      "err",
+      "muted",
+      "off",
+      "ok",
+      "quiet",
+      "refused",
+      "removed",
+      "renamed",
+      "warn",
+    ]);
   });
 
   it("has no pending tone: a request on its way is GhostWire's, and a queued wire a change tone", () => {

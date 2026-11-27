@@ -48,8 +48,7 @@ The change tones draw an edit that is queued, not true yet (F10):
 
 - **F6. One tone set.** Every component that takes a tone takes all seven state tones, and every
   one that draws edits takes all four change tones, so an app maps a state once, whatever draws it.
-  **Built:** Pill, Badge, NodeBox. **Not yet:** Banner, StatusWords, Toaster and KeyValue take five
-  (no `accent`, `muted`), and Wire has no `renamed`: pb-nx9.75.
+  **Built:** Pill, Badge, Banner, StatusWords, Toaster, KeyValue, NodeBox, Wire.
 - **F7. One look for a tone it does not know:** its words in `muted`, its edge or stripe in
   `line-strong`, and a wire, which has no words, in the `muted` stroke. It is drawn, never refused
   ([`components.md`](components.md#rules-every-component-keeps), rule 2). **Not yet:** the

@@ -134,8 +134,8 @@ screen readers (as inside a busy `Button`); with one it is a `role="status"` tha
 `level?` (h2 to h6, h3 by default).
 
 **`KeyValue`**: facts as a `<dl>`, keys and values side by side. `rows: { key, value, tone?,
-title? }[]` (a row's `tone` colours its value; its `title` is the key's tooltip; two rows may share
-a key), `label?` (the list's name when no heading gives one).
+title? }[]` (a row's `tone`, one of `Pill`'s seven, colours its value; its `title` is the key's
+tooltip; two rows may share a key), `label?` (the list's name when no heading gives one).
 
 ### Forms
 
@@ -263,7 +263,7 @@ stylesheet too. Their own words come through `labels`, as the primitives' do ([r
 
 **`Banner`**: a line of news across a pane or page (a conflict, a lost connection, a refused edit),
 on a raised surface with a stripe in its tone at the start (warn and err on their soft surfaces).
-`tone: "ok" | "warn" | "err" | "quiet" | "off"` (open; one it does not know keeps a plain stripe),
+`tone` ([`Pill`](#state)'s seven tones; open: one it does not know keeps a plain stripe),
 `children` (the news), `actions?` (a slot at its end: the buttons that act on it), `onDismiss?`
 (shows a close button that calls it), `labels?` (its words, [rule 8](#rules-every-component-keeps):
 `dismiss`, the close button's name, "Dismiss"), plus native `div` props.
@@ -274,9 +274,9 @@ on a raised surface with a stripe in its tone at the start (warn and err on thei
   `IconButton`, so it keeps a 36 px target on touch.
 
 **`StatusWords`**: a short row of states, each a word in its tone, a dot between each two (a pane's
-"2 errors · 1 warning · saved"). `items: { tone, label, title? }[]` (tones `"ok" | "warn" | "err" |
-"quiet" | "off"`, open), drawn in the order given, which is most urgent first, plus native `ul`
-props (name it with `aria-label`).
+"2 errors · 1 warning · saved"). `items: { tone, label, title? }[]` (`Pill`'s seven tones, open),
+drawn in the order given, which is most urgent first, plus native `ul` props (name it with
+`aria-label`).
 
 - The list is one `aria-live="polite"` region (an app may pass another `aria-live`), so a screen
   reader reads a change when it is free; it stays in the page while empty, ready for the next
@@ -286,7 +286,7 @@ props (name it with `aria-label`).
 a saved file), each on a raised, shadowed surface with a stripe in its tone at the start, as
 `Banner`'s. The queue is the app's ([`useToasts`](#usetoasts) holds one, and its `toasterProps`
 are this component's props): `toasts: { id, tone, text, count?, action? }[]` (the shown ones,
-oldest first; tones `"ok" | "warn" | "err" | "quiet" | "off"`, open, one it does not know drawn
+oldest first; `Pill`'s seven tones, open, one it does not know drawn
 with a plain stripe; `text` any node; `action: { label, run }`), `more?` (how many older ones are
 folded away), `onDismiss(id)`, `onHold?(held)`, `placement?`, `labels?` (its words, [rule
 8](#rules-every-component-keeps): `region`, the region's name, "Notifications", which an

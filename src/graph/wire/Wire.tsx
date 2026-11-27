@@ -8,7 +8,7 @@ import type { PillTone } from "../../primitives";
 import "./Wire.css";
 
 /** Pill's tones, the changes and `refused`; any other string is drawn in the edge stroke. */
-export type WireTone = PillTone | "added" | "removed" | "changed" | "refused" | (string & {});
+export type WireTone = PillTone | "added" | "removed" | "renamed" | "changed" | "refused" | (string & {});
 
 /** A wire's look, as React Flow's edge `data`. */
 export type WireData = {

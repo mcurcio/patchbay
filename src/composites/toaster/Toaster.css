@@ -99,6 +99,14 @@
   border-inline-start-color: var(--pb-off);
 }
 
+.pb-toast[data-tone="accent"] {
+  border-inline-start-color: var(--pb-accent);
+}
+
+.pb-toast[data-tone="muted"] {
+  border-inline-start-color: var(--pb-muted);
+}
+
 .pb-toast-text {
   flex: 1 1 12em;
   min-width: 0;

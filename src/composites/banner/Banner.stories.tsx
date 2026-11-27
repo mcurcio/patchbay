@@ -8,7 +8,7 @@ const meta = {
   component: Banner,
   args: { tone: "warn", children: "The file changed on disk since it was opened." },
   argTypes: {
-    tone: { control: "select", options: ["ok", "warn", "err", "quiet", "off", "unknown-tone"] },
+    tone: { control: "select", options: ["ok", "warn", "err", "quiet", "off", "accent", "muted", "unknown-tone"] },
   },
 } satisfies Meta<typeof Banner>;
 
@@ -32,6 +32,8 @@ export const Err: Story = {
 export const Ok: Story = { args: { tone: "ok", children: "Saved." } };
 export const Quiet: Story = { args: { tone: "quiet", children: "Reconnecting…" } };
 export const Off: Story = { args: { tone: "off", children: "The service is stopped." } };
+export const Accent: Story = { args: { tone: "accent", children: "Showing your own changes only." } };
+export const Muted: Story = { args: { tone: "muted", children: "This view has no live values." } };
 
 /** A tone the banner does not know: drawn neutrally. */
 export const UnknownTone: Story = { args: { tone: "sleeping", children: "Nothing has run for an hour." } };
@@ -86,7 +88,7 @@ export const Narrow: Story = {
 export const All: Story = {
   render: (args) => (
     <div style={{ display: "grid", gap: "8px" }}>
-      {["ok", "warn", "err", "quiet", "off", "sleeping"].map((tone) => (
+      {["ok", "warn", "err", "quiet", "off", "accent", "muted", "sleeping"].map((tone) => (
         <Banner key={tone} {...args} tone={tone} actions={<Button size="sm">Act</Button>} onDismiss={() => {}}>
           A {tone} banner.
         </Banner>

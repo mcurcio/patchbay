@@ -7,7 +7,7 @@ import { IconButton } from "../../primitives";
 import "./Banner.css";
 
 /** The tones a banner draws; any other string is drawn neutrally. */
-export type BannerTone = "ok" | "warn" | "err" | "quiet" | "off" | (string & {});
+export type BannerTone = "ok" | "warn" | "err" | "quiet" | "off" | "accent" | "muted" | (string & {});
 
 /** The banner's own words, each replaceable. */
 export interface BannerLabels {

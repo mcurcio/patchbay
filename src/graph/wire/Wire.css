@@ -43,6 +43,10 @@
   --pb-wire-color: var(--pb-removed);
 }
 
+.pb-wire[data-tone="renamed"] {
+  --pb-wire-color: var(--pb-renamed);
+}
+
 /* After the tones, so a selected wire is the accent whatever its tone. */
 .pb-wire[data-selected] {
   --pb-wire-color: var(--pb-accent);

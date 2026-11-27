@@ -72,6 +72,6 @@ describe("KeyValue", () => {
     render(<KeyValue rows={[{ key: "Odd", value: "?", tone: "unheard-of" }]} />);
     expect(screen.getByText("?").parentElement).toHaveAttribute("data-tone", "unheard-of");
     const tones = new Set([...css.matchAll(/data-tone="([^"]+)"/g)].map((match) => match[1]));
-    expect([...tones].sort()).toEqual(["err", "off", "ok", "quiet", "warn"]);
+    expect([...tones].sort()).toEqual(["accent", "err", "muted", "off", "ok", "quiet", "warn"]);
   });
 });

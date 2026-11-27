@@ -161,7 +161,7 @@ export const Narrow: Story = {
 export const All: Story = {
   args: {
     more: 2,
-    toasts: ["ok", "warn", "err", "quiet", "off", "sleeping"].map((tone, index) => ({
+    toasts: ["ok", "warn", "err", "quiet", "off", "accent", "muted", "sleeping"].map((tone, index) => ({
       id: index + 1,
       tone,
       text: `A ${tone} toast.`,
@@ -170,7 +170,7 @@ export const All: Story = {
     })),
   },
   render: (args) => (
-    <div style={{ position: "relative", height: "560px" }}>
+    <div style={{ position: "relative", height: "720px" }}>
       <Toaster {...args} />
     </div>
   ),

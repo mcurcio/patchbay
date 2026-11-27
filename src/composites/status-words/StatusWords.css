@@ -44,3 +44,12 @@
 .pb-status-word[data-tone="off"] {
   color: var(--pb-off);
 }
+
+.pb-status-word[data-tone="accent"] {
+  color: var(--pb-accent);
+}
+
+/* Muted by name: the neutral look, chosen rather than fallen back to. */
+.pb-status-word[data-tone="muted"] {
+  color: var(--pb-muted);
+}
