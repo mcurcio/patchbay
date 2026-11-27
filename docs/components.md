@@ -127,7 +127,11 @@ text. Under forced colours the circle stays, in the system's text colour.
 
 **`Spinner`**: the busy mark, an open ring in the current text colour, turning once per
 `--pb-motion-spin` and still under reduced motion. Without `label` it is decoration, hidden from
-screen readers (as inside a busy `Button`); with one it is a `role="status"` that announces it.
+screen readers (as inside a busy `Button`); with one it is a `role="status"` that announces it,
+drawn empty in the commit that adds it and given its label in the next
+([U42](ux-rules.md#feedback)). A label that goes takes the region with it, and one that comes
+back brings it back empty first; to say more than one thing over time, keep the Spinner mounted
+and change its label.
 
 ### Text and facts
 
@@ -271,8 +275,12 @@ on a raised surface with a stripe in its tone at the start (warn and err on thei
 (shows a close button that calls it), `labels?` (its words, [rule 8](#rules-every-component-keeps):
 `dismiss`, the close button's name, "Dismiss"), plus native `div` props.
 
-- An `err` banner is `role="alert"`, read at once; every other tone is `role="status"`, read when
-  the screen reader is free. The role is the banner's own.
+- **What is read:** two visually hidden live regions inside the banner, a `role="status"` and a
+  `role="alert"`, drawn empty when it mounts and given its words in the next commit, so a banner
+  mounted with its words is read ([U42](ux-rules.md#feedback)). An `err` banner's words are in the
+  alert, read at once; every other tone's in the status, read when the screen reader is free. A
+  change of words is read in its region, and a change of tone moves them to the other. The banner
+  itself is not a live region and takes no `role`.
 - The words wrap and the actions drop under them in a narrow pane. The close button is an
   `IconButton`, so it keeps a 36 px target on touch.
 

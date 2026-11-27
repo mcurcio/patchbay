@@ -145,13 +145,13 @@ cite them. How to read a rule (Built, The app's, Not yet):
 
 ## Feedback
 
-- **U41. Urgency by role.** An `err` message is `role="alert"`, read at once; every other is
-  `role="status"`, read when the reader is free. **Built:** Banner, Toaster.
+- **U41. Urgency by role.** An `err` message is read in a `role="alert"` region, at once; every
+  other in a `role="status"` one, when the reader is free. **Built:** Banner, Toaster.
 - **U42. A live region exists before its words,** as a region added with its words is not reliably
-  read. **Built:** Toaster, Button's busy region, CommandPalette's status line, StatusWords. **Not
-  yet:** Banner carries its role on itself, so the region arrives with its words and changes with
-  its tone (pb-nx9.64); a labelled Spinner is its own region, mounted with its label
-  (pb-nx9.65).
+  read. **Built:** Toaster, Button's busy region, CommandPalette's status line, StatusWords,
+  Banner's two hidden regions, and a labelled Spinner, whose region comes a commit before its
+  label ([`components.md`](components.md#news-and-state), Banner;
+  [`components.md`](components.md#state), Spinner).
 - **U43. Nothing is read twice.** **Built:** Toaster, whose toasts are not live regions.
 - **U44. The channel follows where the news is and how long it lasts.**
 
