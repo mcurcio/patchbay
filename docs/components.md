@@ -527,6 +527,41 @@ native `pre` props (`ref` included; name it with `aria-label` where no heading d
 LF; lines are kept as written, and a wide one scrolls sideways; the box is a tab stop, so it
 scrolls from the keyboard too. It has no words of its own, so no `labels`.
 
+### Queued changes
+
+**`ChangeList`**: the changes an app holds until a save, listed in words
+([patterns](patterns.md#saving-or-queuing-changes)). `changes: { id, change, label, detail?, refused?
+}[]` (in the order the app holds them, the newest last; `change` is `"added" | "removed" | "renamed" |
+"changed"`, open; `label` and `detail` any node, the app's words for what changes; `refused` a check's
+reason, a string), `onDrop?(id)` (each row's drop button; without it there is none), `actions?` (a slot
+at the head's far end: the app's Check, Save and Discard), `labels?` (its words, [rule
+8](#rules-every-component-keeps): `added`, `removed`, `renamed`, `changed`, the Badge's words; `count(n)`,
+"No changes", "1 change", "n changes"; `drop`, "Drop"; `refused(reason)`, "Refused: " and the reason;
+`defaultChangeListLabels`), plus native `section` props.
+
+- **Rows.** Each change is a list item: a [`Badge`](#state) in its change's tone with its word (a change
+  it does not know is drawn neutrally, by its own word), then its `label`, its `detail` in `--pb-muted`
+  and `--pb-text-sm`, and, for a refused change, `labels.refused(reason)` in `--pb-err` with an
+  `--pb-err` stripe at the row's inline start, so the change at fault is marked in words as on the
+  canvas ([U58](ux-rules.md#live-pending-queued-refused)). The drop button, a small neutral `Button` at
+  the inline end, is described by the row's words, so several read apart; it asks `onDrop` with the id,
+  and the app takes the change out of its queue.
+- **The count** is a `role="status"` line, there from the start (the section's name, unless the app
+  names it), so a change of count is read politely ([U34](ux-rules.md#states),
+  [U42](ux-rules.md#feedback)); with no changes it says `labels.count(0)` and there is no list.
+- **The queue is the app's,** and holds only the net change ([U50](ux-rules.md#confirmation-and-undo)):
+  the list draws the changes it is given. Queuing the reverse of a queued change drops that change
+  rather than adding a second: removing a node added in the queue drops the add (and any change to
+  it); adding back a node removed in the queue drops the removal; renaming back to the name the
+  source holds drops the rename; setting a value back to the source's drops the change. A change to
+  something added in the queue folds into the add, which stays `added` with the new settings. Mod+Z
+  drops the last change ([U18](ux-rules.md#focus-and-keyboard)), and Discard drops them all. Save is
+  unavailable while a check refuses ([U6](ux-rules.md#focus-and-keyboard)).
+- **Look:** rows edged by `--pb-line` between them; on touch each drop button is at least 36 px tall,
+  as a `Button` is. Its paddings and the stripe are logical, so in right-to-left text the Badge is at
+  the right and Drop at the left. It does not animate. Under forced colours a refused row's stripe is
+  in `CanvasText`.
+
 ## Shell (`/shell`)
 
 ```ts

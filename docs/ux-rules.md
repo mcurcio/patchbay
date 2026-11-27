@@ -198,8 +198,9 @@ cite them. How to read a rule (Built, The app's, Not yet):
   (U28). **Built:** a toast's `action` ([`useToasts`](components.md#usetoasts)). **The app's:** the
   inverse.
 - **U50. A queue holds the net change.** Queuing the reverse of a queued change drops it, rather
-  than adding a second; taking back is dropping a queued change. **The app's:** the queue. **Not
-  yet:** patchbay has no list of queued changes to draw it with: pb-nx9.90.
+  than adding a second; taking back is dropping a queued change. **Built:** [`ChangeList`](components.md#queued-changes)
+  draws the queue and asks to drop a change. **The app's:** the queue, and keeping its net change
+  (`ChangeList`'s docs give the cases).
 
 ## Live, pending, queued, refused
 

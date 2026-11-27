@@ -1,5 +1,6 @@
 import { Canvas, Meta } from "@storybook/addon-docs/blocks";
 import * as ButtonStories from "../primitives/button/Button.stories";
+import * as ChangeListStories from "../composites/change-list/ChangeList.stories";
 import * as DiffViewStories from "../composites/diff-view/DiffView.stories";
 import * as NodeBoxStories from "../graph/node-box/NodeBox.stories";
 import * as WireStories from "../graph/wire/Wire.stories";
@@ -29,8 +30,14 @@ Each change by its word on the node, and a queued wire dashed:
 
 <Canvas of={ButtonStories.BusyLabel} />
 
-## Not built yet
+## The queue in words
 
-- The list of queued changes, with their count, a drop button per row, and slots for Check, Save
-  and Discard (ChangeList): `pb-nx9.90`. Mod+Z dropping the last change is the app's binding
-  over it.
+Each change with its Badge and a Drop, under their count and the app's Check, Discard and Save;
+Mod+Z dropping the last change is the app's binding over it:
+
+<Canvas of={ChangeListStories.Default} />
+
+A change a check refused is marked, with its reason in words, and Save waits for the queue to
+change:
+
+<Canvas of={ChangeListStories.Refused} />

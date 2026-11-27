@@ -160,8 +160,9 @@ marks keep a full target (F38).
 
 - The canvas draws each queued change (U53).
 - A list of the queued changes in words, each row with its change Badge and a drop button, with
-  their count, and slots for Check, Save and Discard (patchbay's ChangeList: not yet,
-  pb-nx9.90). The queue keeps only the net change (U50).
+  their count, and a slot for Check, Save and Discard
+  ([`ChangeList`](components.md#queued-changes)). The queue keeps only the net change (U50; the
+  cases are in ChangeList's docs).
 - A [`DiffView`](components.md#code) of what the save writes.
 - One primary Save, busy while it runs, and Discard.
 - The queue is checked after each change and by an explicit Check; Save is unavailable while the
