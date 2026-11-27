@@ -6,6 +6,7 @@
 import type { ComponentPropsWithRef } from "react";
 import type { ThemeChoice } from "../../hooks/use-theme/useTheme";
 import { Button } from "../button";
+import { Glyph } from "../glyph";
 import "./ThemeSwitch.css";
 
 export type { ThemeChoice };
@@ -67,10 +68,10 @@ export function ThemeSwitch({ choice, onChoose, labels, className, ...rest }: Th
         onChoose(following(choice));
       }}
     >
-      <svg className="pb-theme-switch-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
-        <circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" strokeWidth="1.5" />
-        <path d="M8 1.75a6.25 6.25 0 0 1 0 12.5z" fill="currentColor" />
-      </svg>
+      <Glyph className="pb-theme-switch-icon">
+        <circle cx="8" cy="8" r="6" />
+        <path d="M8 2a6 6 0 0 1 0 12z" fill="currentColor" stroke="none" />
+      </Glyph>
       <span className="pb-theme-switch-word">{words[choice]}</span>
     </Button>
   );

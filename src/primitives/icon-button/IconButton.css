@@ -40,12 +40,15 @@
   border-color: transparent;
 }
 
-/* The glyph a little larger than the text, centred on one line. */
+/* The glyph's place: the one 16 px glyph box (docs/foundations.md#glyphs, F50), centred; a text glyph is set at the
+   box's size, as an SVG Glyph fills it. */
 .pb-icon-button-glyph {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.15em;
+  min-width: 16px;
+  height: 16px;
+  font-size: 16px;
   line-height: 1;
 }
 

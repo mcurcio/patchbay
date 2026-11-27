@@ -1,0 +1,6 @@
+/* A glyph (Glyph.tsx): a 16 px box that never shrinks in a row of words, sitting on the text's middle. */
+.pb-glyph {
+  flex: none;
+  display: inline-block;
+  vertical-align: middle;
+}

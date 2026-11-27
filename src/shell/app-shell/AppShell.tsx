@@ -18,7 +18,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { useMediaBreakpoint } from "../../hooks";
-import { IconButton, Panel, Sheet, Splitter } from "../../primitives";
+import { Glyph, IconButton, Panel, Sheet, Splitter } from "../../primitives";
 import { clampDrawerHeight, clampInspectorWidth, drawerBounds, drawerMaxHeight, inspectorBounds } from "./bounds";
 import "./AppShell.css";
 
@@ -135,9 +135,9 @@ function useWindowHeight(): number {
 /** A chevron pointing up (show) or down (hide), in the current text colour. */
 function DrawerGlyph({ open }: { open: boolean }) {
   return (
-    <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
-      <path d={open ? "M3 6l5 5 5-5" : "M3 10l5-5 5 5"} fill="none" stroke="currentColor" strokeWidth="1.75" />
-    </svg>
+    <Glyph>
+      <path d={open ? "M4 6l4 4 4-4" : "M4 10l4-4 4 4"} />
+    </Glyph>
   );
 }
 

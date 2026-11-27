@@ -15,7 +15,7 @@ import {
   useStoreApi,
 } from "@xyflow/react";
 import { type ReactNode, useEffect, useLayoutEffect, useRef } from "react";
-import { IconButton, ToolGroup } from "../../primitives";
+import { Glyph, IconButton, ToolGroup } from "../../primitives";
 import { slowMotionMs } from "./motion";
 import "./CanvasTools.css";
 
@@ -72,9 +72,9 @@ export type CanvasToolsProps<NodeType extends Node = Node> = {
 };
 
 const glyph = (path: string) => (
-  <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
-    <path d={path} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
+  <Glyph>
+    <path d={path} />
+  </Glyph>
 );
 
 const glyphs = {
@@ -82,7 +82,7 @@ const glyphs = {
   zoomOut: glyph("M3 8h10"),
   fit: glyph("M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4"),
   tidy: glyph("M2 2h5v5H2zM9 2h5v5H9zM2 9h5v5H2zM9 9h5v5H9z"),
-  minimap: glyph("M1.5 3h13v10h-13zM8.5 8h4v3h-4z"),
+  minimap: glyph("M2 3.5h12v9H2zM8.5 8h3.5v2.5H8.5z"),
 };
 
 export function CanvasTools<NodeType extends Node = Node>({

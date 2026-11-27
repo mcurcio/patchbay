@@ -454,7 +454,9 @@ const follow = useFollowFit({ key: layoutKey, onFitted });
   wheel on it zooms. React Flow moves the view by code for these, with no event, so `onViewMove`
   is how they reach `useFollowFit`. **Forced colours:** the
   frame in `CanvasText`.
-- The glyphs are SVG, hidden from screen readers; each tool is named by its word.
+- The glyphs are drawn with [`Glyph`](components.md#actions), hidden from screen readers; each tool
+  is named by its word. A tool the app adds draws its glyph with `Glyph` too, so it sits beside
+  them.
 
 ## `useAddAt`
 

@@ -88,7 +88,8 @@ primary per view), `size?`, `busy?`, `busyLabel?`, plus native button props.
 
 **`IconButton`**: a square glyph button on `Button`'s rules (`tone`, `size`, `busy`, `busyLabel`,
 pressed). `label` (required) is its accessible name and, unless `title` is given, its tooltip;
-`children` is the glyph, hidden from screen readers. A glyph has no words to swap, so while busy a
+`children` is the glyph (a [`Glyph`](#actions), or a character, set in the same 16 px box at 16 px),
+hidden from screen readers. A glyph has no words to swap, so while busy a
 `busyLabel` becomes its name and (unless `title` is given) its tooltip, and is announced as on
 `Button`; the spinner covers the glyph as without one. 28 px (22 px when `sm`), borderless until
 hovered, pressed or toned; 36 px on touch, edged in `--pb-line-strong` at rest there (not when
@@ -98,7 +99,17 @@ whose frame is the edge.
 **`CloseGlyph`**: the close glyph, a cross in the current text colour, hidden from screen readers.
 It is the one look for Close (what the person opened: a dialog, a sheet, the inspector) and Dismiss
 (news that came by itself: a banner, a toast), always as the child of an `IconButton` named by the
-word ([U30](ux-rules.md#words)); `Dialog`, `Sheet`, `Banner` and `Toaster` draw theirs with it.
+word ([U30](ux-rules.md#words)); `Dialog`, `Sheet`, `Banner` and `Toaster` draw theirs with it. It is
+drawn with `Glyph`.
+
+**`Glyph`**: the one glyph grid ([F50](foundations.md#glyphs)), for patchbay's glyphs and an app's own:
+an SVG 16 px square (`viewBox="0 0 16 16"`) whose `children`, its shapes, lie within the middle 12 px
+(2 to 14), stroked at 1.75 with round caps and joins in the current text colour, no fill unless a shape
+gives one, hidden from screen readers and never focused; `className` is added to its own `pb-glyph`,
+and other native `svg` props pass through. `GLYPH_BOX` (16), `GLYPH_DRAWN` (12) and `GLYPH_STROKE`
+(1.75) are its sizes. It does not shrink in a row of words. The close glyph, the theme switch's, a
+diff's fold chevron, the drawer's chevron and the canvas tools are drawn with it; a text glyph in an
+`IconButton` or a `ToolGroup` is set at 16 px, the same box.
 
 **`ThemeSwitch`**: one button that cycles system, light and dark, drawn as a neutral `Button`
 (its face, hover, focus ring, touch height and forced colours). `choice`, `onChoose(next)`,
