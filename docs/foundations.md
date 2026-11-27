@@ -63,9 +63,7 @@ The change tones draw an edit that is queued, not true yet (F10):
   candidate. **Built:** GhostWire.
 - **F10. Pending and queued are two words.** **Pending** is a request sent and not answered yet:
   GhostWire's `pending` tone, a busy Button. **Queued** is a change held here until a save: a change
-  tone with dashes (U53). **Not yet:** Wire also takes a `pending` tone, meaning not saved, which
-  dashed looks like a GhostWire; it goes, and a queued wire is a change tone with `dashed`:
-  pb-nx9.74.
+  tone with dashes (U53). Wire has no `pending` tone. **Built:** GhostWire, Button, Wire.
 - **F11. warn and err fill on their soft surfaces.** An outlined Badge, a Banner, a Toast and a
   failed node's header put the tone on `warn-soft` or `err-soft`. **Built:** Badge, Banner,
   Toaster, NodeBox.

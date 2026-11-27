@@ -147,6 +147,10 @@ describe("Wire's stylesheet", () => {
     expect(plain).toMatch(/stroke-opacity: calc\(0\.45 \+ 0\.55 \* var\(--pb-wire-emphasis\)\)/);
   });
 
+  it("has no pending tone: a request on its way is GhostWire's, and a queued wire a change tone", () => {
+    expect(plain).not.toMatch(/data-tone="pending"/);
+  });
+
   it("puts the selected rule after the tones", () => {
     expect(plain.indexOf("[data-selected] {")).toBeGreaterThan(plain.lastIndexOf('[data-tone="removed"]'));
   });

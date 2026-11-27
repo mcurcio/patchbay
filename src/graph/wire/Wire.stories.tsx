@@ -48,20 +48,7 @@ const meta = {
   argTypes: {
     tone: {
       control: "select",
-      options: [
-        "ok",
-        "warn",
-        "err",
-        "quiet",
-        "off",
-        "accent",
-        "muted",
-        "added",
-        "removed",
-        "changed",
-        "pending",
-        "refused",
-      ],
+      options: ["ok", "warn", "err", "quiet", "off", "accent", "muted", "added", "removed", "changed", "refused"],
     },
     emphasis: { control: { type: "range", min: 0, max: 1, step: 0.05 } },
     label: { control: "text" },
@@ -109,7 +96,7 @@ export const UnknownTone: Story = {
   },
 };
 
-/** An edit not yet saved: dashed; a queued one also takes a change's tone. */
+/** A queued edit: a change's tone, dashed. */
 export const Dashed: Story = { args: { tone: "added", dashed: true } };
 
 /** Dots moving toward the input; under reduced motion they are not drawn. */
@@ -216,7 +203,6 @@ const looks: WireData[] = [
   { tone: "added", dashed: true, label: "added" },
   { tone: "removed", dashed: true, label: "removed" },
   { tone: "changed", dashed: true, label: "changed" },
-  { tone: "pending", dashed: true },
   { tone: "refused", label: "refused" },
   { tone: "maybe" },
 ];

@@ -212,8 +212,7 @@ are F10's:
 - **U52. A ghost is not a thing.** It is drawn dashed and faint, takes no pointer events, and is not
   selectable, focusable or deletable. **Built:** GhostWire ([`graph.md`](graph.md#ghostwire)).
 - **U53. Queued is a change tone and dashes.** A queued wire is a change tone, dashed; a queued
-  node has its change border and badge; removed strikes the title. **Built:** Wire, NodeBox. **Not
-  yet:** Wire's `pending` tone (F10): pb-nx9.74.
+  node has its change border and badge; removed strikes the title. **Built:** Wire, NodeBox.
 - **U54. Selected wins over tone.** **Built:** Wire.
 - **U55. A level is emphasis, not a tone:** a wire's level is its width and opacity. **Built:**
   Wire.

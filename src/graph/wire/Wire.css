@@ -19,8 +19,7 @@
   --pb-wire-color: var(--pb-err);
 }
 
-.pb-wire[data-tone="quiet"],
-.pb-wire[data-tone="pending"] {
+.pb-wire[data-tone="quiet"] {
   --pb-wire-color: var(--pb-quiet);
 }
 
