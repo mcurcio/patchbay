@@ -89,7 +89,9 @@ function OpenSheet({
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
-    if (event.defaultPrevented || event.key !== "Escape") return;
+    // Not a press already handled, nor one inside an input method's composition (docs/ux-rules.md#focus-and-keyboard,
+    // U14).
+    if (event.defaultPrevented || event.nativeEvent.isComposing || event.key !== "Escape") return;
     event.preventDefault();
     event.stopPropagation();
     onClose();

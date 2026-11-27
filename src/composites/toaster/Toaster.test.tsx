@@ -150,6 +150,17 @@ describe("Toaster", () => {
     expect(screen.getByRole("status")).toHaveTextContent("2 Mal");
   });
 
+  it("leaves an Escape inside an input method's composition to the input method", () => {
+    const onDismiss = vi.fn();
+    render(<Toaster toasts={two} onDismiss={onDismiss} />);
+    const toast = screen.getAllByRole("listitem")[0];
+    if (toast === undefined) throw new Error("no toast");
+    expect(fireEvent.keyDown(toast, { key: "Escape", isComposing: true })).toBe(true);
+    expect(onDismiss).not.toHaveBeenCalled();
+    fireEvent.keyDown(toast, { key: "Escape" });
+    expect(onDismiss).toHaveBeenCalledOnce();
+  });
+
   it("dismisses the focused toast on Escape, alone, and moves the focus to the one beside it, then back", async () => {
     const outer = vi.fn();
     render(

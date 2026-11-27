@@ -151,6 +151,21 @@ describe("Toolbar", () => {
     expect(button("Extra")).toHaveAttribute("tabindex", "-1");
   });
 
+  it("leaves a press inside an input method's composition to the input method", () => {
+    render(
+      <Toolbar label="Tools">
+        <button type="button">A</button>
+        <button type="button">B</button>
+      </Toolbar>,
+    );
+    button("A").focus();
+    expect(fireEvent.keyDown(button("A"), { key: "ArrowRight", isComposing: true })).toBe(true);
+    expect(fireEvent.keyDown(button("A"), { key: "Process" })).toBe(true);
+    expect(button("A")).toHaveFocus();
+    expect(fireEvent.keyDown(button("A"), { key: "ArrowRight" })).toBe(false);
+    expect(button("B")).toHaveFocus();
+  });
+
   it("leaves a text field's arrow keys to the field, and keys with a modifier alone", () => {
     render(
       <Toolbar label="Tools">

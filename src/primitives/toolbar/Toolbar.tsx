@@ -57,6 +57,8 @@ export function Toolbar({
     onKeyDown?.(event);
     const toolbar = own.current;
     if (event.defaultPrevented || toolbar === null || event.altKey || event.ctrlKey || event.metaKey) return;
+    // A press inside an input method's composition is the input method's (docs/ux-rules.md#focus-and-keyboard, U14).
+    if (event.nativeEvent.isComposing || event.key === "Process") return;
     if (editsText(event.target as Element)) return;
     const all = items(toolbar);
     const index = all.indexOf(event.target as HTMLElement);

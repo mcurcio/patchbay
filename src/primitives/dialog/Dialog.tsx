@@ -93,7 +93,9 @@ function OpenDialog({ onClose, title, children, actions, labels, className }: Om
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.defaultPrevented) return;
-    if (event.key === "Escape") {
+    // An Escape inside an input method's composition ends the composition, and only that
+    // (docs/ux-rules.md#focus-and-keyboard, U14). The Tab trap holds during one, so the focus never leaves the modal.
+    if (event.key === "Escape" && !event.nativeEvent.isComposing) {
       event.preventDefault();
       event.stopPropagation();
       onCloseRef.current();

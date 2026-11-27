@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
@@ -119,6 +119,20 @@ describe("Sheet", () => {
     await user.keyboard("{Escape}");
     await user.click(screen.getByRole("button", { name: "Close" }));
     expect(onClose).toHaveBeenCalledTimes(2);
+  });
+
+  it("leaves an Escape inside an input method's composition to the input method", () => {
+    const onClose = vi.fn();
+    render(
+      <Sheet open onClose={onClose} label="S">
+        <input aria-label="Name" />
+      </Sheet>,
+    );
+    const name = screen.getByRole("textbox", { name: "Name" });
+    expect(fireEvent.keyDown(name, { key: "Escape", isComposing: true })).toBe(true);
+    expect(onClose).not.toHaveBeenCalled();
+    fireEvent.keyDown(name, { key: "Escape" });
+    expect(onClose).toHaveBeenCalledOnce();
   });
 
   it("gives the focus back to where it came from when it closes holding it", async () => {

@@ -99,6 +99,8 @@ export function Splitter({
   function key(event: KeyboardEvent<HTMLDivElement>) {
     onKeyDown?.(event);
     if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) return;
+    // A press inside an input method's composition is the input method's (docs/ux-rules.md#focus-and-keyboard, U14).
+    if (event.nativeEvent.isComposing || event.key === "Process") return;
     const next = keyed(value, event.key, growKey(orientation, edge, direction(event.currentTarget)), step, bounds);
     if (next === undefined) return;
     event.preventDefault();

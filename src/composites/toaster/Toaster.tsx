@@ -236,7 +236,8 @@ export function Toaster({
                 tabIndex={-1}
                 onKeyDown={(event) => {
                   // Escape here is the toast's alone, so a sheet or dialog behind it does not also close.
-                  if (event.key !== "Escape" || event.defaultPrevented) return;
+                  // Not a press already handled, nor one inside an input method's composition (U14).
+                  if (event.key !== "Escape" || event.defaultPrevented || event.nativeEvent.isComposing) return;
                   event.preventDefault();
                   event.stopPropagation();
                   dismiss(toast.id);

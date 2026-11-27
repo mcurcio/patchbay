@@ -53,9 +53,9 @@ cite them. How to read a rule (Built, The app's, Not yet):
   palette, the shortcut sheet and the canvas tools show the app's. **Built:** CanvasTools
   `keyShortcuts`, ShortcutSheet, CommandPalette.
 - **U14. A handled press is left alone.** A press marked `defaultPrevented`, or inside an input
-  method's composition, does nothing more. **Built:** useShortcuts and CodeEditor for both;
-  Toolbar, Splitter, Dialog, Sheet and Toaster for a handled press. **Not yet:** those five act on
-  a press inside a composition: pb-nx9.94.
+  method's composition, does nothing more. **Built:** useShortcuts, CodeEditor, CommandPalette,
+  Toolbar, Splitter, Dialog, Sheet and Toaster; Dialog's Tab trap still holds during a composition,
+  so the focus never leaves the modal.
 - **U15. The keyboard can always leave a text editor:** Escape, then Tab, moves on, and the editor's
   description says so. **Built:** CodeEditor.
 - **U16. Undo history survives a programmatic edit.** **Built:** CodeEditor's Tab.
