@@ -5,6 +5,7 @@ import { expect, waitFor } from "storybook/test";
 import type { LiveSubscribe } from "../../hooks";
 import { Badge, Button, Pill } from "../../primitives";
 import { type BoxNode, StoryCanvas, storyNodeTypes } from "../../test/story-canvas";
+import { tokenColor } from "../../test/token-color";
 import { Meter } from "../meter";
 import { nodeBoxSize } from "./geometry";
 import { NodeBox, type NodeBoxProps, type PortSpec } from "./NodeBox";
@@ -99,6 +100,22 @@ export const StagedEdit: Story = {
     await expect(canvas.getByText("added")).toHaveClass("pb-badge");
     await expect(box.querySelector('[data-handleid="in"]')).toHaveAttribute("data-hint", "ok");
     await expect(box.querySelector('[data-handleid="side"]')).toHaveAttribute("title", "Takes control, not audio");
+  },
+};
+
+/** A tone it does not know: its stripe in line-strong. */
+export const UnknownTone: Story = {
+  render: () => (
+    <StoryCanvas height={160} nodes={[node("n", 0, 0, { title: "node-1", subtitle: "tone", tone: "sparkly" })]} />
+  ),
+  play: async ({ canvasElement }) => {
+    const box = await waitFor(() => {
+      const found = canvasElement.querySelector(".pb-node-box");
+      if (found === null) throw new Error("no node yet");
+      return found;
+    });
+    await expect(box).toHaveAttribute("data-tone", "sparkly");
+    await expect(getComputedStyle(box, "::before").backgroundColor).toBe(tokenColor(canvasElement, "line-strong"));
   },
 };
 

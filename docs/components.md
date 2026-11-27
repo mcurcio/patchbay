@@ -115,7 +115,8 @@ system's text colour.
 "outlined" | "filled"`, `children`, `title?`.
 
 - Outlined (the default): text and border in the tone on the sunken surface; warn, err and changed
-  on their soft surfaces. A tone it does not know, and `off`, have a plain line.
+  on their soft surfaces. A tone it does not know has its words in `--pb-muted` and its border in
+  `--pb-line-strong` ([F7](foundations.md#tones)); `off` has a plain line.
 - Filled: the tone's colour as the fill, the words in `--pb-on-strong`, for a fact that must stand
   out. A tone it does not know is filled with `--pb-muted`. Under forced colours the fill gives way
   to the border, which stays.
@@ -134,8 +135,8 @@ screen readers (as inside a busy `Button`); with one it is a `role="status"` tha
 `level?` (h2 to h6, h3 by default).
 
 **`KeyValue`**: facts as a `<dl>`, keys and values side by side. `rows: { key, value, tone?,
-title? }[]` (a row's `tone`, one of `Pill`'s seven, colours its value; its `title` is the key's
-tooltip; two rows may share a key), `label?` (the list's name when no heading gives one).
+title? }[]` (a row's `tone`, one of `Pill`'s seven, colours its value, and one it does not know
+draws it in `--pb-muted`; its `title` is the key's tooltip; two rows may share a key), `label?` (the list's name when no heading gives one).
 
 ### Forms
 
@@ -263,7 +264,7 @@ stylesheet too. Their own words come through `labels`, as the primitives' do ([r
 
 **`Banner`**: a line of news across a pane or page (a conflict, a lost connection, a refused edit),
 on a raised surface with a stripe in its tone at the start (warn and err on their soft surfaces).
-`tone` ([`Pill`](#state)'s seven tones; open: one it does not know keeps a plain stripe),
+`tone` ([`Pill`](#state)'s seven tones; open: one it does not know has its stripe in `--pb-line-strong`),
 `children` (the news), `actions?` (a slot at its end: the buttons that act on it), `onDismiss?`
 (shows a close button that calls it), `labels?` (its words, [rule 8](#rules-every-component-keeps):
 `dismiss`, the close button's name, "Dismiss"), plus native `div` props.
@@ -274,8 +275,8 @@ on a raised surface with a stripe in its tone at the start (warn and err on thei
   `IconButton`, so it keeps a 36 px target on touch.
 
 **`StatusWords`**: a short row of states, each a word in its tone, a dot between each two (a pane's
-"2 errors · 1 warning · saved"). `items: { tone, label, title? }[]` (`Pill`'s seven tones, open),
-drawn in the order given, which is most urgent first, plus native `ul` props (name it with
+"2 errors · 1 warning · saved"). `items: { tone, label, title? }[]` (`Pill`'s seven tones, open:
+one it does not know in `--pb-muted`), drawn in the order given, which is most urgent first, plus native `ul` props (name it with
 `aria-label`).
 
 - The list is one `aria-live="polite"` region (an app may pass another `aria-live`), so a screen
@@ -287,7 +288,7 @@ a saved file), each on a raised, shadowed surface with a stripe in its tone at t
 `Banner`'s. The queue is the app's ([`useToasts`](#usetoasts) holds one, and its `toasterProps`
 are this component's props): `toasts: { id, tone, text, count?, action? }[]` (the shown ones,
 oldest first; `Pill`'s seven tones, open, one it does not know drawn
-with a plain stripe; `text` any node; `action: { label, run }`), `more?` (how many older ones are
+with its stripe in `--pb-line-strong`; `text` any node; `action: { label, run }`), `more?` (how many older ones are
 folded away), `onDismiss(id)`, `onHold?(held)`, `placement?`, `labels?` (its words, [rule
 8](#rules-every-component-keeps): `region`, the region's name, "Notifications", which an
 `aria-label` the app gives replaces; `dismiss`, "Dismiss"; `more(more)`, "and n more";

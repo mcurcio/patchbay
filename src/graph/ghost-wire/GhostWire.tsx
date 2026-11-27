@@ -5,7 +5,7 @@ import { BaseEdge, type Edge, EdgeLabelRenderer, type EdgeProps, getBezierPath }
 import { type ReactNode, useMemo } from "react";
 import "./GhostWire.css";
 
-/** `pending` (the default) or `refused`; any other string is drawn as `pending`. */
+/** `pending` (the default) or `refused`; any other string is drawn in the muted stroke, dashed and dimmed. */
 export type GhostWireTone = "pending" | "refused" | (string & {});
 
 /** A ghost wire's look, as React Flow's edge `data`. */
@@ -34,7 +34,7 @@ export function GhostWire({
     () => getBezierPath({ sourceX, sourceY, sourcePosition, targetX, targetY, targetPosition }),
     [sourceX, sourceY, sourcePosition, targetX, targetY, targetPosition],
   );
-  const tone = data?.tone === "refused" ? "refused" : "pending";
+  const tone = data?.tone ?? "pending";
   const label = data?.label;
   return (
     <>

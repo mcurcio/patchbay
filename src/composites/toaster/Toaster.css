@@ -1,6 +1,6 @@
 /* The toaster (Toaster.tsx): a stack of raised, shadowed toasts, each with a stripe in its tone at the start (warn and
    err on their soft surfaces), placed at a corner or edge of its positioned container, or inline where the app put
-   it. A tone it does not know keeps the plain line as its stripe; a placement it does not know is drawn inline. */
+   it. A tone it does not know keeps the line-strong stripe; a placement it does not know is drawn inline. */
 .pb-toaster {
   box-sizing: border-box;
   display: flex;

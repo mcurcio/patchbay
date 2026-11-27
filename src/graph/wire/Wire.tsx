@@ -7,12 +7,12 @@ import { type CSSProperties, memo, type ReactNode, useMemo } from "react";
 import type { PillTone } from "../../primitives";
 import "./Wire.css";
 
-/** Pill's tones, the changes and `refused`; any other string is drawn in the edge stroke. */
+/** Pill's tones, the changes and `refused`; any other string is drawn in the muted stroke. */
 export type WireTone = PillTone | "added" | "removed" | "renamed" | "changed" | "refused" | (string & {});
 
 /** A wire's look, as React Flow's edge `data`. */
 export type WireData = {
-  /** The stroke's tone; none, or one it does not know, is React Flow's edge stroke. */
+  /** The stroke's tone; none is React Flow's edge stroke, and one it does not know the muted one. */
   tone?: WireTone;
   /** The signal's level, 0 to 1 (clamped; not a number is 0): thickness and brightness. None is the plain wire. */
   emphasis?: number;

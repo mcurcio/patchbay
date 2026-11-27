@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, within } from "storybook/test";
+import { tokenColor } from "../../test/token-color";
 import { Pill } from "./Pill";
 
 const meta = {
@@ -22,8 +23,14 @@ export const Off: Story = { args: { tone: "off", label: "stopped" } };
 export const Accent: Story = { args: { tone: "accent", label: "reconfiguring" } };
 export const Muted: Story = { args: { tone: "muted", label: "offline" } };
 
-/** A tone the pill does not know: drawn neutrally, by its own word. */
-export const UnknownTone: Story = { args: { tone: "sleeping", label: "sleeping" } };
+/** A tone the pill does not know: drawn neutrally, by its own word, its dot and word muted. */
+export const UnknownTone: Story = {
+  args: { tone: "sleeping", label: "sleeping" },
+  play: async ({ canvasElement }) => {
+    const pill = within(canvasElement).getByText("sleeping");
+    await expect(getComputedStyle(pill).color).toBe(tokenColor(canvasElement, "muted"));
+  },
+};
 
 /** The dot pulses while a state is on its way; the word stays still. */
 export const Pulsing: Story = {

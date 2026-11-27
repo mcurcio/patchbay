@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, within } from "storybook/test";
+import { tokenColor } from "../../test/token-color";
 import { WarnMark } from "../warn-mark/WarnMark";
 import { Badge } from "./Badge";
 
@@ -54,8 +55,15 @@ export const Filled: Story = {
   },
 };
 
-/** A tone the badge does not know: muted, with a plain line. */
-export const UnknownTone: Story = { args: { tone: "mystery", children: "new" } };
+/** A tone the badge does not know: muted words and a line-strong edge. */
+export const UnknownTone: Story = {
+  args: { tone: "mystery", children: "new" },
+  play: async ({ canvasElement }) => {
+    const badge = getComputedStyle(within(canvasElement).getByText("new"));
+    await expect(badge.color).toBe(tokenColor(canvasElement, "muted"));
+    await expect(badge.borderTopColor).toBe(tokenColor(canvasElement, "line-strong"));
+  },
+};
 
 /** Its meaning on hover. */
 export const WithTitle: Story = {

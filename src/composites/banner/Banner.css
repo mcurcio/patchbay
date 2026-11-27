@@ -1,5 +1,5 @@
 /* A banner (Banner.tsx): the news on a raised surface with a stripe in its tone at the start; warn and err on their
-   soft surfaces. A tone it does not know keeps the plain line as its stripe. */
+   soft surfaces. A tone it does not know keeps the line-strong stripe, as every unknown tone does. */
 .pb-banner {
   box-sizing: border-box;
   display: flex;

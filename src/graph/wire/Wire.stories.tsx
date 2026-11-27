@@ -4,6 +4,7 @@ import { type Edge, ReactFlow, ReactFlowProvider } from "@xyflow/react";
 import { useEffect, useState } from "react";
 import { expect, waitFor } from "storybook/test";
 import { type BoxNode, StoryCanvas, storyNodeTypes } from "../../test/story-canvas";
+import { tokenColor } from "../../test/token-color";
 import { Wire, type WireData } from "./Wire";
 
 const edgeTypes = { wire: Wire };
@@ -88,7 +89,7 @@ export const Plain: Story = {
 /** A tone: here the ok tone, as a signal that flows. */
 export const Tone: Story = { args: { tone: "ok" } };
 
-/** A tone it does not know is drawn as the plain wire. */
+/** A tone it does not know: the muted stroke. */
 export const UnknownTone: Story = {
   args: { tone: "maybe" },
   play: async ({ canvasElement }) => {
@@ -97,15 +98,8 @@ export const UnknownTone: Story = {
       if (found === null) throw new Error("no wire yet");
       return found;
     });
-    const plain = getComputedStyle(path).stroke;
-    const group = canvasElement.querySelector(".pb-wire");
-    await expect(group).toHaveAttribute("data-tone", "maybe");
-    // The same stroke as React Flow's edge colour, which tokens.css points at --pb-muted.
-    const probe = document.createElement("div");
-    probe.style.color = "var(--pb-muted)";
-    document.body.append(probe);
-    await expect(plain).toBe(getComputedStyle(probe).color);
-    probe.remove();
+    await expect(canvasElement.querySelector(".pb-wire")).toHaveAttribute("data-tone", "maybe");
+    await expect(getComputedStyle(path).stroke).toBe(tokenColor(canvasElement, "muted"));
   },
 };
 

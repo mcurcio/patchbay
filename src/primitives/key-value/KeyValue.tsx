@@ -1,9 +1,9 @@
 // Facts as a two-column list of keys and values (a status summary, an inspector's details), drawn as a <dl> so each key
-// names its value for screen readers. A row's tone colours its value; a tone it does not know leaves it plain.
+// names its value for screen readers. A row's tone colours its value; a tone it does not know draws it muted.
 import type { ReactNode } from "react";
 import "./KeyValue.css";
 
-/** The tones a value draws in; any other string leaves it plain. */
+/** The tones a value draws in; any other string draws it muted. */
 export type KeyValueTone = "ok" | "warn" | "err" | "quiet" | "off" | "accent" | "muted" | (string & {});
 
 export type KeyValueRow = {

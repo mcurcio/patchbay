@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, fn } from "storybook/test";
+import { expect, fn, within } from "storybook/test";
 import { Button } from "../../primitives/button";
+import { tokenColor } from "../../test/token-color";
 import { Banner } from "./Banner";
 
 const meta = {
@@ -35,8 +36,14 @@ export const Off: Story = { args: { tone: "off", children: "The service is stopp
 export const Accent: Story = { args: { tone: "accent", children: "Showing your own changes only." } };
 export const Muted: Story = { args: { tone: "muted", children: "This view has no live values." } };
 
-/** A tone the banner does not know: drawn neutrally. */
-export const UnknownTone: Story = { args: { tone: "sleeping", children: "Nothing has run for an hour." } };
+/** A tone the banner does not know: drawn neutrally, its stripe in line-strong. */
+export const UnknownTone: Story = {
+  args: { tone: "sleeping", children: "Nothing has run for an hour." },
+  play: async ({ canvasElement }) => {
+    const banner = getComputedStyle(within(canvasElement).getByRole("status"));
+    await expect(banner.borderInlineStartColor).toBe(tokenColor(canvasElement, "line-strong"));
+  },
+};
 
 /** The app's buttons at its end. */
 export const WithActions: Story = {

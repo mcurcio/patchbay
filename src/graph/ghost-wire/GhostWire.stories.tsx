@@ -3,6 +3,7 @@ import "@xyflow/react/dist/style.css";
 import type { Edge } from "@xyflow/react";
 import { expect, waitFor } from "storybook/test";
 import { type BoxNode, StoryCanvas } from "../../test/story-canvas";
+import { tokenColor } from "../../test/token-color";
 import { Wire } from "../wire";
 import { GhostWire, type GhostWireData } from "./GhostWire";
 
@@ -77,11 +78,15 @@ export const Pending: Story = {
 /** Refused: the error tone, until the app removes it. */
 export const Refused: Story = { args: { tone: "refused", label: "refused" } };
 
-/** A tone it does not know is drawn as pending. */
+/** A tone it does not know: the muted stroke, dashed and dimmed; its label's edge in line-strong. */
 export const UnknownTone: Story = {
-  args: { tone: "maybe" },
+  args: { tone: "maybe", label: "on its way" },
   play: async ({ canvasElement }) => {
-    await expect(await found(canvasElement, ".pb-ghost-wire")).toHaveAttribute("data-tone", "pending");
+    await expect(await found(canvasElement, ".pb-ghost-wire")).toHaveAttribute("data-tone", "maybe");
+    const path = await found(canvasElement, ".pb-ghost-wire-path");
+    await expect(getComputedStyle(path).stroke).toBe(tokenColor(canvasElement, "muted"));
+    const label = await found(canvasElement, ".pb-ghost-wire-label");
+    await expect(getComputedStyle(label).borderTopColor).toBe(tokenColor(canvasElement, "line-strong"));
   },
 };
 

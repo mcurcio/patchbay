@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, within } from "storybook/test";
+import { tokenColor } from "../../test/token-color";
 import { KeyValue } from "./KeyValue";
 
 const meta = {
@@ -26,7 +27,7 @@ export const Default: Story = {
   },
 };
 
-/** Values tinted by their tone; a tone the list does not know leaves its value plain. */
+/** Values tinted by their tone; a tone the list does not know draws its value muted. */
 export const Tones: Story = {
   args: {
     rows: [
@@ -37,8 +38,17 @@ export const Tones: Story = {
       { key: "Schedule", value: "off", tone: "off" },
       { key: "Owner", value: "you", tone: "accent" },
       { key: "Kind", value: "filter", tone: "muted" },
-      { key: "Mystery", value: "plain", tone: "unheard-of" },
+      { key: "Mystery", value: "muted", tone: "unheard-of" },
     ],
+  },
+};
+
+/** A tone the list does not know: its value in muted words. */
+export const UnknownTone: Story = {
+  args: { rows: [{ key: "Mood", value: "sleepy", tone: "sleeping" }] },
+  play: async ({ canvasElement }) => {
+    const value = within(canvasElement).getByText("sleepy");
+    await expect(getComputedStyle(value).color).toBe(tokenColor(canvasElement, "muted"));
   },
 };
 

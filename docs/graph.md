@@ -234,7 +234,7 @@ const edge: WireEdge = { id, source, sourceHandle, target, targetHandle, type: "
 
 | `WireData` | What it is |
 |---|---|
-| `tone?` | [`Pill`](components.md#state)'s tones (`ok`, `warn`, `err`, `quiet`, `off`, `accent`, `muted`), the changes (`added` in `--pb-added`, `removed` in `--pb-removed`, `renamed` in `--pb-renamed`, `changed` in `--pb-warn`) and `refused` (`--pb-err`); open. None, or one it does not know, is React Flow's edge stroke (`--xy-edge-stroke`, which `tokens.css` points at `--pb-muted`). Selected, the wire is `--pb-accent` whatever its tone |
+| `tone?` | [`Pill`](components.md#state)'s tones (`ok`, `warn`, `err`, `quiet`, `off`, `accent`, `muted`), the changes (`added` in `--pb-added`, `removed` in `--pb-removed`, `renamed` in `--pb-renamed`, `changed` in `--pb-warn`) and `refused` (`--pb-err`); open. None is React Flow's edge stroke (`--xy-edge-stroke`, which `tokens.css` points at `--pb-muted`), and one it does not know is `--pb-muted` ([F7](foundations.md#tones)). Selected, the wire is `--pb-accent` whatever its tone |
 | `emphasis?` | The signal's level, `0` to `1` (clamped; not a number is `0`): 1.5 px to 3.5 px thick and from 45 % to full opacity. None is the plain wire, 1.5 px at full opacity |
 | `dashed?` | Dashes (6 on, 4 off). A queued edit is `tone` (a change) and `dashed`; a request on its way is a [`GhostWire`](#ghostwire), not a `Wire` |
 | `flow?` | Round dots 12 px apart moving along the wire toward the input, one period per `--pb-motion-flow` |
@@ -267,8 +267,8 @@ removes it when the request is answered; a refused one goes with the toast that 
 
 | `GhostWireData` | What it is |
 |---|---|
-| `tone?` | `"pending"` (the default: dashed in `--pb-quiet` at 60 % opacity) or `"refused"` (dashed in `--pb-err`, at full opacity); open, and one it does not know is drawn as `pending` |
-| `label?` | `ReactNode` at the midpoint, through `EdgeLabelRenderer`, its border in the tone |
+| `tone?` | `"pending"` (the default: dashed in `--pb-quiet` at 60 % opacity) or `"refused"` (dashed in `--pb-err`, at full opacity); open, and one it does not know is dashed in `--pb-muted` at 60 % opacity ([F7](foundations.md#tones)) |
+| `label?` | `ReactNode` at the midpoint, through `EdgeLabelRenderer`, its dashed border in the tone (`--pb-line-strong` for one it does not know), its words in `--pb-muted` (`--pb-err` when refused) |
 
 - It draws with React Flow's `BaseEdge` (`react-flow__edge-path`, plus `pb-ghost-wire-path`) and
   no hit path, and takes no pointer events: it is a sign of a request, not a thing to act on. Its

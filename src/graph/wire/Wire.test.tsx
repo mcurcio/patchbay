@@ -137,8 +137,11 @@ describe("Wire", () => {
 describe("Wire's stylesheet", () => {
   const plain = css.replace(/\/\*[\s\S]*?\*\//g, "");
 
-  it("draws a tone it does not know in React Flow's edge stroke", () => {
+  it("draws no tone in React Flow's edge stroke, and a tone it does not know in the muted one", () => {
     expect(plain).toMatch(/\.pb-wire \{\s*--pb-wire-color: var\(--xy-edge-stroke\);/);
+    expect(plain).toMatch(/\.pb-wire\[data-tone\] \{\s*--pb-wire-color: var\(--pb-muted\);/);
+    // Before every tone it knows, which follow and win.
+    expect(plain.indexOf(".pb-wire[data-tone] {")).toBeLessThan(plain.indexOf('[data-tone="ok"]'));
     expect(plain).not.toMatch(/data-tone="maybe"/);
   });
 

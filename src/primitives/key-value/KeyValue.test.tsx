@@ -68,10 +68,13 @@ describe("KeyValue", () => {
     expect(container.querySelector("dl")?.children).toHaveLength(0);
   });
 
-  it("leaves a value plain for a tone it does not know: its stylesheet styles only the ones it does", () => {
+  it("draws a value muted for a tone it does not know: any tone is muted until one it knows wins", () => {
     render(<KeyValue rows={[{ key: "Odd", value: "?", tone: "unheard-of" }]} />);
     expect(screen.getByText("?").parentElement).toHaveAttribute("data-tone", "unheard-of");
     const tones = new Set([...css.matchAll(/data-tone="([^"]+)"/g)].map((match) => match[1]));
     expect([...tones].sort()).toEqual(["accent", "err", "muted", "off", "ok", "quiet", "warn"]);
+    const plain = css.replace(/\/\*[\s\S]*?\*\//g, "");
+    expect(plain).toMatch(/\.pb-key-value-row\[data-tone\] dd \{\s*color: var\(--pb-muted\);/);
+    expect(plain.indexOf(".pb-key-value-row[data-tone] dd {")).toBeLessThan(plain.indexOf('[data-tone="ok"]'));
   });
 });

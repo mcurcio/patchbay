@@ -51,9 +51,8 @@ The change tones draw an edit that is queued, not true yet (F10):
   **Built:** Pill, Badge, Banner, StatusWords, Toaster, KeyValue, NodeBox, Wire.
 - **F7. One look for a tone it does not know:** its words in `muted`, its edge or stripe in
   `line-strong`, and a wire, which has no words, in the `muted` stroke. It is drawn, never refused
-  ([`components.md`](components.md#rules-every-component-keeps), rule 2). **Not yet:** the
-  fallbacks differ (Badge's plain line, Banner's and Toaster's plain stripe, GhostWire's `pending`):
-  pb-nx9.76.
+  ([`components.md`](components.md#rules-every-component-keeps), rule 2). **Built:** Pill, Badge,
+  Banner, StatusWords, Toaster, KeyValue, NodeBox, Wire, GhostWire.
 - **F8. A severity is not a tone.** CodeEditor's diagnostics say `error` and `warning`, the words
   checkers emit; they are drawn as `err` and `warn`, and any other severity as `muted`
   ([`components.md`](components.md#code), CodeEditor). **Built:** CodeEditor.

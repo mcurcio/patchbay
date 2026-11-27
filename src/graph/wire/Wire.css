@@ -1,8 +1,15 @@
-/* A wire: the stroke in its tone (React Flow's edge stroke when it has none it knows), the accent when selected. A level
+/* A wire: the stroke in its tone (React Flow's edge stroke when it has none, muted for one it does not know), the
+   accent when selected. A level
    is --pb-wire-emphasis, 0 to 1, set on the group: 1.5 px to 3.5 px thick and dim to full, so a change of level restyles
    the path rather than rebuilding it. */
 .pb-wire {
   --pb-wire-color: var(--xy-edge-stroke);
+}
+
+/* A tone it does not know: the muted stroke every unknown tone on a wire has (docs/foundations.md#tones, F7). The tones
+   it knows follow and win. */
+.pb-wire[data-tone] {
+  --pb-wire-color: var(--pb-muted);
 }
 
 .pb-wire[data-tone="ok"] {

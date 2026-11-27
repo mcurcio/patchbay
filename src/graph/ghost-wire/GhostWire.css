@@ -1,9 +1,14 @@
 /* A ghost wire: thin and dashed, plainly a request and not yet an edge; pending in the quiet tone, dimmed, refused in the
-   error tone. It is never under the pointer. */
+   error tone. A tone it does not know is the muted stroke, dimmed, and its label's edge line-strong, as every unknown
+   tone is drawn (docs/foundations.md#tones, F7). It is never under the pointer. */
 .pb-ghost-wire {
-  --pb-ghost-wire-color: var(--pb-quiet);
+  --pb-ghost-wire-color: var(--pb-muted);
   pointer-events: none;
   opacity: 0.6;
+}
+
+.pb-ghost-wire[data-tone="pending"] {
+  --pb-ghost-wire-color: var(--pb-quiet);
 }
 
 .pb-ghost-wire[data-tone="refused"] {
@@ -24,7 +29,7 @@
   position: absolute;
   pointer-events: none;
   padding: 0 var(--pb-space-2);
-  border: 1px dashed var(--pb-quiet);
+  border: 1px dashed var(--pb-line-strong);
   border-radius: var(--pb-radius-pill);
   background: var(--pb-raised);
   color: var(--pb-muted);
@@ -32,6 +37,10 @@
   font-size: var(--pb-text-sm);
   line-height: 16px;
   white-space: nowrap;
+}
+
+.pb-ghost-wire-label[data-tone="pending"] {
+  border-color: var(--pb-quiet);
 }
 
 .pb-ghost-wire-label[data-tone="refused"] {

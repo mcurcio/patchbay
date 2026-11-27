@@ -25,6 +25,12 @@
   overflow-wrap: anywhere;
 }
 
+/* A tone it does not know: muted words, as every unknown tone has (docs/foundations.md#tones, F7). The tones it knows
+   follow and win. */
+.pb-key-value-row[data-tone] dd {
+  color: var(--pb-muted);
+}
+
 .pb-key-value-row[data-tone="ok"] dd {
   color: var(--pb-ok);
 }

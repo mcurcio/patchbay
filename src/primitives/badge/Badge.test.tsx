@@ -39,6 +39,8 @@ describe("Badge", () => {
       "renamed",
       "warn",
     ]);
+    // Outlined, its edge is line-strong, as every unknown tone's is; off keeps a plain line.
+    expect(badgeCss).toMatch(/\.pb-badge:not\(\[data-variant\]\) \{\s*border-color: var\(--pb-line-strong\);/);
   });
 
   it("takes any string as a tone, as its open type says", () => {

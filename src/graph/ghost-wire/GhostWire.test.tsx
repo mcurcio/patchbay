@@ -39,7 +39,7 @@ describe("GhostWire", () => {
     [undefined, "pending"],
     ["pending", "pending"],
     ["refused", "refused"],
-    ["maybe", "pending"],
+    ["maybe", "maybe"],
   ])("draws the tone %s as %s", (tone, drawn) => {
     const { container } = draw(tone === undefined ? undefined : { tone });
     expect(group(container)).toHaveAttribute("data-tone", drawn);
@@ -63,8 +63,14 @@ describe("GhostWire's stylesheet", () => {
   });
 
   it("dims a pending one in the quiet tone and draws a refused one in the error tone", () => {
-    expect(plain).toMatch(/\.pb-ghost-wire \{[^}]*--pb-ghost-wire-color: var\(--pb-quiet\)[^}]*opacity: 0\.6/);
+    expect(plain).toMatch(/\[data-tone="pending"\] \{[^}]*--pb-ghost-wire-color: var\(--pb-quiet\)/);
     expect(plain).toMatch(/\[data-tone="refused"\] \{[^}]*--pb-ghost-wire-color: var\(--pb-err\)/);
+  });
+
+  it("draws a tone it does not know in the muted stroke, dimmed, its label's edge line-strong", () => {
+    expect(plain).toMatch(/\.pb-ghost-wire \{[^}]*--pb-ghost-wire-color: var\(--pb-muted\)[^}]*opacity: 0\.6/);
+    expect(plain).toMatch(/\.pb-ghost-wire-label \{[^}]*border: 1px dashed var\(--pb-line-strong\)/);
+    expect(plain).toMatch(/\.pb-ghost-wire-label\[data-tone="pending"\] \{\s*border-color: var\(--pb-quiet\)/);
   });
 
   it("keeps the dashes under forced colours", () => {
