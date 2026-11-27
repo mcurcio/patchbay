@@ -60,7 +60,12 @@ Other native `<div>` props (`className`, `id`, `data-*`, pointer handlers) pass 
   When all is still, no frame is asked for. A new floor, hold, fall or lamp time redraws the level
   on it.
 - **The tooltip** is written on pointer entry and then at most every 250 ms while the pointer stays
-  (`meterTitleEveryMs`); it is never written while nobody hovers.
+  (`meterTitleEveryMs`); it is never written while nobody hovers. It is a convenience: it shows on
+  neither touch nor focus, and the numbers are never announced, so an app that needs them read
+  writes them in the inspector ([U47](ux-rules.md#feedback)), from the same `read` through
+  [`useLiveValue`](components.md#uselivevalue) painting a text node, with `toDb` and
+  `formatMeterDb` (one decimal, −∞ for silence) or `labels.title` itself, so they read as the
+  tooltip does.
 - **Size and direction.** Horizontal fills its container's width (48 px when the container gives
   none) and is 6 px thick, filling from the inline start with the lamp, a 6 px square, at the
   inline end: from the left in left-to-right text and from the right in right-to-left text, and a
@@ -126,7 +131,7 @@ const nodeTypes = { source: SourceBox };
 
 | Prop | What it is |
 |---|---|
-| `title` | `ReactNode`, one line, cut with an ellipsis; a string is also the header's tooltip. It names the box's group |
+| `title` | `ReactNode`, one line, cut with an ellipsis; a string is also the header's tooltip, a convenience: a cut title is written out whole as the inspector's title when the node is selected, the app's ([U47](ux-rules.md#feedback), [F20](foundations.md#type)). It names the box's group |
 | `subtitle?` | `ReactNode`, the second header line in `--pb-muted` (the type) |
 | `tone?` | `"ok" \| "warn" \| "err" \| "quiet" \| "off" \| "accent" \| "muted"`, open: a 4 px stripe down the box's start edge in the tone's token. None, or a tone it does not know, draws it in `--pb-line-strong` |
 | `disabled?` | A dashed border, the stripe hatched (the tone and the surface in stripes), the words in `--pb-muted`. Drawing only: whether its ports still connect is the app's rule |
@@ -134,7 +139,7 @@ const nodeTypes = { source: SourceBox };
 | `change?` | `"added" \| "removed" \| "renamed" \| "changed"`, open: an edit not yet applied. A 2 px border in `--pb-added`, `--pb-removed`, `--pb-renamed` or `--pb-warn`, drawn inward so the size holds, and a [`Badge`](components.md#state) of the same tone in the header with the change's word, so it never rests on colour; `removed` also strikes the title through. A change it does not know: a `--pb-line-strong` border, and the string itself as the badge's word |
 | `labels?` | Its words ([rule 8](components.md#rules-every-component-keeps)): the change badge's `added`, `removed`, `renamed` and `changed`, English in `defaultNodeBoxLabels` |
 | `status?` | Slot at the header's end (a `Pill`) |
-| `line?` | `ReactNode`, one row under the header saying why the node is silent: `--pb-muted`, `--pb-err` when `failed`; one line, ellipsis; a string is also its tooltip |
+| `line?` | `ReactNode`, one row under the header saying why the node is silent: `--pb-muted`, `--pb-err` when `failed`; one line, ellipsis; a string is also its tooltip, and a cut line is written out whole in the inspector with the node's state, the app's ([U47](ux-rules.md#feedback)) |
 | `inputs?`, `outputs?` | `PortSpec[]`: each [`PortRow`](#portrow)'s props without `side` (`NodeBox` sets it), keyed by `id` |
 | `ports?` | `"stacked"` (the default: the inputs' rows, then the outputs') or `"side-by-side"` (two columns, the inputs on the left and the outputs on the right, row *n* of each on one line), open; one it does not know is stacked |
 | `footer?` | Slot: one row at the foot (badges), above a `--pb-line` rule |
@@ -164,10 +169,10 @@ drawing a box of its own may use it alone, inside a React Flow node.
 |---|---|
 | `id` | The handle id, passed to React Flow's `<Handle id>` unchanged (the app's own scheme) |
 | `side` | `"input"` (a `target` handle on the left edge) or `"output"` (a `source` handle on the right). React Flow's positions are physical, so right-to-left text does not mirror the handles; the row's words follow its handle |
-| `label` | `ReactNode`, the port's name; a string is also the row's tooltip |
+| `label` | `ReactNode`, the port's name; a string is also the row's tooltip, and a cut name is written out whole in the inspector's list of the node's ports, the app's ([U47](ux-rules.md#feedback)) |
 | `typeLabel?` | `ReactNode`, after the label in `--pb-muted`, the code face (the port's type) |
 | `hint?` | `"ok" \| "no" \| "origin" \| null`, open, while a wire is dragged: `origin` the handle the drag began at (an accent ring); `ok` accepts it (the dot in `--pb-ok`, grown to 12 px); `no` refuses it (the dot in `--pb-off`, the words muted, a not-allowed cursor); `null` no drag. One it does not know is drawn as `null`. Not given, the row takes its hint from the nearest [`<ConnectHints>`](#useconnecthints) (none outside one); given, even as `null`, it wins over that |
-| `reason?` | Why `no`: the handle's and the row's tooltip while `hint` is `no`. A reason from `<ConnectHints>` comes first |
+| `reason?` | Why `no`: the handle's and the row's tooltip while `hint` is `no`. A reason from `<ConnectHints>` comes first, and is also [`ConnectStatus`](#connectstatus)' words; a row's own `reason` is not, so the app says it in words too ([U47](ux-rules.md#feedback)) |
 | `problem?` | `string`: a [`WarnMark`](components.md#state) beside the label, with this as its words |
 | `trailing?` | Slot at the row's inner end, toward the box's centre (a [`Meter`](#meter)) |
 | `connectable?` | `true` by default; `<Handle isConnectable>` |
@@ -282,7 +287,7 @@ const edge: WireEdge = { id, source, sourceHandle, target, targetHandle, type: "
 | `flow?` | Round dots 12 px apart moving along the wire toward the input, one period per `--pb-motion-flow` |
 | `arrow?` | An arrowhead at the input end, its tip on the handle and pointing into the node from the handle's side, 8 px long; drawn by `Wire` (not an SVG `<marker>`), so it takes the tone |
 | `label?` | `ReactNode` at the midpoint, on the raised surface in `--pb-text-sm`, through React Flow's `EdgeLabelRenderer`; it takes no pointer events. An `err` or `refused` wire says why in it, or in the inspector when the reason is longer ([F13](foundations.md#tones)) |
-| `title?` | `string`: a `<title>` on the hit path, the wire's tooltip |
+| `title?` | `string`: a `<title>` on the hit path, the wire's tooltip. A convenience only, for a pointer: what it says is also in words, in `label` or in the inspector when the wire is selected ([U47](ux-rules.md#feedback)) |
 
 - **React Flow's edge.** The visible path is React Flow's `BaseEdge`, so it keeps
   `react-flow__edge-path` (`Wire` adds `pb-wire-path`) and the edge's `markerStart`, `markerEnd`

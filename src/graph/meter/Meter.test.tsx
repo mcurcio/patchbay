@@ -5,7 +5,15 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import { createRef, Profiler } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { LiveSubscribe } from "../../hooks";
-import { defaultMeterLabels, defaultMeterTitle, Meter, type MeterHandle, meterFraction, toDb } from "./Meter";
+import {
+  defaultMeterLabels,
+  defaultMeterTitle,
+  formatMeterDb,
+  Meter,
+  type MeterHandle,
+  meterFraction,
+  toDb,
+} from "./Meter";
 import css from "./Meter.css?raw";
 
 function source(initial: readonly [number, number] = [0, 0]) {
@@ -74,6 +82,12 @@ describe("the scale", () => {
   it("writes the English tooltip with −∞ for silence", () => {
     expect(defaultMeterTitle(-12, -18.34, false)).toBe("peak -12.0 dB, rms -18.3 dB");
     expect(defaultMeterTitle(-Infinity, -Infinity, false)).toBe("peak −∞ dB, rms −∞ dB");
+  });
+
+  it("formats a level as the tooltip does, for an app writing the numbers in words", () => {
+    expect(formatMeterDb(toDb(0.25))).toBe("-12.0");
+    expect(formatMeterDb(-Infinity)).toBe("−∞");
+    expect(formatMeterDb(0)).toBe("0.0");
   });
 });
 

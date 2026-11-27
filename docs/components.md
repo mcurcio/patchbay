@@ -465,7 +465,10 @@ props.
   units (a tab is one); a line past the end is read as the last. Each line a diagnostic names gets
   a mark in the gutter by its worst severity: a circle in `--pb-err` for `error`, a diamond in
   `--pb-warn` for `warning`, and a ring in `--pb-muted` for any other severity, so the severity
-  never rests on colour alone; the mark's tooltip lists the line's diagnostics. Under the text a
+  never rests on colour alone; the mark's tooltip lists the line's diagnostics, a convenience: the
+  same words are read in the textarea's description (below) and are the app's to list under the box,
+  each row putting the caret at its place ([patterns](patterns.md#editing-text),
+  [U47](ux-rules.md#feedback)). Under the text a
   wavy line in the same tone runs from the column to the end of the word there (one character on
   white space), or under the line's text when there is no column; where marks overlap, error
   wins over warning over any other. A press on a gutter mark focuses the textarea and puts the

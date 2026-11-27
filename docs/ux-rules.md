@@ -174,9 +174,14 @@ cite them. How to read a rule (Built, The app's, Not yet):
   status line, which also says why a port refuses while a wire is dragged (U59). Tooltips stay, as
   a convenience. **Built:** CommandPalette, whose active row (every row on touch) is written out
   whole (F20); [`ConnectStatus`](graph.md#connectstatus), the canvas's status line, for a refusing
-  port's reason. **Not yet:** a wire's `title`, a meter's numbers, the gutter mark's list of
-  diagnostics and a cut node title are in a tooltip only, with no place named for their words
-  (pb-nx9.79).
+  port's reason; CodeEditor, whose gutter marks' diagnostics are read in its description. Each
+  other tooltip's docs name where its words go: a cut node title, line or port name in the
+  inspector ([`NodeBox`](graph.md#nodebox), [`PortRow`](graph.md#portrow)); a wire's `title` in its
+  `label` or the inspector ([`Wire`](graph.md#wire)); a meter's numbers in the inspector, written
+  with `formatMeterDb` ([`Meter`](graph.md#meter)); the gutter marks' diagnostics in the list under
+  the box ([`CodeEditor`](components.md#code)). **The app's:** writing those words there, and
+  every `title` it gives a component (Pill, Badge, KeyValue, StatusWords, RadioGroup, WarnMark).
+  **Not yet:** DiffView's whole file path is only its heading's tooltip: pb-nx9.95.
 
 ## Confirmation and undo
 

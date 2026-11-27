@@ -77,11 +77,17 @@ export function meterFraction(db: number, floor: number): number {
   return Math.min(1, Math.max(0, (db - floor) / -floor));
 }
 
-const formatDb = (db: number) => (db === -Infinity ? "−∞" : db.toFixed(1));
+/**
+ * A level in dBFS as the tooltip writes it: one decimal ("-12.0"), and "−∞" for silence. An app writing a meter's
+ * numbers in words (the inspector) uses it, with `toDb`, so they read as the tooltip's.
+ */
+export function formatMeterDb(db: number): string {
+  return db === -Infinity ? "−∞" : db.toFixed(1);
+}
 
 /** The English tooltip: "peak -12.0 dB, rms -18.3 dB", with −∞ for silence. */
 export const defaultMeterTitle: MeterTitle = (peakDb, rmsDb) =>
-  `peak ${formatDb(peakDb)} dB, rms ${formatDb(rmsDb)} dB`;
+  `peak ${formatMeterDb(peakDb)} dB, rms ${formatMeterDb(rmsDb)} dB`;
 
 /** The meter's own words, each replaceable. */
 export interface MeterLabels {

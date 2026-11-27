@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useRef, useState } from "react";
 import { expect, waitFor } from "storybook/test";
-import type { LiveSubscribe } from "../../hooks";
+import { type LiveSubscribe, useLiveValue } from "../../hooks";
 import { Button } from "../../primitives";
-import { Meter, type MeterHandle } from "./Meter";
+import { formatMeterDb, Meter, type MeterHandle, toDb } from "./Meter";
 
 type Level = readonly [peak: number, rms: number];
 
@@ -175,6 +175,35 @@ export const Labels: Story = {
     await expect(meter).toHaveAccessibleName("Signal level");
     await userEvent.hover(meter);
     await expect(meter).toHaveAttribute("title", "Peak -12 dBFS, average -18 dBFS");
+  },
+};
+
+/**
+ * The numbers in words, as an app's inspector writes them beside the meter (U47): read from the same source through
+ * useLiveValue and painted into a text node, never through React state, with formatMeterDb so they read as the
+ * tooltip does.
+ */
+function NumbersDemo({ source }: { source: { subscribe: LiveSubscribe; read: () => Level } }) {
+  const words = useRef<HTMLSpanElement>(null);
+  useLiveValue(source.subscribe, source.read, ([peak, rms]) => {
+    if (words.current !== null) {
+      words.current.textContent = `Peak ${formatMeterDb(toDb(peak))} dB, RMS ${formatMeterDb(toDb(rms))} dB`;
+    }
+  });
+  return (
+    <div style={box}>
+      <Meter {...source} label="Left output" />
+      <p style={{ margin: "var(--pb-space-2) 0 0", fontSize: "var(--pb-text-sm)" }}>
+        <span ref={words} data-testid="numbers" />
+      </p>
+    </div>
+  );
+}
+
+export const NumbersInWords: Story = {
+  render: () => <NumbersDemo source={steady(-12, -18)} />,
+  play: async ({ canvas }) => {
+    await expect(canvas.getByTestId("numbers")).toHaveTextContent("Peak -12.0 dB, RMS -18.0 dB");
   },
 };
 

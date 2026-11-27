@@ -2,6 +2,7 @@ export {
   defaultMeterLabels,
   defaultMeterScale,
   defaultMeterTitle,
+  formatMeterDb,
   Meter,
   meterFraction,
   meterTitleEveryMs,
