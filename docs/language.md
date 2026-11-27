@@ -34,7 +34,8 @@ to, or a document it saves. patchbay never knows which, and draws both the same 
 | [`ux-rules.md`](ux-rules.md) | The rules every screen keeps: focus and keyboard, Escape, words, states, feedback, confirmation and undo, pending and queued and refused, the view and the canvas, right-to-left, forced colours, reduced motion |
 | [`patterns.md`](patterns.md) | Editing a live graph: the two commit models, adding, placing, connecting, inspecting, editing text, saving or queuing, refusals, following the view, going to a node, read-only, empty and offline, narrow and phone |
 
-Storybook's Foundations and Patterns pages, which show each live, are not built yet: pb-nx9.93.
+Storybook's Foundations and Patterns pages (`src/patterns/`) show each foundation and pattern live,
+built from the components' own stories, and link back to the section they show.
 
 ## Principles
 

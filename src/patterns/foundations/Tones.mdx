@@ -1,0 +1,44 @@
+import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as BadgeStories from "../../primitives/badge/Badge.stories";
+import * as NodeBoxStories from "../../graph/node-box/NodeBox.stories";
+import * as PillStories from "../../primitives/pill/Pill.stories";
+import * as WireStories from "../../graph/wire/Wire.stories";
+
+<Meta title="Foundations/Tones" />
+
+# Tones
+
+A tone says what a state is, and an app maps each of its states to one of patchbay's seven state
+tones and four change tones. What each means, and the rules F6 to F13, are in
+[foundations: tones](https://github.com/mcurcio/patchbay/blob/main/docs/foundations.md#tones).
+Switch the brand and theme in the toolbar to see each one hold.
+
+## State tones
+
+As Pill's dot and word, and as Badge, outlined and filled:
+
+<Canvas of={PillStories.All} />
+
+<Canvas of={BadgeStories.All} />
+
+As a node's stripe, with one tone it does not know drawn in `line-strong`:
+
+<Canvas of={NodeBoxStories.Tones} />
+
+## Change tones
+
+A queued edit, drawn by its own word on the node:
+
+<Canvas of={NodeBoxStories.Changes} />
+
+And as a wire's stroke:
+
+<Canvas of={WireStories.Tone} />
+
+## Not built yet
+
+- One tone set for every tone-taking component (Banner, StatusWords, Toaster and KeyValue take
+  five; Wire has no `renamed`): `pb-nx9.75`.
+- One look for a tone a component does not know: `pb-nx9.76`.
+- Wire's own `pending` tone goes; a queued wire is a change tone with dashes: `pb-nx9.74`.
+- Wire and KeyValue tones carried by more than colour: `pb-nx9.77`.

@@ -1,0 +1,30 @@
+import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as CanvasToolsStories from "../graph/canvas-tools/CanvasTools.stories";
+import * as FollowFitStories from "../graph/follow-fit/useFollowFit.stories";
+
+<Meta title="Patterns/Following the view" />
+
+# Following the view
+
+The view fits the whole graph whenever it changes shape or the canvas changes size, until the
+person moves the view; only Fit follows again. Going to a node selects it, moves the view to it and
+stops following. The rules are in [patterns: following the view](https://github.com/mcurcio/patchbay/blob/main/docs/patterns.md#following-the-view)
+and [going to a node](https://github.com/mcurcio/patchbay/blob/main/docs/patterns.md#going-to-a-node).
+
+## Following, and stopping
+
+Press "Add a node" and the view follows; pan or wheel and it stops; the fit tool follows again.
+
+<Canvas of={FollowFitStories.All} />
+
+## The canvas tools
+
+Zoom, Fit and Tidy, one Tab stop:
+
+<Canvas of={CanvasToolsStories.All} />
+
+## Not built yet
+
+- The zoom tools, their keys and a minimap drag stopping the following: `pb-nx9.52`.
+- The default fit leaving the tools' corner clear: `pb-nx9.83`.
+- Finding a node in the palette by more than its name (keywords): `pb-nx9.51`.

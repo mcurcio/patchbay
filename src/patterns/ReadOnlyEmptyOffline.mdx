@@ -1,0 +1,40 @@
+import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as AddAtStories from "../graph/add-at/useAddAt.stories";
+import * as SpinnerStories from "../primitives/spinner/Spinner.stories";
+import * as PatternStories from "./Patterns.stories";
+
+<Meta title="Patterns/Read-only, empty and offline" />
+
+# Read-only, empty and offline
+
+A read-only graph turns off every edit with the switches there are and says why in a `quiet`
+banner, while reading, selecting and inspecting stay; an empty graph says how to add; a lost
+connection says whether it is coming back, and the canvas keeps the last graph it had. The
+switches and states are in [patterns: a read-only graph](https://github.com/mcurcio/patchbay/blob/main/docs/patterns.md#a-read-only-graph) and
+[patterns: empty, loading and offline](https://github.com/mcurcio/patchbay/blob/main/docs/patterns.md#empty-loading-and-offline).
+
+## Read only
+
+No connecting, dragging or deleting; a quiet banner says why, and a locked item carries a `muted`
+badge with its reason:
+
+<Canvas of={PatternStories.ReadOnlyGraph} />
+
+With adding off, a double-click zooms again:
+
+<Canvas of={AddAtStories.Off} />
+
+## Loading
+
+<Canvas of={SpinnerStories.Labelled} />
+
+## Offline
+
+The connection's pill, in the top bar's `status` slot:
+
+<Canvas of={PatternStories.Connection} />
+
+## Not built yet
+
+- The empty-canvas hint, which goes with the first node: `pb-nx9.87`.
+- A labelled Spinner's status region present before its label: `pb-nx9.65`.

@@ -1,0 +1,34 @@
+import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as CodeEditorStories from "../composites/code-editor/CodeEditor.stories";
+import * as PatternStories from "./Patterns.stories";
+
+<Meta title="Patterns/Editing text" />
+
+# Editing text
+
+A CodeEditor for text the source reads, its diagnostics marked and listed; a draft is never
+overwritten, and goes stale when its own text changes underneath; read-only text says why, and is
+never dimmed. The rules are in [patterns: editing text](https://github.com/mcurcio/patchbay/blob/main/docs/patterns.md#editing-text).
+
+## A draft that goes stale
+
+Type in the box, then change the text underneath: the draft is kept, and a `warn` banner offers
+Reload, which takes the new text.
+
+<Canvas of={PatternStories.StaleDraft} />
+
+## Diagnostics
+
+Marks in the gutter, a wavy line under the text, and the words read with the editor; a press on a
+mark puts the caret there:
+
+<Canvas of={CodeEditorStories.Diagnostics} />
+
+## Read only
+
+<Canvas of={CodeEditorStories.ReadOnly} />
+
+## Not built yet
+
+- A list of the diagnostics in words under the box, each row putting the caret at its place
+  (DiagnosticList): `pb-nx9.89`.

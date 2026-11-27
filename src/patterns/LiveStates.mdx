@@ -1,0 +1,45 @@
+import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as ButtonStories from "../primitives/button/Button.stories";
+import * as GhostWireStories from "../graph/ghost-wire/GhostWire.stories";
+import * as NodeBoxStories from "../graph/node-box/NodeBox.stories";
+import * as PatternStories from "./Patterns.stories";
+
+<Meta title="Patterns/Live, pending, queued, refused" />
+
+# Live, pending, queued, refused
+
+What the canvas shows is what the source holds; what the person asked for is drawn apart from it
+until the source answers. **Pending** is a request sent and not answered yet; **queued** is a
+change held until a save. An app applies each change at once or queues it, and both draw with the
+same states: [patterns: two commit models](https://github.com/mcurcio/patchbay/blob/main/docs/patterns.md#two-commit-models), and the rules in
+[ux-rules: live, pending, queued, refused](https://github.com/mcurcio/patchbay/blob/main/docs/ux-rules.md#live-pending-queued-refused).
+
+## Every state, each with its word
+
+A live wire, a request pending (a GhostWire), a queued wire (a change tone with dashes) and a
+queued node (its change badge), a refused request, and a node that failed with its reason on its
+line:
+
+<Canvas of={PatternStories.States} />
+
+## One request, stepped through
+
+Connect sends the request: the button is busy and a ghost stands for the wire. Then answer for the
+source. Accepted, the ghost becomes a live wire; refused, it turns `refused` and the reason is in
+words. In an app the reason goes in a toast
+([Feedback](?path=/docs/patterns-refusals-and-feedback--docs)).
+
+<Canvas of={PatternStories.RequestSteps} />
+
+## The parts
+
+<Canvas of={GhostWireStories.All} />
+
+<Canvas of={ButtonStories.BusyLabel} />
+
+<Canvas of={NodeBoxStories.Failed} />
+
+## Not built yet
+
+- A ghost NodeBox for a node whose add is pending: `pb-nx9.82`.
+- Wire's own `pending` tone goes; a queued wire is a change tone with dashes: `pb-nx9.74`.

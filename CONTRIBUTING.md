@@ -41,6 +41,7 @@ pnpm storybook                          # the catalogue on http://localhost:6006
 | `src/tokens/` | `tokens.css` (every `--pb-` token, light and dark), `base.css`, and the token tests |
 | `src/primitives/`, `src/composites/`, `src/shell/`, `src/graph/`, `src/hooks/` | One folder per component or hook |
 | `src/testing/` | `/testing`: the brand contrast check apps run in their own tests ([`docs/tokens.md`](docs/tokens.md#checking-a-brand)) |
+| `src/patterns/` | Storybook's Foundations and Patterns pages (MDX) and the stories only they show; not part of the package |
 | `examples/brands/` | Example brands: how an app writes its own look; not part of the package |
 | `.storybook/` | Storybook's config: the brand and theme toolbar, viewports, the accessibility check |
 | `docs/` | The library docs ([`docs/README.md`](docs/README.md)), and `design/` for unbuilt work |

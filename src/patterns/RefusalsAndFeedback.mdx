@@ -1,0 +1,52 @@
+import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as BannerStories from "../composites/banner/Banner.stories";
+import * as FieldStories from "../primitives/field/Field.stories";
+import * as NodeBoxStories from "../graph/node-box/NodeBox.stories";
+import * as PillStories from "../primitives/pill/Pill.stories";
+import * as StatusWordsStories from "../composites/status-words/StatusWords.stories";
+import * as ToasterStories from "../composites/toaster/Toaster.stories";
+
+<Meta title="Patterns/Refusals and feedback" />
+
+# Refusals and feedback
+
+News lands where it happened and lasts as long as its cause: inline for what the person is
+touching, a banner for a lasting state of a pane, a toast for an event off-screen or asked from no
+surface, a pill for one thing's state. A refusal says why, in words, where the change was asked.
+The channel table is
+[ux-rules: feedback](https://github.com/mcurcio/patchbay/blob/main/docs/ux-rules.md#feedback) (U44); where each refusal lands is
+[patterns: refusals](https://github.com/mcurcio/patchbay/blob/main/docs/patterns.md#refusals).
+
+## Inline: what the person is touching
+
+A field's error:
+
+<Canvas of={FieldStories.WithError} />
+
+A node's own line:
+
+<Canvas of={NodeBoxStories.Failed} />
+
+## A banner: a lasting state of a pane
+
+<Canvas of={BannerStories.Err} />
+
+<Canvas of={BannerStories.WithActions} />
+
+## A toast: an event from elsewhere
+
+With its one action (Show, Reload, Check again), and held while hovered or focused:
+
+<Canvas of={ToasterStories.Action} story={{ inline: false, height: "320px" }} />
+
+## Status words and a pill: a pane's count, one thing's state
+
+<Canvas of={StatusWordsStories.Mixed} />
+
+<Canvas of={PillStories.Pulsing} />
+
+## Not built yet
+
+- The canvas's status line, for why a port refuses during a drag: `pb-nx9.78`.
+- Every fact a native tooltip holds also in words: `pb-nx9.79`.
+- Banner's live region present before its words: `pb-nx9.64`.

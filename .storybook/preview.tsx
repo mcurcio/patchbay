@@ -49,6 +49,35 @@ const preview: Preview = {
     // An accessibility violation fails the story's test, not just its panel.
     a11y: { test: "error" },
     controls: { matchers: { color: /(background|color)$/i } },
+    // The design language first, in its reading order (docs/patterns.md's), then the layers.
+    options: {
+      storySort: {
+        order: [
+          "Introduction",
+          "Foundations",
+          ["Tones", "Motion", "Touch and density"],
+          "Patterns",
+          [
+            "Live, pending, queued, refused",
+            "Adding a node",
+            "Connecting",
+            "Selecting and inspecting",
+            "Editing text",
+            "Saving or queuing changes",
+            "Refusals and feedback",
+            "Following the view",
+            "Read-only, empty and offline",
+            "Narrow and phone",
+            "Keyboard and Escape",
+          ],
+          "Primitives",
+          "Composites",
+          "Shell",
+          "Graph",
+          "Hooks",
+        ],
+      },
+    },
   },
 };
 

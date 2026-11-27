@@ -1,0 +1,42 @@
+import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as AppShellStories from "../shell/app-shell/AppShell.stories";
+
+<Meta title="Patterns/Narrow and phone" />
+
+# Narrow and phone
+
+On a narrow window the inspector is a sheet at the inline end; at phone width it rises from the
+bottom; targets and text fields take their touch sizes, and the top bar keeps only the status,
+the palette, the theme switch and the inspector. The layout is in
+[patterns: narrow and phone layouts](https://github.com/mcurcio/patchbay/blob/main/docs/patterns.md#narrow-and-phone-layouts), and the widths in
+[foundations: widths](https://github.com/mcurcio/patchbay/blob/main/docs/foundations.md#widths).
+
+Each example below is drawn in a frame of that width, so the shell takes the layout it would on a
+window that wide.
+
+## Wide
+
+<Canvas of={AppShellStories.All} story={{ inline: false, height: "520px" }} />
+
+## Narrow (700 px)
+
+<div style={{ maxWidth: "700px" }}>
+  <Canvas of={AppShellStories.TitledNarrow} story={{ inline: false, height: "520px" }} />
+</div>
+
+## Phone (390 px)
+
+<div style={{ maxWidth: "390px" }}>
+  <Canvas of={AppShellStories.TitledPhone} story={{ inline: false, height: "640px" }} />
+</div>
+
+## Right-to-left
+
+The inspector at the inline end, the left, its splitter mirrored:
+
+<Canvas of={AppShellStories.RightToLeft} story={{ inline: false, height: "520px" }} />
+
+## Not built yet
+
+- The inspector's content kept mounted across widths, so a draft in it survives the switch:
+  `pb-nx9.88`.

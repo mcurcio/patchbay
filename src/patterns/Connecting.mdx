@@ -1,0 +1,42 @@
+import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as ConnectHintsStories from "../graph/connect-hints/useConnectHints.stories";
+import * as GhostWireStories from "../graph/ghost-wire/GhostWire.stories";
+import * as PortRowStories from "../graph/port-row/PortRow.stories";
+import * as ToasterStories from "../composites/toaster/Toaster.stories";
+import * as PatternStories from "./Patterns.stories";
+
+<Meta title="Patterns/Connecting" />
+
+# Connecting
+
+A drag from a handle; every candidate port says yes or no from the app's one rule; a drop makes a
+request (a ghost) or a queued change (a dashed wire); the source's answer makes it live or
+refused. From the keyboard, each port in the inspector has a "Connect to" choice. The steps are in
+[patterns: connecting](https://github.com/mcurcio/patchbay/blob/main/docs/patterns.md#connecting).
+
+## Dragging, with hints
+
+Drag from an output: the ports that accept the wire grow, the ones that refuse dim.
+
+<Canvas of={ConnectHintsStories.Drag} />
+
+A port with a problem says so in words:
+
+<Canvas of={PortRowStories.Problem} />
+
+## The drop and the answer
+
+<Canvas of={PatternStories.RequestSteps} />
+
+A refused request's reason goes in a toast, the ghost going with it:
+
+<Canvas of={GhostWireStories.Refused} />
+
+<Canvas of={ToasterStories.BottomEnd} story={{ inline: false, height: "320px" }} />
+
+## Not built yet
+
+- The canvas's status line, saying why a port refuses while a wire is dragged: `pb-nx9.78`.
+  Until then the reason is only the port's tooltip.
+- The ports `canConnect` accepts for one port, for the inspector's "Connect to" Select (the
+  keyboard path): `pb-nx9.81`.

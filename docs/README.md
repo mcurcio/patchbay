@@ -13,8 +13,9 @@ part is and takes).
 | [`tokens.md`](tokens.md) | The design tokens, the light and dark themes, writing a brand and checking its contrast (`/testing`), the base stylesheet, and the tests that hold them |
 | [`components.md`](components.md) | The rules every component keeps, and each built component, the shell and each hook: what it is for, its props, its keyboard and touch behaviour |
 | [`graph.md`](graph.md) | The graph layer's built parts (`Meter`, the node geometry, `NodeBox`, `PortRow`, `useConnectHints`, `Wire`, `GhostWire`, `CanvasTools`, `useAddAt`, `useFollowFit`): props, how they move, and how they draw |
-| [`design/`](design/patchbay.md) | Designs for work not built yet (`SchemaForm`, Storybook's screenshots and its Foundations and Patterns pages, the overlay helper); when a part is built it moves into the pages above |
+| [`design/`](design/patchbay.md) | Designs for work not built yet (`SchemaForm`, Storybook's screenshots, the overlay helper); when a part is built it moves into the pages above |
 
 A rule the code does not follow yet says so ("Not yet") and names the bead that holds the change.
 Storybook (`pnpm storybook`) is the catalogue: every component's states under each example brand
-and theme. How to build and test is in [`AGENTS.md`](../AGENTS.md#build-and-test).
+and theme, and the Foundations and Patterns pages, which show the design language's sections live.
+How to build and test is in [`AGENTS.md`](../AGENTS.md#build-and-test).

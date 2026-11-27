@@ -8,6 +8,20 @@ A React component library for graph-based editors and live dashboards: design to
 primitives, and graph components on React Flow. Components only draw: data comes in as props, and
 what the person does goes out as callbacks.
 
+## The design language
+
+How an app built on patchbay looks and behaves is written down in
+[the design language](https://github.com/mcurcio/patchbay/blob/main/docs/language.md): its
+principles, then the [foundations](https://github.com/mcurcio/patchbay/blob/main/docs/foundations.md),
+the [UX rules](https://github.com/mcurcio/patchbay/blob/main/docs/ux-rules.md) and the
+[patterns for editing a live graph](https://github.com/mcurcio/patchbay/blob/main/docs/patterns.md).
+Read it first. The **Foundations** and **Patterns** pages here show those sections live, built from
+the components' own stories; each links to the section it shows, which holds the rules.
+
+## This catalogue
+
 The toolbar switches the **brand** (`data-brand` on `<html>`: none, the base theme, or one of the
 example brands in `examples/brands/`) and the **theme** (`data-theme`: system, light, dark); the
-viewport switch covers the shell's three widths.
+viewport switch covers the shell's three widths. Each component's props are in
+[`components.md`](https://github.com/mcurcio/patchbay/blob/main/docs/components.md) and
+[`graph.md`](https://github.com/mcurcio/patchbay/blob/main/docs/graph.md).

@@ -1,0 +1,36 @@
+import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as ButtonStories from "../primitives/button/Button.stories";
+import * as DiffViewStories from "../composites/diff-view/DiffView.stories";
+import * as NodeBoxStories from "../graph/node-box/NodeBox.stories";
+import * as WireStories from "../graph/wire/Wire.stories";
+
+<Meta title="Patterns/Saving or queuing changes" />
+
+# Saving or queuing changes
+
+An app that queues changes draws each on the canvas, lists them in words with a drop button each,
+shows the diff of what the save writes, and has one Save, busy while it runs; the queue keeps only
+the net change. The states, from clean to saved or stale, are in
+[patterns: saving or queuing changes](https://github.com/mcurcio/patchbay/blob/main/docs/patterns.md#saving-or-queuing-changes).
+
+## Queued changes on the canvas
+
+Each change by its word on the node, and a queued wire dashed:
+
+<Canvas of={NodeBoxStories.Changes} />
+
+<Canvas of={WireStories.Dashed} />
+
+## What the save writes
+
+<Canvas of={DiffViewStories.Files} />
+
+## Save, busy while it runs
+
+<Canvas of={ButtonStories.BusyLabel} />
+
+## Not built yet
+
+- The list of queued changes, with their count, a drop button per row, and slots for Check, Save
+  and Discard (ChangeList): `pb-nx9.90`. Mod+Z dropping the last change is the app's binding
+  over it.
