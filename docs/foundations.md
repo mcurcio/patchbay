@@ -169,8 +169,8 @@ Reduced motion: [ux-rules](ux-rules.md#reduced-motion).
   not: a splitter's bar, a gutter mark ([`components.md`](components.md#layout), Splitter;
   [`components.md`](components.md#code), CodeEditor).
 - **F39. The component draws its own press.** Pressable things set
-  `-webkit-tap-highlight-color: transparent`. **Built:** Button, ToolGroup, ThemeSwitch, Checkbox,
-  RadioGroup, Splitter, DiffView.
+  `-webkit-tap-highlight-color: transparent`. **Built:** Button (and so IconButton and ThemeSwitch),
+  ToolGroup, Checkbox, RadioGroup, Splitter, DiffView.
 - **F40. A target can be found without hover.** On touch, an IconButton has its `line-strong` edge
   at rest and a Splitter draws its grip (a short bar) at rest. **Built:** IconButton, Splitter
   ([`components.md`](components.md#actions), IconButton; [`components.md`](components.md#layout),
@@ -200,9 +200,9 @@ Reduced motion: [ux-rules](ux-rules.md#reduced-motion).
 - **F45. No flash.** `themeScript` in the page's `<head>` applies a kept choice before the first
   paint ([`components.md`](components.md#usetheme)).
 - **F46. One theme switch.** [`ThemeSwitch`](components.md#actions) cycles system, light and dark,
-  named by the choice; an app uses it and its words rather than a switch of its own. **Not yet:**
-  ThemeSwitch keeps its own theme cycle (pb-nx9.22) and copies Button's look in its own stylesheet
-  rather than drawing with Button: pb-nx9.68.
+  named by the choice; an app uses it and its words rather than a switch of its own. **Built:**
+  ThemeSwitch, drawn with a neutral Button. **Not yet:** ThemeSwitch keeps its own theme cycle:
+  pb-nx9.22.
 - **F47. A brand overrides tokens and adds none,** each override with its reason, and passes the
   contrast check apps run from `/testing` ([`tokens.md`](tokens.md#writing-a-brand)).
 - **F48. React Flow follows the tokens.** Its `--xy-*` variables point at them; its `colorMode` is

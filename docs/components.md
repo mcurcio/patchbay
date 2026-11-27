@@ -100,7 +100,8 @@ It is the one look for Close (what the person opened: a dialog, a sheet, the ins
 (news that came by itself: a banner, a toast), always as the child of an `IconButton` named by the
 word ([U30](ux-rules.md#words)); `Dialog`, `Sheet`, `Banner` and `Toaster` draw theirs with it.
 
-**`ThemeSwitch`**: one button that cycles system, light and dark. `choice`, `onChoose(next)`,
+**`ThemeSwitch`**: one button that cycles system, light and dark, drawn as a neutral `Button`
+(its face, hover, focus ring, touch height and forced colours). `choice`, `onChoose(next)`,
 `labels?` (its words, [rule 8](#rules-every-component-keeps): `theme`, `system`, `light`, `dark`,
 `systemHint`, `clickFor`; `defaultThemeSwitchLabels`). It shows an icon and the choice's word; its
 name is "Theme: dark", its tooltip says what a press does (`themeSwitchTitle`). Below 600 px the

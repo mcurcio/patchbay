@@ -286,8 +286,7 @@ are F10's:
 - **U73. Every edge and state stays.** What a fill carried moves to a system colour, with
   `forced-color-adjust: none` where a shape would vanish. **Built:** a
   `@media (forced-colors: active)` block in each stylesheet whose fill or hidden edge would be
-  lost; the rest keep native edges. **Not yet:** ThemeSwitch, which copies Button's look without
-  its block: pb-nx9.68.
+  lost (ThemeSwitch keeps Button's, as it is drawn with Button); the rest keep native edges.
 - **U74. Three system roles.** Selection is `Highlight`; refused and disabled are `GrayText`;
   ordinary marks are `CanvasText`. **Built:** per component.
 

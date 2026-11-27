@@ -1,33 +1,8 @@
-/* The theme switch (ThemeSwitch.tsx): a plain button with an icon and the choice's word. It sets its own box, type and
-   focus ring, so it needs no base stylesheet. */
-.pb-theme-switch {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--pb-space-2);
-  box-sizing: border-box;
-  min-height: 28px;
-  margin: 0;
-  padding: 0 var(--pb-space-3);
-  font-family: var(--pb-font-ui);
-  font-size: var(--pb-text-md);
-  line-height: 1.2;
+/* The theme switch (ThemeSwitch.tsx): a neutral Button with an icon and the choice's word. Its face, hover, focus
+   ring, touch height and forced-colours edge are Button's (Button.css); this sheet keeps only what is the switch's own:
+   one line, and the icon alone at phone width. */
+.pb-button.pb-theme-switch {
   white-space: nowrap;
-  color: var(--pb-text);
-  background: var(--pb-raised);
-  border: 1px solid var(--pb-line-strong);
-  border-radius: var(--pb-radius-control);
-  cursor: pointer;
-  transition: background-color var(--pb-motion-fast);
-  -webkit-tap-highlight-color: transparent;
-}
-
-.pb-theme-switch:hover {
-  background: var(--pb-sunken);
-}
-
-.pb-theme-switch:focus-visible {
-  outline: 2px solid var(--pb-accent);
-  outline-offset: 2px;
 }
 
 .pb-theme-switch-icon {
@@ -36,7 +11,7 @@
 
 /* At phone width the icon alone: the button's name still says the choice. */
 @media (max-width: 599.98px) {
-  .pb-theme-switch {
+  .pb-button.pb-theme-switch {
     padding: 0 var(--pb-space-2);
   }
 
@@ -45,11 +20,9 @@
   }
 }
 
-/* A finger needs a 36 px target. */
+/* A finger needs a 36 px target: Button gives the height, and the icon alone the width. */
 @media (hover: none) and (pointer: coarse) {
-  .pb-theme-switch {
+  .pb-button.pb-theme-switch {
     min-width: 36px;
-    min-height: 36px;
-    justify-content: center;
   }
 }
