@@ -4,7 +4,7 @@
 // read at once, every other tone's in the status, read when the reader is free. A tone it does not know is drawn
 // neutrally.
 import { type ComponentPropsWithRef, type ReactNode, useEffect, useState } from "react";
-import { IconButton } from "../../primitives";
+import { CloseGlyph, IconButton } from "../../primitives";
 import "./Banner.css";
 
 /** The tones a banner draws; any other string is drawn neutrally. */
@@ -55,9 +55,7 @@ export function Banner({ tone, children, actions, onDismiss, labels, className, 
       {actions !== undefined && <div className="pb-banner-actions">{actions}</div>}
       {onDismiss !== undefined && (
         <IconButton className="pb-banner-dismiss" size="sm" label={words.dismiss} onClick={onDismiss}>
-          <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
-            <path d="M3 3l10 10M13 3L3 13" fill="none" stroke="currentColor" strokeWidth="1.75" />
-          </svg>
+          <CloseGlyph />
         </IconButton>
       )}
     </div>

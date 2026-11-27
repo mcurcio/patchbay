@@ -117,13 +117,15 @@ describe("Banner", () => {
     expect(banner).toHaveAttribute("data-pane", "files");
   });
 
-  it("closes by an IconButton, which keeps a touch target of its own", () => {
+  it("closes by the close glyph on an IconButton, which keeps a touch target of its own", () => {
     render(
       <Banner tone="ok" onDismiss={() => {}}>
         Saved.
       </Banner>,
     );
-    expect(screen.getByRole("button", { name: "Dismiss" })).toHaveClass("pb-icon-button");
+    const button = screen.getByRole("button", { name: "Dismiss" });
+    expect(button).toHaveClass("pb-icon-button");
+    expect(button.querySelector("svg.pb-close-glyph")).not.toBeNull();
   });
 
   it("has nothing to stop under reduced motion: no animation or transition", () => {

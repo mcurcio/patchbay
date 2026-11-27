@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, fn, waitFor } from "storybook/test";
 import { tokenColor } from "../../test/token-color";
 import { underTouch } from "../../test/touch-rules";
+import { CloseGlyph } from "./CloseGlyph";
 import { IconButton } from "./IconButton";
 
 const meta = {
@@ -50,7 +51,22 @@ export const Danger: Story = { args: { tone: "danger", label: "Remove", children
 
 export const UnknownTone: Story = { args: { tone: "sparkly", label: "Unknown tone", children: "?" } };
 
-export const Small: Story = { args: { size: "sm", label: "Close", children: "×" } };
+export const Small: Story = { args: { size: "sm", label: "Close", children: <CloseGlyph /> } };
+
+/**
+ * The close glyph, `CloseGlyph`: the one look for Close (a dialog, a sheet, the inspector) and Dismiss (a banner, a
+ * toast), always on an IconButton named by the word (U30).
+ */
+export const Close: Story = {
+  args: { label: "Close", children: <CloseGlyph /> },
+  play: async ({ canvas }) => {
+    const button = canvas.getByRole("button", { name: "Close" });
+    await expect(button).toHaveAttribute("title", "Close");
+    const glyph = button.querySelector("svg.pb-close-glyph");
+    await expect(glyph).not.toBeNull();
+    await expect(glyph?.closest("[aria-hidden='true']")).not.toBeNull();
+  },
+};
 
 export const Pressed: Story = { args: { "aria-pressed": true, label: "Minimap", children: "▦" } };
 

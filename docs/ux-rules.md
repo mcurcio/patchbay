@@ -112,8 +112,8 @@ cite them. How to read a rule (Built, The app's, Not yet):
 - **U30. "Close" and "Dismiss".** "Close" for what the person opened (a dialog, a sheet, the
   inspector); "Dismiss" for news that came by itself (a banner, a toast). Both are one look, the
   close glyph on an IconButton named by the word. **Built:** Dialog, Sheet and AppShell's
-  inspector sheet (Close); Banner and Toaster say Dismiss. **Not yet:** Banner draws its own glyph
-  and a toast's Dismiss is a text button: pb-nx9.84.
+  inspector sheet (Close); Banner and Toaster (Dismiss); all draw
+  [`CloseGlyph`](components.md#actions), which an app's own close buttons use too.
 - **U31. An error says what happened, then what to do,** in plain words; the source's code comes
   after them, in code type (U29). **The app's:** the words of its errors.
 

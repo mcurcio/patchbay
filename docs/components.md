@@ -95,6 +95,11 @@ hovered, pressed or toned; 36 px on touch, edged in `--pb-line-strong` at rest t
 disabled), as nothing hovers ([F40](foundations.md#density-and-touch)); 40 px in a `ToolGroup`,
 whose frame is the edge.
 
+**`CloseGlyph`**: the close glyph, a cross in the current text colour, hidden from screen readers.
+It is the one look for Close (what the person opened: a dialog, a sheet, the inspector) and Dismiss
+(news that came by itself: a banner, a toast), always as the child of an `IconButton` named by the
+word ([U30](ux-rules.md#words)); `Dialog`, `Sheet`, `Banner` and `Toaster` draw theirs with it.
+
 **`ThemeSwitch`**: one button that cycles system, light and dark. `choice`, `onChoose(next)`,
 `labels?` (its words, [rule 8](#rules-every-component-keeps): `theme`, `system`, `light`, `dark`,
 `systemHint`, `clickFor`; `defaultThemeSwitchLabels`). It shows an icon and the choice's word; its
@@ -288,8 +293,9 @@ on a raised surface with a stripe in its tone at the start (warn and err on thei
   alert, read at once; every other tone's in the status, read when the screen reader is free. A
   change of words is read in its region, and a change of tone moves them to the other. The banner
   itself is not a live region and takes no `role`.
-- The words wrap and the actions drop under them in a narrow pane. The close button is an
-  `IconButton`, so it keeps a 36 px target on touch.
+- The words wrap and the actions drop under them in a narrow pane. The close button is the
+  [`CloseGlyph`](#actions) on an `IconButton` named `labels.dismiss`, so it keeps a 36 px target on
+  touch.
 
 **`StatusWords`**: a short row of states, each a word in its tone, a dot between each two (a pane's
 "2 errors · 1 warning · saved"). `items: { tone, label, title? }[]` (`Pill`'s seven tones, open:
@@ -320,8 +326,9 @@ folded away), `onDismiss(id)`, `onHold?(held)`, `placement?`, `labels?` (its wor
   and the container's width less the gutters on a phone. It draws nothing with no toasts but its
   two empty live regions, so keep it mounted.
 - **Each toast** says its text, then `×n` when it was shown n times (read as ", n times"), then
-  its action (a press runs it and dismisses the toast) and a Dismiss button, which the text
-  describes, so several read apart.
+  its action (a press runs it and dismisses the toast) and its Dismiss button, the
+  [`CloseGlyph`](#actions) on an `IconButton` named `labels.dismiss` (also its tooltip), which the
+  text describes, so several read apart.
 - **What is read:** two visually hidden live regions beside the stack, there before any toast
   ([U42](ux-rules.md#feedback)), say each toast's text (and ", n times") when
   it first shows and again when its count goes up, without its buttons: an `err` toast's in a
@@ -336,7 +343,7 @@ folded away), `onDismiss(id)`, `onHold?(held)`, `placement?`, `labels?` (its wor
   not passed on (so a sheet or dialog behind it stays open). After a toast that held the focus is
   dismissed, the focus moves to the toast beside it, or back to where it came from into the stack
   when none is left.
-- The buttons are `Button`s, so they keep a 36 px target on touch. A toast rises in over
+- The action is a `Button` and Dismiss an `IconButton`, so both keep a 36 px target on touch. A toast rises in over
   `--pb-motion-slow`, still under reduced motion; under forced colours the stripe stays, in the
   system's text colour.
 

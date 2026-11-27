@@ -14,8 +14,7 @@ import {
   useId,
   useRef,
 } from "react";
-import { CloseGlyph } from "../dialog/CloseGlyph";
-import { IconButton } from "../icon-button";
+import { CloseGlyph, IconButton } from "../icon-button";
 import "./Sheet.css";
 
 /**

@@ -140,6 +140,12 @@
   margin-inline-start: auto;
 }
 
+/* Dismiss is the close glyph on an IconButton, as a banner's (U30), in the text colour on the toast's surface. */
+.pb-button.pb-toast-dismiss {
+  flex: none;
+  color: var(--pb-text);
+}
+
 @keyframes pb-toast-in {
   from {
     opacity: 0;

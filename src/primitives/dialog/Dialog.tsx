@@ -7,8 +7,7 @@
 // several open dialogs keeps the focus.
 import { type ReactNode, type KeyboardEvent, useEffect, useId, useRef } from "react";
 import { createPortal } from "react-dom";
-import { IconButton } from "../icon-button";
-import { CloseGlyph } from "./CloseGlyph";
+import { CloseGlyph, IconButton } from "../icon-button";
 import "./Dialog.css";
 
 /** The dialog's own words, each replaceable. */

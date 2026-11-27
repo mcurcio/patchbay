@@ -8,7 +8,7 @@
 // beside it, or back to where it came from when none is left.
 import { type ComponentPropsWithRef, type ReactNode, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import type { ToastAction, ToastTone } from "../../hooks";
-import { Button } from "../../primitives";
+import { Button, CloseGlyph, IconButton } from "../../primitives";
 import "./Toaster.css";
 
 /** Where the stack sits; any other string is drawn inline. */
@@ -264,15 +264,17 @@ export function Toaster({
                       {toast.action.label}
                     </Button>
                   )}
-                  <Button
+                  <IconButton
+                    className="pb-toast-dismiss"
                     size="sm"
+                    label={words.dismiss}
                     aria-describedby={textId}
                     onClick={() => {
                       dismiss(toast.id);
                     }}
                   >
-                    {words.dismiss}
-                  </Button>
+                    <CloseGlyph />
+                  </IconButton>
                 </div>
               </li>
             );
