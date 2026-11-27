@@ -10,7 +10,7 @@ while a wire is dragged).
 
 ```ts
 import "@xyflow/react/dist/style.css";
-import { CanvasTools, ConnectHints, ConnectStatus, connectTargets, EmptyCanvasHint, GhostNode, GhostWire, mergeFlowProps, Meter, NodeBox, nodeBoxSize, PortRow, useAddAt, useConnectHints, useFollowFit, Wire } from "@mcurcio/patchbay/graph";
+import { CanvasTools, ConnectHints, ConnectStatus, connectTargets, EmptyCanvasHint, GhostNode, GhostWire, mergeFlowProps, Meter, NodeBox, nodeBoxSize, PortRow, useAddAt, useConnectHints, useContextAt, useFollowFit, Wire } from "@mcurcio/patchbay/graph";
 ```
 
 Importing the layer loads its stylesheet (`dist/graph.css`) and imports `@xyflow/react` (React Flow
@@ -478,6 +478,42 @@ Adding a node at a place on the canvas: `useAddAt(onAddAt, options?)` → `{ flo
   zooms in as React Flow's own does (or as the app's own `zoomOnDoubleClick` says).
 - A double-click has no keyboard path; the app's own add command (a palette entry, a button) is
   that path.
+
+## `useContextAt`
+
+A context menu at a point on the canvas: `useContextAt(onContextAt, options?)` → `{ flowProps }`.
+A right-click, or a long-press on a touch screen, on a node or on empty canvas asks the app to open
+its [`CommandPalette`](components.md#commands-and-keys) there, with the selection's (or the pressed
+node's) commands first; there is no menu of its own ([U66](ux-rules.md#the-view-and-the-canvas)).
+
+```tsx
+const context = useContextAt(({ at, node }) => openPalette({ at, node }));
+<ReactFlow {...mergeFlowProps(addAt.flowProps, context.flowProps)} … />
+```
+
+- **`onContextAt({ point, at, node?, by })`.** `point` is in flow coordinates, as `useAddAt`'s;
+  `at` is the same point in the window's, as the palette's `at` takes it; `node` is the node
+  pressed, as React Flow holds it (absent on empty canvas); `by` is `"contextmenu"` (a right-click) or
+  `"long-press"`.
+- **What counts.** React Flow's pane and its nodes. A handle, an edge or a panel is not a place for
+  it: a right-click there is the browser's, and a long-press there nothing.
+- **The right-click** is React Flow's `onPaneContextMenu` and `onNodeContextMenu`; the browser's own
+  menu is prevented where it asks.
+- **The long-press.** Touch has no contextmenu on every browser (iOS fires none), so the hook times
+  it: a primary touch held for `LONG_PRESS_MS` (500 ms) without moving more than `LONG_PRESS_SLOP`
+  (10 px) asks, at the point where it began. A move past the slop (a pan or a drag), a lift, a
+  cancel or a second finger (a pinch) before then asks nothing. A contextmenu that comes while the
+  touch is held (Android fires one) is that same long-press, so a press asks once. The click its lift
+  makes is swallowed, so it neither selects nor clears the selection the menu is for. A mouse's or
+  a pen's press is never timed.
+- **`flowProps`**: `onPaneContextMenu`, `onNodeContextMenu` and the pointer handlers
+  (`onPointerDown`, `onPointerMove`, `onPointerUp`, `onPointerCancel`), for `<ReactFlow>` (with
+  others through [`mergeFlowProps`](#mergeflowprops)). The object is the same across renders, and
+  the newest `onContextAt` is called.
+- **`options.enabled`** (`true`) switches it off, as an app with no commands at a point would: a
+  right-click is the browser's again, and a long-press nothing.
+- It draws nothing. Its keyboard path is the palette's own key (Mod+K, U18), whose commands act on
+  the selection ([U2](ux-rules.md#focus-and-keyboard)).
 
 ## `useFollowFit`
 

@@ -1,5 +1,6 @@
 import { Canvas, Meta } from "@storybook/addon-docs/blocks";
 import * as AppShellStories from "../shell/app-shell/AppShell.stories";
+import * as ContextAtStories from "../graph/context-at/useContextAt.stories";
 import * as KeyValueStories from "../primitives/key-value/KeyValue.stories";
 import * as NodeBoxStories from "../graph/node-box/NodeBox.stories";
 import * as PatternStories from "./Patterns.stories";
@@ -34,6 +35,9 @@ A selected node:
 
 <Canvas of={NodeBoxStories.Selected} />
 
-## Not built yet
+## A context menu at the point
 
-- A right-click or long-press at a point that opens the palette there: `pb-nx9.92`.
+A right-click, or a long-press on a touch screen, on a node or the canvas opens the palette at the
+point, the pressed node's commands first; there is no menu of its own:
+
+<Canvas of={ContextAtStories.RightClick} />

@@ -268,8 +268,9 @@ are F10's:
   **The app's:** its node types draw no fields.
 - **U66. A context menu is the palette at the point.** A right-click or a long-press on a node or
   the canvas opens the [`CommandPalette`](components.md#commands-and-keys) at the point (`at`),
-  with the selection's commands first; there is no menu of its own. **Not yet:** React Flow gives
-  the point of a right-click, and nothing gives a long-press's: pb-nx9.92.
+  with the selection's commands first; there is no menu of its own. **Built:**
+  [`useContextAt`](graph.md#usecontextat) gives the point and the node for both gestures. **The
+  app's:** the commands, and opening the palette.
 - **U67. Several things can be selected,** by React Flow's shift-click and box select, and the
   inspector shows their count and the actions for all
   ([patterns](patterns.md#selecting-and-inspecting)). **The app's:** the actions.

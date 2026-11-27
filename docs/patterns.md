@@ -113,7 +113,8 @@ selection:
 The inspector's title is the subject's name and its actions sit at the header's far end
 ([`AppShell`](components.md#appshell)). What is cut or a tooltip on the canvas is written out here
 (U47, F20), and names and values are edited here, never on the canvas (U65). A right-click or a
-long-press opens the palette at the point with the selection's commands first (U66).
+long-press opens the palette at the point with the selection's commands first
+([`useContextAt`](graph.md#usecontextat), U66).
 
 On a wide window the person may hide the inspector with a top-bar button; the app keeps the choice
 ([`usePersistentState`](components.md#usepersistentstate)), and a selection does not reopen it. On
