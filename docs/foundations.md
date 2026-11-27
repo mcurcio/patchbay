@@ -55,7 +55,7 @@ The change tones draw an edit that is queued, not true yet (F10):
   Banner, StatusWords, Toaster, KeyValue, NodeBox, Wire, GhostWire.
 - **F8. A severity is not a tone.** CodeEditor's diagnostics say `error` and `warning`, the words
   checkers emit; they are drawn as `err` and `warn`, and any other severity as `muted`
-  ([`components.md`](components.md#code), CodeEditor). **Built:** CodeEditor.
+  ([`components.md`](components.md#code), CodeEditor). **Built:** CodeEditor, DiagnosticList.
 - **F9. Pending is `quiet`, not `off`.** A request on its way is drawn in `--pb-quiet`, as
   GhostWire's `pending` is ([`graph.md`](graph.md#ghostwire)); `off` is stopped, or not a
   candidate. **Built:** GhostWire.

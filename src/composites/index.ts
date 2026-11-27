@@ -3,6 +3,7 @@
 export * from "./banner";
 export * from "./code-editor";
 export * from "./command-palette";
+export * from "./diagnostic-list";
 export * from "./diff-view";
 export * from "./shortcut-sheet";
 export * from "./status-words";

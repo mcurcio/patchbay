@@ -131,8 +131,8 @@ dialog to inspect.
 **When:** the person edits text the source reads (a node's definition, a whole file).
 
 **How:** [`CodeEditor`](components.md#code) for the text, in the inspector or the drawer, its
-diagnostics marked in the gutter and listed in words under the box, each row putting the caret at
-its place (patchbay's list: not yet, pb-nx9.89); [`Field`](components.md#forms) with
+diagnostics marked in the gutter and listed in words under the box by
+[`DiagnosticList`](components.md#code), each row putting the caret at its place; [`Field`](components.md#forms) with
 [`TextInput`](components.md#forms) for one value; a Save [`Button`](components.md#actions), busy
 while its request is out; the draft's state as a status word.
 

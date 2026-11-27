@@ -1,5 +1,6 @@
 import { Canvas, Meta } from "@storybook/addon-docs/blocks";
 import * as CodeEditorStories from "../composites/code-editor/CodeEditor.stories";
+import * as DiagnosticListStories from "../composites/diagnostic-list/DiagnosticList.stories";
 import * as PatternStories from "./Patterns.stories";
 
 <Meta title="Patterns/Editing text" />
@@ -24,11 +25,10 @@ mark puts the caret there:
 
 <Canvas of={CodeEditorStories.Diagnostics} />
 
+Listed in words under the box, each row putting the caret at its place:
+
+<Canvas of={DiagnosticListStories.Default} />
+
 ## Read only
 
 <Canvas of={CodeEditorStories.ReadOnly} />
-
-## Not built yet
-
-- A list of the diagnostics in words under the box, each row putting the caret at its place
-  (DiagnosticList): `pb-nx9.89`.

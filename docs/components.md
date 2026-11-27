@@ -466,9 +466,9 @@ props.
   a mark in the gutter by its worst severity: a circle in `--pb-err` for `error`, a diamond in
   `--pb-warn` for `warning`, and a ring in `--pb-muted` for any other severity, so the severity
   never rests on colour alone; the mark's tooltip lists the line's diagnostics, a convenience: the
-  same words are read in the textarea's description (below) and are the app's to list under the box,
-  each row putting the caret at its place ([patterns](patterns.md#editing-text),
-  [U47](ux-rules.md#feedback)). Under the text a
+  same words are read in the textarea's description (below) and listed under the box by
+  `DiagnosticList` (below), each row putting the caret at its place
+  ([patterns](patterns.md#editing-text), [U47](ux-rules.md#feedback)). Under the text a
   wavy line in the same tone runs from the column to the end of the word there (one character on
   white space), or under the line's text when there is no column; where marks overlap, error
   wins over warning over any other. A press on a gutter mark focuses the textarea and puts the
@@ -486,8 +486,9 @@ props.
   (`execCommand("insertText")`, the one way to keep the undo history, so Ctrl+Z takes an indent
   back), and by value where the browser has none. `tabEdit(text, start, end, indent, out)` is the
   rule, exported and pure.
-- **The caret.** `onCaret` is called when the caret moves (a key, a press, an edit, a gutter mark),
-  once per place, with its line and column (from 1) and offset; the caret is the selection's
+- **The caret.** `onCaret` is called when the caret moves (a key, a press, an edit, a gutter mark,
+  or code that moves the selection, as a `DiagnosticList` row: the textarea's own `selectionchange`
+  and `select` events count while it has the focus), once per place, with its line and column (from 1) and offset; the caret is the selection's
   moving end. `caretAt(text, offset)` and `offsetAt(text, line, column)` are the conversions, and
   `shownText`, `codeRuns`, `gutterRows` and `markLevel` the other steps, exported and pure.
 - **The gutter** numbers every line in `--pb-muted` on `--pb-sunken`, as wide as the widest
@@ -496,6 +497,29 @@ props.
   the overlap, and the gutter's edge clips it), while the mark drawn stays 7 px. The marks are a
   pointer shortcut; the keyboard reaches each diagnostic by its line and column. It does not
   animate, so there is nothing to stop under reduced motion.
+
+**`DiagnosticList`**: an editor's diagnostics listed in words, for under the box (where it sits is the
+app's layout). `diagnostics` (the `CodeDiagnostic`s the app gives `CodeEditor`, listed in the order
+given), `editor?` (a ref to the editor's textarea: the `ref` given to `CodeEditor`), `onGo?(diagnostic)`
+(after a row's press, as when the app must first show the editor), `labels?` (its words, [rule
+8](#rules-every-component-keeps): `diagnostic(d)`, a row's words, CodeEditor's own by default, "Line 3,
+column 5: error E1: message", so a row reads as the mark's tooltip and the editor's description do;
+`count(n)`, "No problems", "1 problem", "n problems"; `defaultDiagnosticListLabels`), plus native
+`div` props.
+
+- **Rows.** Each diagnostic is a `<button>` in a list named by the count, its words written out whole
+  and wrapping, after a mark of its severity in the gutter's shapes and tones (a circle in `--pb-err`
+  for `error`, a diamond in `--pb-warn` for `warning`, a ring in `--pb-muted` for any other), hidden
+  from screen readers as the words say the severity. A press (or Enter or Space) focuses the
+  editor's textarea and puts the caret at the diagnostic's line and column (`offsetAt`; the line's
+  start without a column), as a press on its gutter mark does, and then calls `onGo`.
+- **The count** is a `role="status"` line, there from the start, so a new check's count is read
+  politely ([U34](ux-rules.md#states), [U42](ux-rules.md#feedback)); with no diagnostics it says `labels.count(0)` and there
+  is no list.
+- **Look:** `--pb-text-sm` words, a row's face `--pb-sunken` on hover, the 2 px focus ring; on touch
+  each row is at least 36 px tall with 16 px words. Its stylesheet's logical paddings and `text-align:
+  start` put the mark at the inline start in right-to-left text. Hover changes over
+  `--pb-motion-fast`. Under forced colours the marks keep their shapes in `CanvasText`.
 
 **`CodeText`**: read-only highlighted text, in code type on the read-only code surface. `value`,
 `language?: "knobly"`, `highlight?` (highlighted as `CodeEditor` is, `highlight` winning), plus

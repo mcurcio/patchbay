@@ -7,6 +7,7 @@ import {
   type ComponentPropsWithRef,
   type CSSProperties,
   type KeyboardEvent,
+  useEffect,
   useId,
   useLayoutEffect,
   useMemo,
@@ -181,6 +182,27 @@ export function CodeEditor({
     lastCaret.current = key;
     onCaret(caret);
   };
+
+  // A caret moved by code with no key or press of the person's (a DiagnosticList row, the app's own setSelectionRange)
+  // reaches React's onSelect in no browser alike, so the textarea's own selectionchange, and the select event that
+  // setSelectionRange queues, report it too; a place already reported is not reported again.
+  const report = useRef(reportCaret);
+  useLayoutEffect(() => {
+    report.current = reportCaret;
+  });
+  useEffect(() => {
+    const box = area.current;
+    if (box === null) return;
+    const onMoved = () => {
+      if (document.activeElement === box) report.current();
+    };
+    box.addEventListener("selectionchange", onMoved);
+    box.addEventListener("select", onMoved);
+    return () => {
+      box.removeEventListener("selectionchange", onMoved);
+      box.removeEventListener("select", onMoved);
+    };
+  }, []);
 
   // After a render (an edit, a new text), put the copy and the gutter where the textarea is scrolled, and the
   // selection where an edit made without the browser's own editing left it.

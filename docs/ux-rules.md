@@ -125,7 +125,7 @@ cite them. How to read a rule (Built, The app's, Not yet):
 - **U33. On its way is shown, never blocking:** a pulsing dot (Pill `pulse`) or a ghost wire, and
   the rest of the screen stays usable. **Built:** Pill, GhostWire.
 - **U34. An empty list says so,** in a status line there from the start. **Built:** CommandPalette,
-  ShortcutSheet.
+  ShortcutSheet, DiagnosticList (its count).
 - **U35. An empty canvas says what to do,** in words drawn on the canvas itself: the app's words
   and the add gestures, gone with the first node
   ([patterns](patterns.md#empty-loading-and-offline)). **Built:**
@@ -149,6 +149,7 @@ cite them. How to read a rule (Built, The app's, Not yet):
   other in a `role="status"` one, when the reader is free. **Built:** Banner, Toaster.
 - **U42. A live region exists before its words,** as a region added with its words is not reliably
   read. **Built:** Toaster, Button's busy region, CommandPalette's status line, StatusWords,
+  DiagnosticList's count,
   Banner's two hidden regions, and a labelled Spinner, whose region comes a commit before its
   label ([`components.md`](components.md#news-and-state), Banner;
   [`components.md`](components.md#state), Spinner).
@@ -175,12 +176,12 @@ cite them. How to read a rule (Built, The app's, Not yet):
   status line, which also says why a port refuses while a wire is dragged (U59). Tooltips stay, as
   a convenience. **Built:** CommandPalette, whose active row (every row on touch) is written out
   whole (F20); [`ConnectStatus`](graph.md#connectstatus), the canvas's status line, for a refusing
-  port's reason; CodeEditor, whose gutter marks' diagnostics are read in its description. Each
+  port's reason; CodeEditor, whose gutter marks' diagnostics are read in its description and
+  listed in words under the box by [`DiagnosticList`](components.md#code). Each
   other tooltip's docs name where its words go: a cut node title, line or port name in the
   inspector ([`NodeBox`](graph.md#nodebox), [`PortRow`](graph.md#portrow)); a wire's `title` in its
   `label` or the inspector ([`Wire`](graph.md#wire)); a meter's numbers in the inspector, written
-  with `formatMeterDb` ([`Meter`](graph.md#meter)); the gutter marks' diagnostics in the list under
-  the box ([`CodeEditor`](components.md#code)). **The app's:** writing those words there, and
+  with `formatMeterDb` ([`Meter`](graph.md#meter)). **The app's:** writing those words there, and
   every `title` it gives a component (Pill, Badge, KeyValue, StatusWords, RadioGroup, WarnMark).
   **Not yet:** DiffView's whole file path is only its heading's tooltip: pb-nx9.95.
 
