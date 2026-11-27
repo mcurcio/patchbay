@@ -13,7 +13,7 @@ don't cover it. Security problems go through [`SECURITY.md`](SECURITY.md), not a
 
 ## What belongs in patchbay
 
-patchbay is a library, not a framework ([`docs/design/patchbay.md`](docs/design/patchbay.md#1-what-patchbay-is)):
+patchbay is a library, not a framework ([`docs/language.md`](docs/language.md#7-components-draw-the-app-decides)):
 components draw what they are given and report what the person did. A change fits when it is
 useful to apps beyond your own. Keep your app's protocol, data types, words and brand in your app;
 a value that differs between apps becomes a prop, a slot, a token or a brand, never a constant.
@@ -59,7 +59,8 @@ pnpm storybook                          # the catalogue on http://localhost:6006
   from the design.
 - **Accessibility is part of done.** Every story runs through the accessibility check in Chromium
   (`pnpm test-storybook`), and a violation fails it. Check the keyboard path, touch targets
-  (36 px, 40 px in tool groups) and reduced motion.
+  ([`docs/foundations.md`](docs/foundations.md#density-and-touch)) and reduced motion, against the
+  rules in [`docs/ux-rules.md`](docs/ux-rules.md).
 - Run `pnpm check` and `pnpm test-storybook` before you push; CI runs both on every pull request.
 
 ## Commits and pull requests

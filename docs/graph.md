@@ -210,7 +210,8 @@ const hints = useConnectHints(canConnect);
   Flow's strict connection mode. A row given its own `hint` keeps it. `value.origin` is the drag's
   `PortRef` and `side`; `value.hintFor(port, side)` is the hint for one handle, as `PortRow` asks.
 - It draws nothing and has no keyboard path of its own: React Flow's connections are made with a
-  pointer (or touch).
+  pointer (or touch), and the keyboard's is the inspector's "Connect to"
+  ([patterns](patterns.md#connecting)).
 
 ### `mergeFlowProps`
 
@@ -260,7 +261,8 @@ const edge: WireEdge = { id, source, sourceHandle, target, targetHandle, type: "
 
 A request on its way, before the app's graph holds the edge. The app adds it as an edge of type
 `ghost` between the two handle ids, with `selectable`, `focusable` and `deletable` false, and
-removes it when the request is answered: how long a refused one stays is the app's.
+removes it when the request is answered; a refused one goes with the toast that says why
+([U58](ux-rules.md#live-pending-queued-refused)).
 `data` is a `GhostWireData` (`type GhostWireEdge = Edge<GhostWireData, "ghost">`):
 
 | `GhostWireData` | What it is |

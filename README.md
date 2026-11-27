@@ -69,6 +69,9 @@ write a brand; [`examples/brands/`](examples/brands/) has two worked examples.
 
 ## Documentation
 
+- [`docs/language.md`](docs/language.md): the design language, how an app on patchbay looks and
+  behaves: its principles, [foundations](docs/foundations.md), [UX rules](docs/ux-rules.md) and
+  [patterns for editing a live graph](docs/patterns.md)
 - [`docs/tokens.md`](docs/tokens.md): the tokens, the themes, writing a brand, and the contrast rules,
   with `@mcurcio/patchbay/testing`'s `checkBrandContrast` to hold your brand to them in your own tests
 - [`docs/components.md`](docs/components.md): every built component and hook, with props, keyboard
