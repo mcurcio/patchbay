@@ -180,7 +180,7 @@
 }
 
 /* At phone width the centred box takes the width less the gutters. */
-@media (max-width: 599px) {
+@media (max-width: 599.98px) {
   .pb-palette-layer:not([data-anchored]) {
     padding-top: max(var(--pb-space-5), env(safe-area-inset-top));
     padding-right: max(var(--pb-space-4), env(safe-area-inset-right));

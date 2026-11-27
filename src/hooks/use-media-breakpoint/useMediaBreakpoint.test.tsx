@@ -13,6 +13,11 @@ import {
   widthOf,
 } from "./useMediaBreakpoint";
 
+// Every stylesheet under src/, whose width and touch queries must be the hook's own (docs/foundations.md#widths, F41;
+// docs/foundations.md#density-and-touch, F35): the constants are the one source, and each stylesheet writes their
+// query exactly.
+const stylesheets = import.meta.glob<string>("../../**/*.css", { query: "?raw", import: "default", eager: true });
+
 /** A stand-in window whose width and pointer the test sets, answering the hook's three queries. */
 function fakeMedia(start: { width: number; touch: boolean }) {
   const state = { ...start };
@@ -63,6 +68,20 @@ describe("the widths", () => {
       phone: "(max-width: 599.98px)",
       touch: "(hover: none) and (pointer: coarse)",
     });
+  });
+
+  it("are the only width and touch queries the stylesheets write", () => {
+    const allowed = new Set<string>(Object.values(mediaQueries));
+    const written = Object.entries(stylesheets).flatMap(([file, css]) =>
+      [...css.matchAll(/@media ([^{]+)\{/g)]
+        .map((match) => (match[1] ?? "").trim())
+        .filter((query) => /width|pointer|hover/.test(query))
+        .map((query) => ({ file, query })),
+    );
+    expect(written.length).toBeGreaterThan(0);
+    expect(written.filter(({ query }) => !allowed.has(query))).toEqual([]);
+    // Some write each width query, so the check above is not empty for either.
+    expect(written.some(({ query }) => query === mediaQueries.phone)).toBe(true);
   });
 });
 

@@ -97,7 +97,7 @@
 }
 
 /* At phone width the box takes the width less the gutters, and sits a little lower than the top bar. */
-@media (max-width: 599px) {
+@media (max-width: 599.98px) {
   .pb-dialog-scrim {
     padding-top: max(var(--pb-space-5), env(safe-area-inset-top));
     padding-right: max(var(--pb-space-4), env(safe-area-inset-right));

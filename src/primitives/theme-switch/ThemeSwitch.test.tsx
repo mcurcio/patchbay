@@ -63,7 +63,7 @@ describe("ThemeSwitch", () => {
   });
 
   it("hides the word at phone width and is a 36 px target on touch", () => {
-    expect(css).toMatch(/@media \(max-width: 599px\)[\s\S]*?\.pb-theme-switch-word \{\s*display: none;/);
+    expect(css).toMatch(/@media \(max-width: 599\.98px\)[\s\S]*?\.pb-theme-switch-word \{\s*display: none;/);
     expect(css).toMatch(/@media \(hover: none\) and \(pointer: coarse\)[\s\S]*?min-height: 36px/);
   });
 });

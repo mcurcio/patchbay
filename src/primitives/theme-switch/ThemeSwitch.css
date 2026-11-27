@@ -35,7 +35,7 @@
 }
 
 /* At phone width the icon alone: the button's name still says the choice. */
-@media (max-width: 599px) {
+@media (max-width: 599.98px) {
   .pb-theme-switch {
     padding: 0 var(--pb-space-2);
   }

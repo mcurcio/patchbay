@@ -662,7 +662,11 @@ With no window to ask (on a server, before hydration, or with no `matchMedia`) i
 not touch.
 
 `narrowBelow` (760), `phoneBelow` (600), `mediaQueries` (the three queries, for an app's own
-stylesheet or `matchMedia`), `widthOf(px)` and `readBreakpoint()` are exported too.
+stylesheet or `matchMedia`), `widthOf(px)` and `readBreakpoint()` are exported too. The queries
+are the one source of the widths: `(max-width: 759.98px)` and `(max-width: 599.98px)`, so a
+window a fraction of a pixel under a width is below it, as `widthOf` says. patchbay's stylesheets
+write them exactly, and `useMediaBreakpoint.test.tsx` fails on a stylesheet with any other width
+or touch query; an app's own stylesheet writes them from `mediaQueries` too.
 
 ### `useLiveValue`
 

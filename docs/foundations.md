@@ -182,8 +182,9 @@ Reduced motion: [ux-rules](ux-rules.md#reduced-motion).
   [`useMediaBreakpoint`](components.md#usemediabreakpoint) names them and exports them. Narrow moves
   the inspector into a sheet and phone moves it to the bottom
   ([`AppShell`](components.md#appshell)); at phone width a dialog, the palette and the toasts take
-  the width less the gutters. **Not yet:** Dialog, CommandPalette and ThemeSwitch write the phone
-  width as a CSS literal of their own: pb-nx9.73.
+  the width less the gutters. **Built:** `mediaQueries` is the one source; a stylesheet that
+  changes at a width (Dialog, CommandPalette, ThemeSwitch) writes its query exactly, and a test
+  fails on any other width or touch query ([`components.md`](components.md#usemediabreakpoint)).
 - **F42. Pane sizes have bounds.** The inspector, the drawer and an inline sheet are held to
   bounds, and a kept size out of bounds is drawn within them and not written back
   ([`components.md`](components.md#appshell), Sizes; [`components.md`](components.md#overlays),
