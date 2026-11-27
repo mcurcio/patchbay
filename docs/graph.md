@@ -61,10 +61,13 @@ Other native `<div>` props (`className`, `id`, `data-*`, pointer handlers) pass 
   on it.
 - **The tooltip** is written on pointer entry and then at most every 250 ms while the pointer stays
   (`meterTitleEveryMs`); it is never written while nobody hovers.
-- **Size.** Horizontal fills its container's width (48 px when the container gives none) and is 6
-  px thick, the lamp a 6 px square at the right end; vertical is 6 px wide and fills its
-  container's height (48 px at least), filling from the bottom with the lamp on top. The zones keep
-  their places along the bar: the bar is drawn whole and clipped to the level.
+- **Size and direction.** Horizontal fills its container's width (48 px when the container gives
+  none) and is 6 px thick, filling from the inline start with the lamp, a 6 px square, at the
+  inline end: from the left in left-to-right text and from the right in right-to-left text, as the
+  stylesheet follows a change of `dir` at once ([U72](ux-rules.md#right-to-left)). Vertical is 6 px wide and
+  fills its container's height (48 px at least), filling from the bottom with the lamp on top, in
+  either direction. The zones keep their places along the bar: the bar is drawn whole and clipped
+  to the level.
 - **Its CSS variables.** It sets four fractions on its element, 0 at the floor and 1 at 0 dBFS:
   `--pb-meter-level` and `--pb-meter-tick` as the level moves, `--pb-meter-mid-at` and
   `--pb-meter-hot-at` from `zones`. They are its own, not tokens; a brand changes the meter's

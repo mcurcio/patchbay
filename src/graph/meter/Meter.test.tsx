@@ -278,6 +278,16 @@ describe("Meter", () => {
     expect(meter()).toHaveAttribute("data-orientation", "vertical");
   });
 
+  it("fills a horizontal bar from the inline start in right-to-left text, and a vertical one from the bottom", () => {
+    // The RTL rule names horizontal by excluding vertical, so an unknown orientation mirrors too.
+    expect(css).toMatch(
+      /\.pb-meter:not\(\[data-orientation="vertical"\]\):dir\(rtl\) \.pb-meter-bar \{\s*background: linear-gradient\(\s*to left,/,
+    );
+    expect(css).toMatch(/clip-path: inset\(0 0 0 calc\(\(1 - var\(--pb-meter-level\)\) \* 100%\)\);/);
+    expect(css).toMatch(/\.pb-meter-peak \{[^}]*inset-inline-start: calc\(var\(--pb-meter-tick\) \* \(100% - 2px\)\);/);
+    expect(css).not.toMatch(/\b(left|right):/);
+  });
+
   it("never re-renders for a level", () => {
     const hot = source([0.1, 0.05]);
     const renders = vi.fn();

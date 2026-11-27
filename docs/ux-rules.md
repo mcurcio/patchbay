@@ -278,8 +278,8 @@ are F10's:
 - **U71. Safe-area insets are physical,** and so are the side paddings that clear them. **Built:**
   AppShell, and the scrims of Dialog and CommandPalette.
 - **U72. A level bar mirrors.** A horizontal Meter fills from the inline start, so from the right
-  in right-to-left text; a vertical one fills from the bottom. **Not yet:** it fills from the left
-  in any direction: pb-nx9.86.
+  in right-to-left text, its lamp at the inline end; a vertical one fills from the bottom.
+  **Built:** Meter ([`graph.md`](graph.md#meter)).
 
 ## Forced colours
 
