@@ -76,8 +76,9 @@ write a brand; [`examples/brands/`](examples/brands/) has two worked examples.
   with `@mcurcio/patchbay/testing`'s `checkBrandContrast` to hold your brand to them in your own tests
 - [`docs/components.md`](docs/components.md): every built component and hook, with props, keyboard
   and touch behaviour
-- Storybook: every component's states under each example brand and theme (`pnpm storybook` in a
-  clone)
+- [Storybook](https://mcurcio.github.io/patchbay/): every component's states under each example
+  brand and theme, and the design language's foundations and patterns shown live (`pnpm storybook`
+  in a clone)
 
 ## Contributing
 

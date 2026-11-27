@@ -1,5 +1,6 @@
 # Every push and pull request: the library's checks (typecheck, lint, format, unit tests, build),
-# and Storybook's build and its stories run as tests in Chromium (interactions and the a11y check).
+# and Storybook's build and its stories run as tests in Chromium (interactions and the a11y check). On main, the
+# catalogue is published to GitHub Pages.
 name: CI
 
 on:
@@ -49,6 +50,31 @@ jobs:
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm build-storybook
       - run: pnpm test-storybook
+      # On main, the built catalogue is kept as the Pages artifact the pages job deploys.
+      - if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: storybook-static
+
+  # Publishes the catalogue built by the storybook job to GitHub Pages (https://mcurcio.github.io/patchbay/) on a push
+  # to main, once check and storybook pass. It needs the repository's Pages source set to GitHub Actions
+  # (CONTRIBUTING.md, Storybook on GitHub Pages). Nothing waits on it: the release job does not need it.
+  pages:
+    needs: [check, storybook]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    permissions:
+      pages: write # deploy to Pages
+      id-token: write # the deployment's OIDC token
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v5
 
   # What a release would publish, on every push and pull request, with no secrets: the package built with a made-up
   # version stamped into a copy of package.json (.github/release-build.sh checks the tarball's name, version and

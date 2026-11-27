@@ -32,6 +32,9 @@ pnpm check                              # typecheck, lint, format check, unit te
 pnpm storybook                          # the catalogue on http://localhost:6006
 ```
 
+The catalogue from `main` is published at https://mcurcio.github.io/patchbay/
+([Storybook on GitHub Pages](#storybook-on-github-pages)).
+
 [`AGENTS.md`](AGENTS.md#build-and-test) lists every command and how the build is put together.
 
 ## Layout
@@ -73,6 +76,14 @@ library. They decide the next version, so pick the type for what a user of the p
 
 Open a pull request into `main` and describe what changed and why. A maintainer reviews and merges
 it; merging is the release.
+
+## Storybook on GitHub Pages
+
+Every push to `main` publishes Storybook to https://mcurcio.github.io/patchbay/: the `storybook`
+job in `.github/workflows/ci.yml` keeps the catalogue it built and tested as the Pages artifact,
+and the `pages` job deploys it once `check` and `storybook` pass. The release does not wait for it.
+It needs one setting, made once by a maintainer: **Settings → Pages → Source: GitHub Actions**.
+Without it the `pages` job fails on `main` (the release is not affected).
 
 ## Releases
 

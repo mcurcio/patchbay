@@ -61,7 +61,7 @@ Storybook is the catalogue, the documentation and the test surface.
   Interaction tests and the accessibility check (a violation fails the story) are built; screenshot
   comparison is not yet (baselines must come from one pinned browser and font set, or CI and a
   laptop disagree on every pixel of text).
-- It is built and published to GitHub Pages from `main`.
+- Published to GitHub Pages from `main`: built ([`CONTRIBUTING.md`](../../CONTRIBUTING.md#storybook-on-github-pages)).
 - **Foundations and Patterns pages:** built ([`docs/language.md`](../language.md#the-pages)).
 
 ## 6. Packaging and releases
