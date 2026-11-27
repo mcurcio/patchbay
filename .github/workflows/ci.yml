@@ -50,8 +50,10 @@ jobs:
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm build-storybook
       - run: pnpm test-storybook
-      # On main, the built catalogue is kept as the Pages artifact the pages job deploys.
+      # On main, the built catalogue is kept as the Pages artifact the pages job deploys. The release needs this job,
+      # so a failed upload must not fail it: the pages job then fails on the missing artifact, and the release goes on.
       - if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        continue-on-error: true
         uses: actions/upload-pages-artifact@v5
         with:
           path: storybook-static
