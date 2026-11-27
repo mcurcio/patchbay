@@ -47,7 +47,7 @@
 
 .pb-diff-toggle:focus-visible {
   outline: 2px solid var(--pb-accent);
-  outline-offset: 0;
+  outline-offset: 2px;
 }
 
 .pb-diff-chevron {

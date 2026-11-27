@@ -1,7 +1,8 @@
 /* A splitter (Splitter.tsx): a 6 px bar straddling one edge of its positioned parent, placed by logical properties
    (a vertical one's start is the inline start, the right in right-to-left text), transparent until hovered, focused
-   or dragged, when its accent fill is the cue (so focus needs no outline of its own). On touch its hit area grows to
-   36 px while the bar drawn stays thin. */
+   or dragged, when its accent fill is the cue. Focus also draws the 2 px accent ring every control has, 1 px clear of
+   the bar as a packed control's is (docs/ux-rules.md#focus-and-keyboard, U1). On touch its hit area grows to 36 px
+   while the bar drawn stays thin. */
 .pb-splitter {
   position: absolute;
   z-index: 5;
@@ -44,7 +45,11 @@
 .pb-splitter:focus-visible,
 .pb-splitter[data-dragging] {
   background: var(--pb-accent);
-  outline: none;
+}
+
+.pb-splitter:focus-visible {
+  outline: 2px solid var(--pb-accent);
+  outline-offset: 1px;
 }
 
 /* Touch: an invisible hit area 36 px across, centred on the bar. */

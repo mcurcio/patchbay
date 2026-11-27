@@ -224,6 +224,15 @@ describe("Splitter", () => {
     expect(splitter).toHaveAttribute("id", "split");
   });
 
+  it("rings the focused bar in the accent, 1 px clear, and keeps the fill", () => {
+    expect(css).toMatch(
+      /\.pb-splitter:focus-visible \{\s*outline: 2px solid var\(--pb-accent\);\s*outline-offset: 1px;/,
+    );
+    expect(css).toMatch(
+      /\.pb-splitter:focus-visible,\s*\.pb-splitter\[data-dragging\] \{\s*background: var\(--pb-accent\);/,
+    );
+  });
+
   it("takes no drag-and-scroll gesture from touch, and widens its hit area to 36 px on touch", () => {
     expect(css).toMatch(/\.pb-splitter \{[^}]*touch-action: none;/);
     const touch = /@media \(hover: none\) and \(pointer: coarse\)\s*\{([\s\S]*?)\n\}/.exec(css)?.[1] ?? "";

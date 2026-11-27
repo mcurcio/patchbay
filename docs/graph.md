@@ -248,6 +248,13 @@ const edge: WireEdge = { id, source, sourceHandle, target, targetHandle, type: "
   and the edge's `interactionWidth` (20 px by default, none at 0), so it can carry the `<title>`.
   React Flow's wrapper keeps the edge's focus, selection and Delete key. The path is React Flow's
   bezier.
+- **Focus.** While React Flow's edge wrapper has `:focus-visible`, `Wire` draws a 2 px ring in the
+  accent along the whole path, 2 px clear of the stroke at any level (two paths under the wire, the
+  ring and a gap in `--pb-surface`, hidden otherwise and taking no pointer events). The stroke
+  keeps its tone while focused (React Flow's own focus rule would restroke it in the selected
+  colour), so focus and selection are two looks and show together on a focused, selected wire
+  ([U17](ux-rules.md#focus-and-keyboard)). Forced colours: the ring in `CanvasText`, its gap
+  `Canvas`.
 - **The level without a rebuild.** The path, the flow and the arrow are built only when an end, the
   flow, the arrow or the tooltip changes. The level is set as `--pb-wire-emphasis` on the wire's
   group (`.pb-wire`, which also carries `data-tone`, `data-selected`, `data-dashed` and

@@ -8,9 +8,8 @@ cite them. How to read a rule (Built, The app's, Not yet):
 
 - **U1. Focus is always visible.** A 2 px ring in the accent on `:focus-visible`: 2 px outside a
   discrete control, 1 px outside a field or a packed tool, inset 2 px on a scroll body or a code
-  box. **Built:** every control's stylesheet; `base.css` for the page. **Not yet:** the Splitter
-  shows focus as an accent fill with no ring (pb-nx9.69), and the DiffView fold toggle's ring
-  has no offset (pb-nx9.70).
+  box. **Built:** every control's stylesheet (the Splitter's ring 1 px clear of its accent fill,
+  as a packed control's); `base.css` for the page; a Wire's ring along its path (U17).
 - **U2. Every action has a keyboard path.** A gesture only a pointer can make has a keyboard path
   beside it: adding at a point is the app's add command ([`graph.md`](graph.md#useaddat)); a
   gutter mark is the caret moved by line and column ([`components.md`](components.md#code),
@@ -62,8 +61,8 @@ cite them. How to read a rule (Built, The app's, Not yet):
 - **U16. Undo history survives a programmatic edit.** **Built:** CodeEditor's Tab.
 - **U17. React Flow owns the canvas's focus.** Node and edge focus, selection, dragging and Delete
   are React Flow's; patchbay adds no tab stops beyond its slots, and draws the ring React Flow does
-  not. **Built:** NodeBox ([`graph.md`](graph.md#nodebox)). **Not yet:** a focused Wire has no look
-  of its own; only `selected` restyles it: pb-nx9.71.
+  not, distinct from the selected look. **Built:** NodeBox ([`graph.md`](graph.md#nodebox)), Wire
+  ([`graph.md`](graph.md#wire)).
 - **U18. The standard keys.** Every app binds Mod+K to the whole palette (adding is one group in
   it, never the palette's only use), `?` to the shortcut sheet, Delete and Backspace to removing
   the selection, F to fit, A to add, and, where its model has them, Mod+S to commit and Mod+Z to

@@ -206,6 +206,8 @@ inspector"), `edge?: "start" | "end"` (which edge of the pane it sits on, `start
   to `min`, End to `max`. Keys with Ctrl, Alt or Meta are left alone.
 - **Pointer:** the main button drags it, with pointer capture; it takes the focus and has
   `data-dragging` while dragging.
+- **Look:** transparent until hovered, focused or dragged, when the bar fills in the accent. Focus
+  also draws the 2 px accent ring, 1 px clear of the bar ([U1](ux-rules.md#focus-and-keyboard)).
 - It sits absolutely on one edge of its positioned parent, placed with logical properties
   (`inset-inline-start`, `inset-block-end`). The bar is 6 px; on touch its hit area is 36 px.
 

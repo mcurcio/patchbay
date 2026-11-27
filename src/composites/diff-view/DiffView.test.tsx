@@ -111,6 +111,12 @@ describe("DiffView", () => {
     expect(ref.current).toHaveAttribute("aria-label", "Changes");
   });
 
+  it("rings its fold toggle 2 px clear when focused, as a discrete control", () => {
+    expect(css).toMatch(
+      /\.pb-diff-toggle:focus-visible \{\s*outline: 2px solid var\(--pb-accent\);\s*outline-offset: 2px;/,
+    );
+  });
+
   it("colours lines by the change and code tokens only, in code type", () => {
     expect(css).toMatch(/\[data-kind="add"\]\s*\{[^}]*color: var\(--pb-added\)/);
     expect(css).toMatch(/\[data-kind="del"\]\s*\{[^}]*color: var\(--pb-removed\)/);

@@ -83,6 +83,8 @@ const WireBody = memo(function WireBody({
 }: WireBodyProps) {
   return (
     <>
+      <path d={path} fill="none" className="pb-wire-focus-ring" aria-hidden="true" />
+      <path d={path} fill="none" className="pb-wire-focus-gap" aria-hidden="true" />
       <BaseEdge
         id={id}
         path={path}

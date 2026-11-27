@@ -200,6 +200,33 @@ export const Keyboard: Story = {
   },
 };
 
+/** Focused from the keyboard: a ring in the accent along the path, 2 px clear of it, while the stroke keeps its tone;
+ * selected as well, the stroke takes the accent and the ring stays, so the two looks are told apart. */
+export const Focused: Story = {
+  args: { tone: "ok" },
+  play: async ({ canvasElement, userEvent }) => {
+    const edge = await waitFor(() => {
+      const found = canvasElement.querySelector<SVGGElement>(".react-flow__edge");
+      if (found === null) throw new Error("no wire yet");
+      return found;
+    });
+    const path = canvasElement.querySelector(".pb-wire-path");
+    const ring = canvasElement.querySelector(".pb-wire-focus-ring");
+    if (path === null || ring === null) throw new Error("no wire paths");
+    // Read once: tokenColor draws a probe, and a waitFor that drew one would wake itself on its own change.
+    const accent = tokenColor(canvasElement, "accent");
+    await expect(getComputedStyle(ring).visibility).toBe("hidden");
+    edge.focus();
+    await expect(edge.matches(":focus-visible")).toBe(true);
+    await expect(getComputedStyle(ring).visibility).toBe("visible");
+    await expect(getComputedStyle(ring).stroke).toBe(accent);
+    await expect(getComputedStyle(path).stroke).toBe(tokenColor(canvasElement, "ok"));
+    await userEvent.keyboard("{Enter}");
+    await waitFor(() => expect(getComputedStyle(path).stroke).toBe(accent));
+    await expect(getComputedStyle(ring).visibility).toBe("visible");
+  },
+};
+
 const levels = [0, 0.25, 0.5, 0.75, 1];
 
 /** Levels from silent to full: 1.5 px to 3.5 px, dim to bright. */

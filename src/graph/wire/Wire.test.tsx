@@ -36,6 +36,16 @@ const group = (container: HTMLElement) => {
 const emphasis = (container: HTMLElement) => group(container).style.getPropertyValue("--pb-wire-emphasis");
 
 describe("Wire", () => {
+  it("draws its focus ring under the wire, hidden from screen readers", () => {
+    const { container } = draw();
+    const ring = container.querySelector(".pb-wire-focus-ring");
+    const gap = container.querySelector(".pb-wire-focus-gap");
+    expect(ring).toHaveAttribute("aria-hidden", "true");
+    expect(gap).toHaveAttribute("aria-hidden", "true");
+    expect(ring?.nextElementSibling).toBe(gap);
+    expect(gap?.nextElementSibling).toHaveClass("pb-wire-path");
+  });
+
   it("keeps React Flow's edge path and hit path", () => {
     const { container } = draw();
     const path = container.querySelector(".react-flow__edge-path");
@@ -152,6 +162,18 @@ describe("Wire's stylesheet", () => {
     // Before every tone it knows, which follow and win.
     expect(plain.indexOf(".pb-wire[data-tone] {")).toBeLessThan(plain.indexOf('[data-tone="ok"]'));
     expect(plain).not.toMatch(/data-tone="maybe"/);
+  });
+
+  it("draws focus as its own ring along the path, shown only while React Flow's edge has :focus-visible", () => {
+    expect(plain).toMatch(/\.pb-wire-focus-gap \{\s*visibility: hidden;/);
+    expect(plain).toMatch(
+      /\.react-flow__edge:focus-visible \.pb-wire-focus-ring,\s*\.react-flow__edge:focus-visible \.pb-wire-focus-gap \{\s*visibility: visible;/,
+    );
+    expect(plain).toMatch(/\.pb-wire-focus-ring \{\s*stroke: var\(--pb-accent\);/);
+    // Focus does not take React Flow's selected stroke, which is the selected look.
+    expect(plain).toMatch(
+      /\.react-flow__edge:focus-visible \.pb-wire \.react-flow__edge-path\.pb-wire-path \{\s*stroke: var\(--pb-wire-color\);/,
+    );
   });
 
   it("draws the level as width and brightness from the variable", () => {
