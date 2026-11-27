@@ -1,5 +1,6 @@
 import { Canvas, Meta } from "@storybook/addon-docs/blocks";
 import * as AddAtStories from "../graph/add-at/useAddAt.stories";
+import * as EmptyCanvasHintStories from "../graph/empty-canvas-hint/EmptyCanvasHint.stories";
 import * as ButtonStories from "../primitives/button/Button.stories";
 import * as CommandPaletteStories from "../composites/command-palette/CommandPalette.stories";
 
@@ -21,6 +22,10 @@ an app opens the palette:
 
 <Canvas of={AddAtStories.All} />
 
+On an empty canvas, the hint says how to add, and goes with the first node:
+
+<Canvas of={EmptyCanvasHintStories.Empty} />
+
 ## Picking a type
 
 The palette opened at the point, `at`:
@@ -36,4 +41,3 @@ The form's Add button is busy while the request is out:
 ## Not built yet
 
 - A ghost NodeBox at the point while the add is pending: `pb-nx9.82`.
-- An empty-canvas hint saying how to add: `pb-nx9.87`.

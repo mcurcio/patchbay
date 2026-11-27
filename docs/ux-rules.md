@@ -128,8 +128,8 @@ cite them. How to read a rule (Built, The app's, Not yet):
   ShortcutSheet.
 - **U35. An empty canvas says what to do,** in words drawn on the canvas itself: the app's words
   and the add gestures, gone with the first node
-  ([patterns](patterns.md#empty-loading-and-offline)). **Not yet:** patchbay has no component for
-  it: pb-nx9.87.
+  ([patterns](patterns.md#empty-loading-and-offline)). **Built:**
+  [`EmptyCanvasHint`](graph.md#emptycanvashint). **The app's:** its words, and its add key.
 - **U36. A field's error is described, not announced:** wired to the field, and not a live region,
   so it is not read at each key. **Built:** Field, RadioGroup, CodeEditor's diagnostics
   ([`components.md`](components.md#forms)).

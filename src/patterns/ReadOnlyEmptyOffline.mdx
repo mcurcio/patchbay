@@ -1,5 +1,6 @@
 import { Canvas, Meta } from "@storybook/addon-docs/blocks";
 import * as AddAtStories from "../graph/add-at/useAddAt.stories";
+import * as EmptyCanvasHintStories from "../graph/empty-canvas-hint/EmptyCanvasHint.stories";
 import * as SpinnerStories from "../primitives/spinner/Spinner.stories";
 import * as PatternStories from "./Patterns.stories";
 
@@ -24,6 +25,16 @@ With adding off, a double-click zooms again:
 
 <Canvas of={AddAtStories.Off} />
 
+## Empty
+
+Words on the canvas say what to do, and go with the first node; a double-click on them still adds:
+
+<Canvas of={EmptyCanvasHintStories.Empty} />
+
+On a read-only graph the hint keeps the app's words and drops the gestures:
+
+<Canvas of={EmptyCanvasHintStories.ReadOnly} />
+
 ## Loading
 
 <Canvas of={SpinnerStories.Labelled} />
@@ -33,7 +44,3 @@ With adding off, a double-click zooms again:
 The connection's pill, in the top bar's `status` slot:
 
 <Canvas of={PatternStories.Connection} />
-
-## Not built yet
-
-- The empty-canvas hint, which goes with the first node: `pb-nx9.87`.

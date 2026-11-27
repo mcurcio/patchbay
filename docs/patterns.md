@@ -245,7 +245,9 @@ says why.
 **How:**
 
 - **Empty:** words on the canvas say what to do (double-click or `A` to add) and go with the first
-  node (U35; not yet, pb-nx9.87); the graph's subject in the inspector says the same.
+  node ([`EmptyCanvasHint`](graph.md#emptycanvashint), U35); the graph's subject in the inspector
+  says the same. On a read-only graph it keeps the app's words and drops the gestures (`add:
+  false`).
 - **Loading:** a labelled [`Spinner`](components.md#state) in the canvas; `onFitted` marks it
   ready.
 - **Offline:** the connection's [`Pill`](components.md#state) in the top bar's `status` slot says
