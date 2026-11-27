@@ -29,6 +29,11 @@ React 19 is a peer dependency. The graph layer (`@mcurcio/patchbay/graph`) also 
 `@xyflow/react` 12 (12.1.0 or newer), and the code views can highlight [knobly](https://github.com/mcurcio/knobly)
 text if you install `knobly`; both are optional, needed only by the parts that use them.
 
+### Browsers
+
+The stylesheets are written for Chrome and Edge 120, Firefox 121 and Safari 16.4, or newer: they use
+`:dir()`, `:has()` and `color-mix()`, and the build keeps them as written.
+
 ## Quickstart
 
 Load the tokens once, at your app's entry, then use the components:

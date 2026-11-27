@@ -275,8 +275,8 @@ are F10's:
 - **U69. Direction is read at the moment of use** (a key press, a drag's start), so a page that
   changes `dir` is followed. **Built:** Splitter.
 - **U70. Handles stay physical.** Inputs on the left and outputs on the right, as React Flow's
-  positions are; the row's words follow their handle. **Built:** PortRow, NodeBox. **Not yet:** the
-  built CSS mirrors the rows only under an RTL `lang`, not under `dir="rtl"` alone: pb-nx9.58.
+  positions are; the row's words follow their handle. **Built:** PortRow, NodeBox, under `dir="rtl"`
+  in any language, as the build keeps their `:dir()` selectors ([`README.md`](../README.md#browsers)).
 - **U71. Safe-area insets are physical,** and so are the side paddings that clear them. **Built:**
   AppShell.
 - **U72. A level bar mirrors.** A horizontal Meter fills from the inline start, so from the right
