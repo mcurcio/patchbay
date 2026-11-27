@@ -5,28 +5,8 @@ deleted from here (the rule in [`AGENTS.md`](../../AGENTS.md#docs)).
 
 ## 1. What patchbay is
 
-patchbay is a React component library for apps that draw a live graph (nodes, ports and the wires
-between them) and let a person edit it: patch editors, pipeline and workflow builders, signal-flow
-and routing tools, dashboards over a running engine. It draws with React Flow and themes with CSS
-custom properties.
-
-**A library, not a framework.** A library is code the app calls; a framework calls the app.
-patchbay draws and handles interaction; each app keeps what gives the drawing its meaning:
-
-| patchbay owns | Each app owns |
-|---|---|
-| Design tokens, the light and dark themes, and the brand mechanism | Its brand, its protocol client and its data types |
-| Primitives, composites and graph components that draw what they are given | Its graph store, and turning its data into patchbay's props |
-| `AppShell`: the layout of a graph-editing app and the sizes it keeps | Its editing model (apply each edit at once, or queue edits until a save) |
-| UI-only hooks: theme, shortcuts, toasts, kept preferences, live values | Graph layout, routing, and every word about its own domain |
-| The words patchbay needs by default (overridable) | |
-
-*Why not a framework:* transport, commit model, port typing and lifecycle differ from one app to
-the next, and a framework would have to own all of them.
-
-**One look, each app its own variation.** One structure and one set of interactions; an app's brand
-changes the accent, the state hues where it needs to, the density and the type
-([`docs/tokens.md`](../tokens.md)).
+Built: [`docs/language.md`](../language.md#principles) (what patchbay owns and what each app owns,
+and one look with each app its own brand).
 
 ## 2. Rules every component keeps
 
@@ -81,7 +61,8 @@ Storybook is the catalogue, the documentation and the test surface.
   Interaction tests and the accessibility check (a violation fails the story) are built; screenshot
   comparison is not yet (baselines must come from one pinned browser and font set, or CI and a
   laptop disagree on every pixel of text).
-- It is built and published to GitHub Pages from `main`.
+- Published to GitHub Pages from `main`: built ([`CONTRIBUTING.md`](../../CONTRIBUTING.md#storybook-on-github-pages)).
+- **Foundations and Patterns pages:** built ([`docs/language.md`](../language.md#the-pages)).
 
 ## 6. Packaging and releases
 

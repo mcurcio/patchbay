@@ -1,0 +1,39 @@
+import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as AddAtStories from "../graph/add-at/useAddAt.stories";
+import * as ButtonStories from "../primitives/button/Button.stories";
+import * as CommandPaletteStories from "../composites/command-palette/CommandPalette.stories";
+
+<Meta title="Patterns/Adding a node" />
+
+# Adding a node
+
+The person asks (a double-click or a dropped wire on empty canvas, the palette, `A`), picks a type
+in the palette opened at the point, configures it in the inspector, and adds it; the node appears
+when the source holds it, at the point it was asked. The steps, states and do's are in
+[patterns: adding a node](https://github.com/mcurcio/patchbay/blob/main/docs/patterns.md#adding-a-node); where it goes after that, in
+[placing nodes](https://github.com/mcurcio/patchbay/blob/main/docs/patterns.md#placing-nodes).
+
+## Asking at a point
+
+Double-click the empty canvas, or drag a wire from `out` and drop it on empty canvas.
+`useAddAt` gives the point (and the port the wire came from); here the story adds at once, where
+an app opens the palette:
+
+<Canvas of={AddAtStories.All} />
+
+## Picking a type
+
+The palette opened at the point, `at`:
+
+<Canvas of={CommandPaletteStories.Anchored} />
+
+## Adding
+
+The form's Add button is busy while the request is out:
+
+<Canvas of={ButtonStories.BusyLabel} />
+
+## Not built yet
+
+- A ghost NodeBox at the point while the add is pending: `pb-nx9.82`.
+- An empty-canvas hint saying how to add: `pb-nx9.87`.

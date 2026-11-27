@@ -13,7 +13,7 @@ don't cover it. Security problems go through [`SECURITY.md`](SECURITY.md), not a
 
 ## What belongs in patchbay
 
-patchbay is a library, not a framework ([`docs/design/patchbay.md`](docs/design/patchbay.md#1-what-patchbay-is)):
+patchbay is a library, not a framework ([`docs/language.md`](docs/language.md#7-components-draw-the-app-decides)):
 components draw what they are given and report what the person did. A change fits when it is
 useful to apps beyond your own. Keep your app's protocol, data types, words and brand in your app;
 a value that differs between apps becomes a prop, a slot, a token or a brand, never a constant.
@@ -32,6 +32,9 @@ pnpm check                              # typecheck, lint, format check, unit te
 pnpm storybook                          # the catalogue on http://localhost:6006
 ```
 
+The catalogue from `main` is published at https://mcurcio.github.io/patchbay/
+([Storybook on GitHub Pages](#storybook-on-github-pages)).
+
 [`AGENTS.md`](AGENTS.md#build-and-test) lists every command and how the build is put together.
 
 ## Layout
@@ -41,6 +44,7 @@ pnpm storybook                          # the catalogue on http://localhost:6006
 | `src/tokens/` | `tokens.css` (every `--pb-` token, light and dark), `base.css`, and the token tests |
 | `src/primitives/`, `src/composites/`, `src/shell/`, `src/graph/`, `src/hooks/` | One folder per component or hook |
 | `src/testing/` | `/testing`: the brand contrast check apps run in their own tests ([`docs/tokens.md`](docs/tokens.md#checking-a-brand)) |
+| `src/patterns/` | Storybook's Foundations and Patterns pages (MDX) and the stories only they show; not part of the package |
 | `examples/brands/` | Example brands: how an app writes its own look; not part of the package |
 | `.storybook/` | Storybook's config: the brand and theme toolbar, viewports, the accessibility check |
 | `docs/` | The library docs ([`docs/README.md`](docs/README.md)), and `design/` for unbuilt work |
@@ -59,7 +63,8 @@ pnpm storybook                          # the catalogue on http://localhost:6006
   from the design.
 - **Accessibility is part of done.** Every story runs through the accessibility check in Chromium
   (`pnpm test-storybook`), and a violation fails it. Check the keyboard path, touch targets
-  (36 px, 40 px in tool groups) and reduced motion.
+  ([`docs/foundations.md`](docs/foundations.md#density-and-touch)) and reduced motion, against the
+  rules in [`docs/ux-rules.md`](docs/ux-rules.md).
 - Run `pnpm check` and `pnpm test-storybook` before you push; CI runs both on every pull request.
 
 ## Commits and pull requests
@@ -71,6 +76,14 @@ library. They decide the next version, so pick the type for what a user of the p
 
 Open a pull request into `main` and describe what changed and why. A maintainer reviews and merges
 it; merging is the release.
+
+## Storybook on GitHub Pages
+
+Every push to `main` publishes Storybook to https://mcurcio.github.io/patchbay/: the `storybook`
+job in `.github/workflows/ci.yml` keeps the catalogue it built and tested as the Pages artifact,
+and the `pages` job deploys it once `check` and `storybook` pass. The release does not wait for it.
+It needs one setting, made once by a maintainer: **Settings → Pages → Source: GitHub Actions**.
+Without it the `pages` job fails on `main` (the release is not affected).
 
 ## Releases
 

@@ -1,0 +1,42 @@
+import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as PillStories from "../../primitives/pill/Pill.stories";
+import * as SheetStories from "../../primitives/sheet/Sheet.stories";
+import * as SpinnerStories from "../../primitives/spinner/Spinner.stories";
+import * as WireStories from "../../graph/wire/Wire.stories";
+
+<Meta title="Foundations/Motion" />
+
+# Motion
+
+Five durations, each for one role; entrances move and exits do not; the graph itself never
+animates. The rules are in
+[foundations: motion](https://github.com/mcurcio/patchbay/blob/main/docs/foundations.md#motion),
+and what changes under reduced motion in
+[ux-rules: reduced motion](https://github.com/mcurcio/patchbay/blob/main/docs/ux-rules.md#reduced-motion).
+To see the reduced result, turn on your browser's or system's reduced-motion setting (in
+Chromium's developer tools: Rendering, "Emulate CSS media feature prefers-reduced-motion"); this
+page cannot switch it for you.
+
+## Slow: what slides in
+
+A sheet slides in over `--pb-motion-slow`, and closes at once:
+
+<Canvas of={SheetStories.OpenAndClose} story={{ inline: false, height: "420px" }} />
+
+## Pulse: something on its way
+
+The dot pulses, never the word:
+
+<Canvas of={PillStories.Pulsing} />
+
+## Flow: dots along a wire
+
+Not drawn under reduced motion:
+
+<Canvas of={WireStories.Flow} />
+
+## Spin: the spinner
+
+<Canvas of={SpinnerStories.Labelled} />
+
+Fast, for hover and hints, is on every control: move the pointer over the buttons on any page.

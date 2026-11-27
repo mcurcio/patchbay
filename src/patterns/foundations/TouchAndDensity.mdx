@@ -1,0 +1,43 @@
+import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as ButtonStories from "../../primitives/button/Button.stories";
+import * as NodeBoxStories from "../../graph/node-box/NodeBox.stories";
+import * as TextInputStories from "../../primitives/text-input/TextInput.stories";
+import * as ToolGroupStories from "../../primitives/tool-group/ToolGroup.stories";
+
+<Meta title="Foundations/Touch and density" />
+
+# Touch and density
+
+One touch query: under it every target grows to a full touch target, a tool group's a little more,
+and text fields take their touch text size; handles and small marks grow their hit area, not
+their drawing. The rules are in
+[foundations: density and touch](https://github.com/mcurcio/patchbay/blob/main/docs/foundations.md#density-and-touch).
+To see the touch sizes, open this page in your browser's device emulation with touch on; this
+page cannot switch the pointer for you.
+
+## A tool group
+
+Tools edge to edge, one Tab stop:
+
+<Canvas of={ToolGroupStories.Canvas} />
+
+## Buttons, at `md` and `sm`
+
+<Canvas of={ButtonStories.Neutral} />
+
+<Canvas of={ButtonStories.Small} />
+
+## A field
+
+<Canvas of={TextInputStories.Filled} />
+
+## A node
+
+Fixed geometry, handles that grow less than a full target:
+
+<Canvas of={NodeBoxStories.LevelNode} />
+
+## Not built yet
+
+- On touch, an IconButton's edge and a Splitter's grip shown at rest, not only on hover or touch:
+  `pb-nx9.85`.

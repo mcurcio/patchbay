@@ -1,0 +1,39 @@
+import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as AppShellStories from "../shell/app-shell/AppShell.stories";
+import * as KeyValueStories from "../primitives/key-value/KeyValue.stories";
+import * as NodeBoxStories from "../graph/node-box/NodeBox.stories";
+import * as PatternStories from "./Patterns.stories";
+
+<Meta title="Patterns/Selecting and inspecting" />
+
+# Selecting and inspecting
+
+The inspector shows one subject, chosen by the selection: nothing selected is the graph, one node
+is the node, one connection is the connection, several is the selection. Names and values are
+edited there, never on the canvas. The table of subjects is in
+[patterns: selecting and inspecting](https://github.com/mcurcio/patchbay/blob/main/docs/patterns.md#selecting-and-inspecting).
+
+## The selection chooses the subject
+
+Select a node, the wire, or several (shift-click, or drag a box with shift held); click the empty
+canvas to select nothing. A connection's subject names its two ends, each a button that selects it.
+
+<Canvas of={PatternStories.InspectorSubjects} />
+
+## The parts
+
+The inspector in the shell, its title the subject's name and its actions at the header's far end:
+
+<Canvas of={AppShellStories.TitledWide} story={{ inline: false, height: "480px" }} />
+
+The subject's facts:
+
+<Canvas of={KeyValueStories.Tones} />
+
+A selected node:
+
+<Canvas of={NodeBoxStories.Selected} />
+
+## Not built yet
+
+- A right-click or long-press at a point that opens the palette there: `pb-nx9.92`.

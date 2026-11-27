@@ -31,11 +31,12 @@ focus ring, so none needs `base.css`.
    progress, the toolbar's tab stop).
 6. **Hot values stay out of React state.** Anything updated many times a second (levels, metrics)
    is read through a subscription and painted through refs.
-7. **Keyboard, touch and reduced motion are built in.** Focus is visible (a 2 px ring in the
-   accent); every action has a keyboard path; on a touch screen (`(hover: none) and (pointer:
-   coarse)`) targets are at least 36 px (40 px in a tool group) and text fields are 16 px, since
-   iOS zooms a smaller one; every animation stops under `prefers-reduced-motion`. Forced-colours
-   mode keeps edges and states visible.
+7. **Keyboard, touch and reduced motion are built in.** Each component keeps the
+   [UX rules](ux-rules.md): focus is visible ([U1](ux-rules.md#focus-and-keyboard)), every action
+   has a keyboard path ([U2](ux-rules.md#focus-and-keyboard)), targets and text fields take their
+   touch sizes ([density and touch](foundations.md#density-and-touch)), and reduced motion and
+   forced colours are kept ([reduced motion](ux-rules.md#reduced-motion),
+   [forced colours](ux-rules.md#forced-colours)).
 8. **Words: the `labels` prop.** A component says no app's words. The words it supplies itself
    (a close button's name, a placeholder, an empty list's line, a tooltip, words only a screen
    reader reads) come through one prop, `labels`: a partial object merged over English defaults
@@ -49,7 +50,7 @@ Common prop names mean the same everywhere:
 
 | Prop | Means |
 |---|---|
-| `tone` | What a state or action is, by colour; an open enum |
+| `tone` | What a state or action is ([the tones](foundations.md#tones)); an open enum |
 | `size` | `md` (the default) or `sm`, the compact one for dense rows |
 | `label` | The accessible name, or the words a screen reader reads (`Pill`'s and `Checkbox`'s are also shown) |
 | `labels` | The component's own words, a partial object over its English defaults ([rule 8](#rules-every-component-keeps)) |
@@ -303,8 +304,8 @@ folded away), `onDismiss(id)`, `onHold?(held)`, `placement?`, `labels?` (its wor
 - **Each toast** says its text, then `×n` when it was shown n times (read as ", n times"), then
   its action (a press runs it and dismisses the toast) and a Dismiss button, which the text
   describes, so several read apart.
-- **What is read:** two visually hidden live regions beside the stack, there before any toast (a
-  region added with its words is not reliably read), say each toast's text (and ", n times") when
+- **What is read:** two visually hidden live regions beside the stack, there before any toast
+  ([U42](ux-rules.md#feedback)), say each toast's text (and ", n times") when
   it first shows and again when its count goes up, without its buttons: an `err` toast's in a
   `role="alert"` region, read at once, every other's in a `role="status"` one. A toast drawn again,
   or coming back from "and n more", is not read again, and a toast's words leave the regions when
@@ -539,10 +540,8 @@ region and the sheet), so state it must keep belongs to the app. The root has `d
 `narrow` or `phone`) for the app's own stylesheet.
 
 **Escape.** The shell's only Escape is the inspector sheet's, and it acts while the focus is in the
-sheet. A `Dialog`, a `CommandPalette` or a `ShortcutSheet` the app opens is modal and holds the
-focus, so Escape goes to it first and closes it, and the sheet stays; each marks the press handled,
-so the app's own [`useShortcuts`](#useshortcuts) Escape does not act on it either. On a wide window
-Escape in the inspector is the app's.
+sheet; a dialog, the palette or the shortcut sheet the app opens over it closes first, in the order
+[U19](ux-rules.md#escape) gives. On a wide window Escape in the inspector is the app's.
 
 **The whole screen.** The shell is `100dvh` high (`100vh` where `dvh` is unknown), so a phone's
 browser bars never hide its foot. Each edge pads itself by its safe-area inset (the bar the top,

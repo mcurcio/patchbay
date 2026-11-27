@@ -1,0 +1,42 @@
+import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as CommandPaletteStories from "../composites/command-palette/CommandPalette.stories";
+import * as ShortcutSheetStories from "../composites/shortcut-sheet/ShortcutSheet.stories";
+import * as ShortcutsStories from "../hooks/use-shortcuts/useShortcuts.stories";
+
+<Meta title="Patterns/Keyboard and Escape" />
+
+# Keyboard and Escape
+
+Every action has a keyboard path; every app binds the standard keys (Mod+K for the palette, `?`
+for the shortcut sheet, Delete, F, A, and Mod+S and Mod+Z where its model has them); Escape closes
+the innermost thing first. The rules are in
+[ux-rules: focus and keyboard](https://github.com/mcurcio/patchbay/blob/main/docs/ux-rules.md#focus-and-keyboard) and
+[ux-rules: Escape](https://github.com/mcurcio/patchbay/blob/main/docs/ux-rules.md#escape).
+
+## The keys, in the shortcut sheet
+
+<Canvas of={ShortcutSheetStories.WithNote} />
+
+## The palette
+
+Every command, from Mod+K:
+
+<Canvas of={CommandPaletteStories.Centred} />
+
+## Binding keys
+
+<Canvas of={ShortcutsStories.All} />
+
+## Escape, innermost first
+
+A focused toast, then the palette, a dialog or the shortcut sheet, then the inspector's sheet while
+the focus is in it, then the app's own Escape. Two stories play it with the keyboard; open each on
+its own, as it needs the focus of the whole frame:
+[AppShell's Escape order](?path=/story/shell-appshell--escape-order) (a dialog takes Escape before
+the inspector's sheet, at the narrow width) and
+[Toaster's Escape](?path=/story/composites-toaster--escape) (a focused toast goes first).
+
+## Not built yet
+
+- Nested dialogs mounted in one commit: `pb-nx9.27`.
+- A focus look for a focused wire: `pb-nx9.71`.
