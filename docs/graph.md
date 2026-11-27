@@ -63,8 +63,8 @@ Other native `<div>` props (`className`, `id`, `data-*`, pointer handlers) pass 
   (`meterTitleEveryMs`); it is never written while nobody hovers.
 - **Size and direction.** Horizontal fills its container's width (48 px when the container gives
   none) and is 6 px thick, filling from the inline start with the lamp, a 6 px square, at the
-  inline end: from the left in left-to-right text and from the right in right-to-left text, as the
-  stylesheet follows a change of `dir` at once ([U72](ux-rules.md#right-to-left)). Vertical is 6 px wide and
+  inline end: from the left in left-to-right text and from the right in right-to-left text, and a
+  change of `dir` is followed at once ([U72](ux-rules.md#right-to-left)). Vertical is 6 px wide and
   fills its container's height (48 px at least), filling from the bottom with the lamp on top, in
   either direction. The zones keep their places along the bar: the bar is drawn whole and clipped
   to the level.
