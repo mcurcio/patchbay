@@ -84,7 +84,7 @@ to" [`Select`](components.md#forms) of the ports on the other side that `canConn
 Remove. patchbay's list of those ports: not yet, pb-nx9.81.
 
 **States:** dragging (the origin ringed, candidates marked), pending (the ghost), live, refused
-(the ghost in `err`, the reason in a toast, U44), queued (a dashed change tone).
+(the ghost `refused`, the reason in a toast, U44), queued (a dashed change tone).
 
 **Touch:** a handle's hit area grows and a near drop finishes (F37).
 

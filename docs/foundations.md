@@ -214,5 +214,5 @@ Reduced motion: [ux-rules](ux-rules.md#reduced-motion).
   meaning ([`components.md`](components.md#actions), IconButton). **Built:** every glyph.
 - **F50. One glyph grid.** A glyph is drawn 12 px inside a 16 px box, at a 1.75 stroke with round
   caps, in `currentColor`, so an app's own glyphs sit beside patchbay's. **Not yet:** glyphs are
-  drawn at 12 to 14 px, chosen per component, and ToolGroup sets a 15 px font for text glyphs:
-  pb-nx9.91.
+  drawn at 10 to 14 px and strokes of 1.5 to 2, chosen per component, and ToolGroup sets a 15 px
+  font for text glyphs: pb-nx9.91.

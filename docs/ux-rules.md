@@ -54,8 +54,9 @@ cite them. How to read a rule (Built, The app's, Not yet):
   palette, the shortcut sheet and the canvas tools show the app's. **Built:** CanvasTools
   `keyShortcuts`, ShortcutSheet, CommandPalette.
 - **U14. A handled press is left alone.** A press marked `defaultPrevented`, or inside an input
-  method's composition, does nothing more. **Built:** useShortcuts, Toolbar, Splitter, Dialog,
-  Sheet, Toaster, CodeEditor.
+  method's composition, does nothing more. **Built:** useShortcuts and CodeEditor for both;
+  Toolbar, Splitter, Dialog, Sheet and Toaster for a handled press. **Not yet:** those five act on
+  a press inside a composition: pb-nx9.94.
 - **U15. The keyboard can always leave a text editor:** Escape, then Tab, moves on, and the editor's
   description says so. **Built:** CodeEditor.
 - **U16. Undo history survives a programmatic edit.** **Built:** CodeEditor's Tab.
@@ -259,8 +260,8 @@ are F10's:
   **The app's:** its node types draw no fields.
 - **U66. A context menu is the palette at the point.** A right-click or a long-press on a node or
   the canvas opens the [`CommandPalette`](components.md#commands-and-keys) at the point (`at`),
-  with the selection's commands first; there is no menu of its own. **Not yet:** patchbay gives
-  the point of a right-click but no long-press: pb-nx9.92.
+  with the selection's commands first; there is no menu of its own. **Not yet:** React Flow gives
+  the point of a right-click, and nothing gives a long-press's: pb-nx9.92.
 - **U67. Several things can be selected,** by React Flow's shift-click and box select, and the
   inspector shows their count and the actions for all
   ([patterns](patterns.md#selecting-and-inspecting)). **The app's:** the actions.
