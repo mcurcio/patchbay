@@ -16,13 +16,15 @@ const node = (index: number): BoxNode => ({
 });
 
 /**
- * An app's canvas that follows its graph: the key is the node count, the fit tool is the hook's fit, and the canvas
- * says the layout is ready once the first fit has landed, as an app's browser tests can wait on.
+ * An app's canvas that follows its graph: the key is the node count, the fit tool is the hook's fit, the tools' view
+ * moves (the zoom tools, the minimap) call its stop, and the canvas says the layout is ready once the first fit has
+ * landed, as an app's browser tests can wait on.
  */
 function Demo() {
   const [nodes, setNodes, onNodesChange] = useNodesState([node(0), node(1)]);
   const [ready, setReady] = useState(false);
   const [fits, setFits] = useState(0);
+  const [minimap, setMinimap] = useState(false);
   const follow = useFollowFit<BoxNode>({
     key: nodes.length,
     fitOptions: { padding: 0.2, maxZoom: 1 },
@@ -53,7 +55,7 @@ function Demo() {
           defaultViewport={{ x: 0, y: 0, zoom: 1 }}
           {...follow.flowProps}
         >
-          <CanvasTools onFit={follow.fit} />
+          <CanvasTools onFit={follow.fit} onViewMove={follow.stop} minimap={minimap} onMinimap={setMinimap} />
         </ReactFlow>
       </div>
     </div>
@@ -118,6 +120,46 @@ export const All: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "Fit the view" }));
     await waitFor(() => expect(state).toHaveTextContent(/^following/));
     await waitFor(() => expect(allInView(canvasElement)).toBe(true));
+  },
+};
+
+/**
+ * Every view move the person asks for stops following, the tools' too (U63): a press of a zoom tool, and a drag on the
+ * minimap. Each time, the fit tool follows again.
+ */
+export const ToolsStopFollowing: Story = {
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await waitFor(() => expect(canvasElement.querySelector('[data-layout="ready"]')).not.toBeNull());
+    const state = canvas.getByTestId("state");
+    const fitTool = canvas.getByRole("button", { name: "Fit the view" });
+
+    await userEvent.click(canvas.getByRole("button", { name: "Zoom in" }));
+    await expect(state).toHaveTextContent("not following");
+    await userEvent.click(fitTool);
+    await waitFor(() => expect(state).toHaveTextContent(/^following/));
+    await userEvent.click(canvas.getByRole("button", { name: "Zoom out" }));
+    await expect(state).toHaveTextContent("not following");
+    await userEvent.click(fitTool);
+    await waitFor(() => expect(state).toHaveTextContent(/^following/));
+
+    await userEvent.click(canvas.getByRole("button", { name: "Minimap" }));
+    const svg = await waitFor(() => {
+      const found = canvasElement.querySelector(".pb-canvas-minimap svg");
+      if (found === null) throw new Error("no minimap");
+      return found;
+    });
+    // React Flow's minimap pans by d3-zoom's mouse events, after the press's pointer event.
+    const box = svg.getBoundingClientRect();
+    const at = { clientX: box.left + box.width / 2, clientY: box.top + box.height / 2, view: window, button: 0 };
+    await fireEvent.pointerDown(svg, at);
+    await fireEvent.mouseDown(svg, at);
+    await fireEvent.mouseMove(window, { ...at, clientX: at.clientX + 20, clientY: at.clientY + 10 });
+    await fireEvent.mouseMove(window, { ...at, clientX: at.clientX + 40, clientY: at.clientY + 20 });
+    await fireEvent.pointerUp(window, at);
+    await fireEvent.mouseUp(window, at);
+    await waitFor(() => expect(state).toHaveTextContent("not following"));
+    await userEvent.click(fitTool);
+    await waitFor(() => expect(state).toHaveTextContent(/^following/));
   },
 };
 

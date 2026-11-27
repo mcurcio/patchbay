@@ -202,7 +202,8 @@ as a failure of the app, or only in a tooltip.
 **How:** [`useFollowFit`](graph.md#usefollowfit) fits the whole graph whenever the app's layout
 key changes and whenever the canvas changes size, until the person moves the view by any input
 (U63); the fit tool of [`CanvasTools`](graph.md#canvastools), passed `follow.fit`, fits and follows
-again. An app that moves the view itself at the person's asking (going to a node) calls `stop()`.
+again, and its zoom tools and minimap, passed `follow.stop` as `onViewMove`, stop it. An app that
+moves the view itself at the person's asking (its own zoom keys, going to a node) calls `stop()`.
 Every fit leaves the canvas tools clear (U64).
 
 **Do:** mark the layout ready on `onFitted`, not on a timer. **Don't:** refit while the person

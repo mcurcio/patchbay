@@ -248,8 +248,9 @@ are F10's:
   any input (a pan, a wheel, a pinch, the zoom tools and their keys, a minimap drag, going to a
   node), stops the view following the graph; a layout or canvas-size change never restarts it, and
   only Fit follows again. **Built:** [`useFollowFit`](graph.md#usefollowfit) for pans, wheels and
-  pinches, and `stop()` for going to a node. **Not yet:** the zoom tools and a minimap drag do not
-  stop it: pb-nx9.52.
+  pinches; its `stop()` for the zoom tools and the minimap, through
+  [`CanvasTools`](graph.md#canvastools)' `onViewMove`. **The app's:** passing `stop` to
+  `onViewMove`, and calling it beside its own zoom keys and going to a node.
 - **U64. A fit leaves the canvas tools clear,** so the graph is never drawn under them and an app
   chooses no inset of its own. **Not yet:** CanvasTools' default fit ignores its own corner:
   pb-nx9.83.

@@ -295,7 +295,7 @@ gives them, tidy and the minimap, as one [`ToolGroup`](components.md#layout) in 
 ```tsx
 const follow = useFollowFit({ key: layoutKey, onFitted });
 <ReactFlow {...mergeFlowProps(follow.flowProps, addAt.flowProps)} … >
-  <CanvasTools onFit={follow.fit} onTidy={tidy} minimap={minimap} onMinimap={setMinimap} />
+  <CanvasTools onFit={follow.fit} onViewMove={follow.stop} onTidy={tidy} minimap={minimap} onMinimap={setMinimap} />
 </ReactFlow>
 ```
 
@@ -304,6 +304,7 @@ const follow = useFollowFit({ key: layoutKey, onFitted });
 | `position?` | The panel's place, React Flow's `PanelPosition`: `"bottom-left"` by default. One it does not know is passed on, and React Flow places nothing |
 | `fitOptions?` | React Flow's `FitViewOptions` for the fit tool |
 | `onFit?` | Replaces the fit tool's own fit; pass `useFollowFit`'s `fit`, so the tool also follows again |
+| `onViewMove?` | Called when the person moves the view through the tools: each press of a zoom tool (before it zooms), and each change of the viewport while a press is down on the minimap or during a wheel on it. Pass `useFollowFit`'s `stop`, so these moves stop following as a pan on the canvas does ([U63](ux-rules.md#the-view-and-the-canvas)) |
 | `onTidy?` | The tidy tool, shown only when given: the layout is the app's |
 | `minimap?`, `onMinimap?` | The minimap tool, shown only with `onMinimap(next)`, pressed (`aria-pressed`) while `minimap` is true; `<MiniMap>` is drawn while `minimap` is true, named by the tool's word |
 | `minimapNodeClassName?` | `string` or `(node) → string`, React Flow's `<MiniMap nodeClassName>`, so the app colours the minimap by its nodes' state |
@@ -316,7 +317,10 @@ const follow = useFollowFit({ key: layoutKey, onFitted });
   element at each move, so a brand's duration holds and reduced motion (where `tokens.css` sets it
   to 0 ms) moves at once; without the tokens loaded, 180 ms, or none under reduced motion.
 - The minimap is React Flow's, coloured by `tokens.css`'s `--xy-minimap-*` map, framed in
-  `--pb-line` with the group's radius and shadow (`pb-canvas-minimap`). **Forced colours:** the
+  `--pb-line` with the group's radius and shadow (`pb-canvas-minimap`). It is pannable and
+  zoomable, as React Flow's own `pannable` and `zoomable` make it: a drag on it moves the view and a
+  wheel on it zooms. React Flow moves the view by code for these, with no event, so `onViewMove`
+  is how they reach `useFollowFit`. **Forced colours:** the
   frame in `CanvasText`.
 - The glyphs are SVG, hidden from screen readers; each tool is named by its word.
 
@@ -357,9 +361,10 @@ Keeping the whole graph in view until the person takes the view over:
   end, because d3-zoom folds a fit that lands during the person's move into the person's gesture,
   which can then end where it began. A press that moves nothing (React Flow starts a move on every
   press on the pane, so a click to deselect or a double-click to add) keeps following, and a move
-  made by code has no event and changes nothing, so CanvasTools' zoom tools do not stop following.
-  `stop()` stops following as the person's move does, for an app that moves the view itself (going
-  to a node). `fit()` fits now, moving as the fit tool does (over `--pb-motion-slow`), and follows
+  made by code has no event and changes nothing. `stop()` stops following as the person's move does,
+  for every move the person asks for that the view makes by code: [`CanvasTools`](#canvastools)'
+  zoom tools and minimap (pass it as their `onViewMove`), the app's own zoom keys (call it beside
+  the zoom), and going to a node ([U63](ux-rules.md#the-view-and-the-canvas)). `fit()` fits now, moving as the fit tool does (over `--pb-motion-slow`), and follows
   again.
 - **`onFitted(viewport)`** is called after each fit has landed, in the frame after the viewport is
   set, with React Flow's viewport: an app, or its browser tests, can mark the layout ready on it
