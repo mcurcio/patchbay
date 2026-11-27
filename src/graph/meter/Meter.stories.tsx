@@ -159,16 +159,20 @@ export const RightToLeft: Story = {
 /** An orientation it does not know is drawn horizontal. */
 export const UnknownOrientation: Story = { args: { orientation: "diagonal" } };
 
-/** The tooltip's words are the app's, through `labels`: here in the app's own phrasing. */
+/** The meter's own words are the app's, through `labels`: its default name and the tooltip, here in the app's own
+ * phrasing. A `label` (what the meter measures) wins over `labels.name`. */
 export const Labels: Story = {
   args: {
+    label: undefined,
     labels: {
+      name: "Signal level",
       title: (peak, rms, clipped) =>
         `${clipped ? "Clipped. " : ""}Peak ${peak.toFixed(0)} dBFS, average ${rms.toFixed(0)} dBFS`,
     },
   },
   play: async ({ canvas, userEvent }) => {
     const meter = canvas.getByRole("img");
+    await expect(meter).toHaveAccessibleName("Signal level");
     await userEvent.hover(meter);
     await expect(meter).toHaveAttribute("title", "Peak -12 dBFS, average -18 dBFS");
   },

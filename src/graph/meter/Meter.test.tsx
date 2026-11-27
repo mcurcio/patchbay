@@ -5,7 +5,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import { createRef, Profiler } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { LiveSubscribe } from "../../hooks";
-import { defaultMeterTitle, Meter, type MeterHandle, meterFraction, toDb } from "./Meter";
+import { defaultMeterLabels, defaultMeterTitle, Meter, type MeterHandle, meterFraction, toDb } from "./Meter";
 import css from "./Meter.css?raw";
 
 function source(initial: readonly [number, number] = [0, 0]) {
@@ -78,11 +78,14 @@ describe("the scale", () => {
 });
 
 describe("Meter", () => {
-  it("is an image named Level by default, or by its label", () => {
+  it("is an image named by labels.name (Level by default), and by its label, which wins", () => {
     const hot = source();
     const { rerender } = render(<Meter subscribe={hot.subscribe} read={hot.read} />);
-    expect(meter()).toHaveAccessibleName("Level");
-    rerender(<Meter subscribe={hot.subscribe} read={hot.read} label="Left output" />);
+    expect(meter()).toHaveAccessibleName(defaultMeterLabels.name);
+    expect(defaultMeterLabels.name).toBe("Level");
+    rerender(<Meter subscribe={hot.subscribe} read={hot.read} labels={{ name: "Signal" }} />);
+    expect(meter()).toHaveAccessibleName("Signal");
+    rerender(<Meter subscribe={hot.subscribe} read={hot.read} labels={{ name: "Signal" }} label="Left output" />);
     expect(meter()).toHaveAccessibleName("Left output");
   });
 

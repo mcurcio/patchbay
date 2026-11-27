@@ -94,7 +94,7 @@ cite them. How to read a rule (Built, The app's, Not yet):
 
 - **U23. A component's own words come through `labels`**
   ([`components.md`](components.md#rules-every-component-keeps), rule 8). **Built:** every
-  component. **Not yet:** Meter's default name, "Level", is a plain prop default: pb-nx9.66.
+  component, Meter's default name ("Level", `labels.name`) included.
 - **U24. The app's content is a prop of its own:** a Field's or a Pill's `label`, the names
   Splitter and Toolbar require, `busyLabel`, what a Meter measures. **Built:** the prop types.
 - **U25. Default words are plain English,** in sentence case, actions as verbs with their object

@@ -45,8 +45,8 @@ React for a level: it reads its source through [`useLiveValue`](components.md#us
 | `fallDbPerS?` | 20: then the tick falls at this rate until it meets the current peak, which it then rides |
 | `clipAt?` | 1.0 (0 dBFS), linear: a peak at or above it lights the clip lamp (`--pb-meter-hot`) |
 | `clipHoldMs?` | 2000: how long the lamp stays lit after the last such peak |
-| `label?` | Its accessible name (`role="img"`), "Level" by default; the numbers are never announced |
-| `labels?` | Its words ([rule 8](components.md#rules-every-component-keeps)): `title`, `(peakDb, rmsDb, clipped) => string`, writes the tooltip; the default, `defaultMeterTitle`, reads "peak -12.0 dB, rms -18.3 dB" (−∞ for silence) |
+| `label?` | Its accessible name (`role="img"`): what it measures, the app's words ("Left output"), winning over `labels.name`; the numbers are never announced |
+| `labels?` | Its words ([rule 8](components.md#rules-every-component-keeps)), English in `defaultMeterLabels`: `name`, its accessible name when no `label` is given, "Level"; `title`, `(peakDb, rmsDb, clipped) => string`, writes the tooltip; the default, `defaultMeterTitle`, reads "peak -12.0 dB, rms -18.3 dB" (−∞ for silence) |
 | `ref?` | A `MeterHandle`: `reset()` empties the bar and clears the hold and the lamp, as when the source closes |
 
 Other native `<div>` props (`className`, `id`, `data-*`, pointer handlers) pass through.

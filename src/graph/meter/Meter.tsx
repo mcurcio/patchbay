@@ -45,7 +45,7 @@ export type MeterProps = Omit<ComponentPropsWithoutRef<"div">, "children" | "tit
   clipAt?: number;
   /** How long the lamp stays lit after the last such peak, in ms. 2000 by default. */
   clipHoldMs?: number;
-  /** The accessible name ("Level" by default); the numbers are never announced. */
+  /** The accessible name: what the meter measures ("Left output"). Without it, `labels.name`; the numbers are never announced. */
   label?: string;
   /** Words to replace; the rest keep their defaults. */
   labels?: Partial<MeterLabels>;
@@ -85,11 +85,14 @@ export const defaultMeterTitle: MeterTitle = (peakDb, rmsDb) =>
 
 /** The meter's own words, each replaceable. */
 export interface MeterLabels {
+  /** The accessible name when the app gives no `label`: "Level". */
+  name: string;
   /** Writes the tooltip from the level: `defaultMeterTitle`, "peak -12.0 dB, rms -18.3 dB". */
   title: MeterTitle;
 }
 
 export const defaultMeterLabels: MeterLabels = {
+  name: "Level",
   title: defaultMeterTitle,
 };
 
@@ -103,7 +106,8 @@ type Level = {
   clippedAt: number;
 };
 
-type Scale = Required<Pick<MeterProps, "floor" | "holdMs" | "fallDbPerS" | "clipAt" | "clipHoldMs">> & MeterLabels;
+type Scale = Required<Pick<MeterProps, "floor" | "holdMs" | "fallDbPerS" | "clipAt" | "clipHoldMs">> &
+  Pick<MeterLabels, "title">;
 
 const silent = (): Level => ({
   peakDb: -Infinity,
@@ -224,7 +228,7 @@ export function Meter({
   fallDbPerS = defaultMeterScale.fallDbPerS,
   clipAt = defaultMeterScale.clipAt,
   clipHoldMs = defaultMeterScale.clipHoldMs,
-  label = "Level",
+  label,
   labels,
   ref,
   className,
@@ -233,7 +237,7 @@ export function Meter({
   onPointerLeave,
   ...rest
 }: MeterProps) {
-  const { title } = { ...defaultMeterLabels, ...labels };
+  const { name, title } = { ...defaultMeterLabels, ...labels };
   const [painter] = useState(() => createPainter({ floor, holdMs, fallDbPerS, clipAt, clipHoldMs, title }));
   // Every render hands the painter the scale and words; a new scale redraws the level on it.
   useLayoutEffect(() => {
@@ -262,7 +266,7 @@ export function Meter({
       ref={attach}
       className={classes}
       role="img"
-      aria-label={label}
+      aria-label={label ?? name}
       data-orientation={orientation}
       data-peak="hidden"
       data-clipped="false"
