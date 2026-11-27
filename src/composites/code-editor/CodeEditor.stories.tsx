@@ -229,6 +229,35 @@ export const InField: Story = {
   },
 };
 
+/** Right-to-left text: the gutter at the inline start, the right, its narrower padding on the outer side, and the
+ * textarea and its highlighted copy still on one set of metrics. */
+export const RightToLeft: Story = {
+  args: { diagnostics: diagnostics.slice(0, 1) },
+  decorators: [
+    (Story) => (
+      <div dir="rtl">
+        <Story />
+      </div>
+    ),
+  ],
+  play: async ({ canvas, canvasElement }) => {
+    const gutter = canvasElement.querySelector(".pb-code-gutter");
+    const layer = canvasElement.querySelector(".pb-code-layer");
+    const code = canvasElement.querySelector(".pb-code-layer-code");
+    const box = canvas.getByRole("textbox", { name: "Settings" });
+    if (gutter === null || layer === null || code === null) throw new Error("no editor parts");
+    await expect(gutter.getBoundingClientRect().left).toBeGreaterThan(box.getBoundingClientRect().left);
+    const edge = getComputedStyle(gutter);
+    await expect(parseFloat(edge.paddingRight)).toBeLessThan(parseFloat(edge.paddingLeft));
+    const input = getComputedStyle(box);
+    const copy = getComputedStyle(layer);
+    for (const side of ["paddingTop", "paddingRight", "paddingBottom", "paddingLeft"] as const) {
+      await expect(copy[side]).toBe(input[side]);
+    }
+    await expect(getComputedStyle(code).paddingLeft).toBe("32px");
+  },
+};
+
 /** No text: one numbered line. */
 export const Empty: Story = { args: { value: "", rows: 3, placeholder: "Write the settings here" } };
 

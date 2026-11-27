@@ -36,7 +36,7 @@ describe("Panel", () => {
     rerender(<Panel aria-label="Tools" actions={<button type="button">Close</button>} />);
     expect(screen.getByRole("region", { name: "Tools" })).toBeInTheDocument();
     expect(screen.queryByRole("heading")).toBeNull();
-    expect(css).toMatch(/\.pb-panel-actions \{[^}]*margin-left: auto;/);
+    expect(css).toMatch(/\.pb-panel-actions \{[^}]*margin-inline-start: auto;/);
   });
 
   it("has no header without a title or actions, and an app's own name wins over the title", () => {

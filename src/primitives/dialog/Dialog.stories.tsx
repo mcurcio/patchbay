@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useState } from "react";
+import { type ReactNode, useLayoutEffect, useState } from "react";
 import { expect, fn, screen, waitFor } from "storybook/test";
 import { Button } from "../button";
 import { Field } from "../field";
@@ -91,6 +91,44 @@ export const Labels: Story = {
 export const Phone: Story = {
   args: { actions: <Button tone="primary">Add</Button> },
   globals: { viewport: { value: "phone" } },
+};
+
+/** Sets the page's direction while the story is shown, as an app sets dir on its <html>: the dialog is in a portal on
+ * <body>, so a wrapper's dir would not reach it. */
+function PageDirection({ dir, children }: { dir: "rtl" | "ltr"; children: ReactNode }) {
+  useLayoutEffect(() => {
+    const root = document.documentElement;
+    const was = root.getAttribute("dir");
+    root.setAttribute("dir", dir);
+    return () => {
+      if (was === null) root.removeAttribute("dir");
+      else root.setAttribute("dir", was);
+    };
+  }, [dir]);
+  return children;
+}
+
+/** Right-to-left text: the head mirrors, its wider padding on the title's side (the right) and the close button at
+ * the left. */
+export const RightToLeft: Story = {
+  args: { title: "إضافة عقدة", children: <p style={{ margin: 0 }}>اختر نوعًا لإضافته.</p>, labels: { close: "إغلاق" } },
+  decorators: [
+    (Story) => (
+      <PageDirection dir="rtl">
+        <Story />
+      </PageDirection>
+    ),
+  ],
+  play: async () => {
+    const dialog = screen.getByRole("dialog", { name: "إضافة عقدة" });
+    const head = dialog.querySelector(".pb-dialog-head");
+    if (head === null) throw new Error("no head");
+    const style = getComputedStyle(head);
+    await expect(parseFloat(style.paddingRight)).toBeGreaterThan(parseFloat(style.paddingLeft));
+    const box = dialog.getBoundingClientRect();
+    const close = screen.getByRole("button", { name: "إغلاق" }).getBoundingClientRect();
+    await expect(close.left - box.left).toBeLessThan(box.width / 2);
+  },
 };
 
 /** Held by the story, as an app holds it: the opener gets the focus back on closing. */

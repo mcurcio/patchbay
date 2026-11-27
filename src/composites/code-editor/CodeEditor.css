@@ -49,11 +49,13 @@
   border-color: transparent;
 }
 
-/* Room past the text's end, so the copy can scroll as far as the textarea, whose scrollbars take room. */
+/* Room past the text's end (the inline end and the bottom), so the copy can scroll as far as the textarea, whose
+   scrollbars take room. */
 .pb-code-layer-code {
   display: inline-block;
   vertical-align: top;
-  padding: 0 32px 32px 0;
+  padding-block-end: 32px;
+  padding-inline-end: 32px;
   font: inherit;
 }
 
@@ -93,7 +95,8 @@
   flex: none;
   width: calc(var(--pb-code-gutter-digits) * 1ch + 24px);
   margin: 0;
-  padding: 5px 6px 0 4px;
+  padding-block: 5px 0;
+  padding-inline: 4px 6px;
   overflow: hidden;
   pointer-events: none;
   border: 1px solid var(--pb-code-border);

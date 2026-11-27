@@ -4,7 +4,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--pb-space-2);
-  padding: 0 7px 0 5px;
+  padding-inline: 5px 7px;
   border-radius: var(--pb-radius-pill);
   background: var(--pb-sunken);
   color: var(--pb-muted);

@@ -49,6 +49,28 @@ export const WithDetail: Story = {
   },
 };
 
+/** Right-to-left text: the dot leads at the inline start, the right, with the narrower padding on its side. */
+export const RightToLeft: Story = {
+  args: { label: "قيد التشغيل" },
+  decorators: [
+    (Story) => (
+      <div dir="rtl">
+        <Story />
+      </div>
+    ),
+  ],
+  play: async ({ canvasElement }) => {
+    const pill = canvasElement.querySelector(".pb-pill");
+    const dot = canvasElement.querySelector(".pb-pill-dot");
+    if (pill === null || dot === null) throw new Error("no pill");
+    const box = pill.getBoundingClientRect();
+    const mark = dot.getBoundingClientRect();
+    await expect(mark.left - box.left).toBeGreaterThan(box.width / 2);
+    const style = getComputedStyle(pill);
+    await expect(parseFloat(style.paddingRight)).toBeLessThan(parseFloat(style.paddingLeft));
+  },
+};
+
 /** Every tone side by side, for a glance under each brand and theme. */
 export const All: Story = {
   render: () => (

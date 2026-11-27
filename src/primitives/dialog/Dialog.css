@@ -40,7 +40,8 @@
   display: flex;
   align-items: center;
   gap: var(--pb-space-3);
-  padding: var(--pb-space-4) var(--pb-space-4) var(--pb-space-3) var(--pb-space-5);
+  padding-block: var(--pb-space-4) var(--pb-space-3);
+  padding-inline: var(--pb-space-5) var(--pb-space-4);
 }
 
 .pb-dialog-title {

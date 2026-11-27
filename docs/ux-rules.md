@@ -269,16 +269,15 @@ are F10's:
 
 - **U68. Edges are logical.** Start and end follow the text direction: Splitter `edge`, Sheet
   `side`, Toaster placements, stripes on the inline start, paddings and margins.
-  **Built:** Splitter, Sheet, Toaster, Banner. **Not yet:** Panel's header actions
-  (pb-nx9.60), Dialog's header padding (pb-nx9.61), Pill's padding (pb-nx9.62), and
-  DiffView's and CodeEditor's line and gutter paddings (pb-nx9.63) are physical.
+  **Built:** Splitter, Sheet, Toaster, Banner, Panel's header actions, Dialog's head, Pill's padding
+  (the dot's side), DiffView's lines, CodeEditor's gutter and text, each with a `RightToLeft` story.
 - **U69. Direction is read at the moment of use** (a key press, a drag's start), so a page that
   changes `dir` is followed. **Built:** Splitter.
 - **U70. Handles stay physical.** Inputs on the left and outputs on the right, as React Flow's
   positions are; the row's words follow their handle. **Built:** PortRow, NodeBox, under `dir="rtl"`
   in any language, as the build keeps their `:dir()` selectors ([`README.md`](../README.md#browsers)).
 - **U71. Safe-area insets are physical,** and so are the side paddings that clear them. **Built:**
-  AppShell.
+  AppShell, and the scrims of Dialog and CommandPalette.
 - **U72. A level bar mirrors.** A horizontal Meter fills from the inline start, so from the right
   in right-to-left text; a vertical one fills from the bottom. **Not yet:** it fills from the left
   in any direction: pb-nx9.86.

@@ -91,7 +91,7 @@
 
 .pb-diff-line {
   display: block;
-  padding: 0 var(--pb-space-4) 0 var(--pb-space-3);
+  padding-inline: var(--pb-space-3) var(--pb-space-4);
   border-inline-start: 3px solid transparent;
   white-space: pre;
 }
