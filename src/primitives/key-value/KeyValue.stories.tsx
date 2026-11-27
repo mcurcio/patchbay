@@ -27,7 +27,7 @@ export const Default: Story = {
   },
 };
 
-/** Values tinted by their tone; a tone the list does not know draws its value muted. */
+/** Values tinted by their tone, each with a dot as Pill's; a tone the list does not know draws its value muted. */
 export const Tones: Story = {
   args: {
     rows: [
@@ -40,6 +40,9 @@ export const Tones: Story = {
       { key: "Kind", value: "filter", tone: "muted" },
       { key: "Mystery", value: "muted", tone: "unheard-of" },
     ],
+  },
+  play: async ({ canvasElement }) => {
+    await expect(canvasElement.querySelectorAll(".pb-key-value-dot")).toHaveLength(8);
   },
 };
 

@@ -89,6 +89,15 @@ describe("Wire", () => {
     expect(container.querySelector(".pb-wire-path")).toBe(path);
   });
 
+  it.each(["added", "removed", "renamed", "changed"])("dashes the change tone %s whatever dashed says", (tone) => {
+    expect(group(draw({ tone }).container)).toHaveAttribute("data-dashed");
+    expect(group(draw({ tone, dashed: false }).container)).toHaveAttribute("data-dashed");
+  });
+
+  it.each(["ok", "err", "refused", "maybe"])("leaves the tone %s solid unless dashed", (tone) => {
+    expect(group(draw({ tone }).container)).not.toHaveAttribute("data-dashed");
+  });
+
   it("marks dashes and a selected wire", () => {
     const { container } = draw({ dashed: true }, { selected: true });
     expect(group(container)).toHaveAttribute("data-dashed");

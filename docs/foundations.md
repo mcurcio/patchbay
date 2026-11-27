@@ -73,7 +73,9 @@ The change tones draw an edit that is queued, not true yet (F10):
   gutter circle, diamond and ring, PortRow's accepting handle growing. A wire's change tone is
   always dashed; an `err` or `refused` wire carries a label, or its reason in the inspector; a
   KeyValue value's tone adds a dot, as Pill's. **Built:** Pill, Badge, NodeBox, DiffView,
-  CodeEditor, PortRow. **Not yet:** Wire and KeyValue tones are colour only: pb-nx9.77.
+  CodeEditor, PortRow, KeyValue, Wire (a change tone dashed whatever `dashed` says). **The app's:**
+  the words of an `err` or `refused` wire, as its `label` or, for a longer reason, in the
+  inspector when it is selected.
 
 ## Type
 

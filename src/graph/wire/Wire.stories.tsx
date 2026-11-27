@@ -106,6 +106,29 @@ export const UnknownTone: Story = {
 /** A queued edit: a change's tone, dashed. */
 export const Dashed: Story = { args: { tone: "added", dashed: true } };
 
+const changes = ["added", "removed", "renamed", "changed"];
+
+/** Each change tone, a queued edit: always dashed, so it never rests on colour alone, with or without `dashed`. */
+export const Changes: Story = {
+  render: () => (
+    <StoryCanvas
+      height={240}
+      nodes={pair(changes.length)}
+      edges={changes.map((tone, index) => wire(index, { tone, label: tone }))}
+      edgeTypes={edgeTypes}
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    await waitFor(() => expect(canvasElement.querySelectorAll(".pb-wire-path")).toHaveLength(changes.length));
+    for (const path of canvasElement.querySelectorAll(".pb-wire-path")) {
+      await expect(getComputedStyle(path).strokeDasharray).not.toBe("none");
+    }
+  },
+};
+
+/** A refused or failed wire says why in words, here its label; a longer reason goes in the inspector. */
+export const Refused: Story = { args: { tone: "refused", dashed: true, label: "refused: types differ" } };
+
 /** Dots moving toward the input; under reduced motion they are not drawn. */
 export const Flow: Story = { args: { tone: "ok", flow: true, emphasis: 0.6 } };
 

@@ -135,8 +135,10 @@ screen readers (as inside a busy `Button`); with one it is a `role="status"` tha
 `level?` (h2 to h6, h3 by default).
 
 **`KeyValue`**: facts as a `<dl>`, keys and values side by side. `rows: { key, value, tone?,
-title? }[]` (a row's `tone`, one of `Pill`'s seven, colours its value, and one it does not know
-draws it in `--pb-muted`; its `title` is the key's tooltip; two rows may share a key), `label?` (the list's name when no heading gives one).
+title? }[]` (a row's `tone`, one of `Pill`'s seven, colours its value and adds a dot before it, as
+`Pill`'s, hidden from screen readers; one it does not know draws both in `--pb-muted`; its `title`
+is the key's tooltip; two rows may share a key), `label?` (the list's name when no heading gives
+one). Under forced colours the dot keeps its shape in the system's text colour.
 
 ### Forms
 

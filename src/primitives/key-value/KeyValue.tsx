@@ -1,5 +1,6 @@
 // Facts as a two-column list of keys and values (a status summary, an inspector's details), drawn as a <dl> so each key
-// names its value for screen readers. A row's tone colours its value; a tone it does not know draws it muted.
+// names its value for screen readers. A row's tone colours its value and adds a dot before it, as Pill's, so the tone
+// never rests on colour alone; a tone it does not know draws it muted.
 import type { ReactNode } from "react";
 import "./KeyValue.css";
 
@@ -11,7 +12,7 @@ export type KeyValueRow = {
   key: string;
   /** Its value. */
   value: ReactNode;
-  /** Colours the value: a fact that is wrong or worth a look. */
+  /** Colours the value and adds a dot before it: a fact that is wrong or worth a look. */
   tone?: KeyValueTone;
   /** Shown on hover over the key: what the fact means. */
   title?: string;
@@ -34,7 +35,10 @@ export function KeyValue({ rows, label, className }: KeyValueProps) {
         // Rows have no identity beyond their place; two may share a key.
         <div key={index} className="pb-key-value-row" data-tone={row.tone}>
           <dt title={row.title}>{row.key}</dt>
-          <dd>{row.value}</dd>
+          <dd>
+            {row.tone !== undefined && <span className="pb-key-value-dot" aria-hidden="true" />}
+            {row.value}
+          </dd>
         </div>
       ))}
     </dl>

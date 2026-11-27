@@ -16,7 +16,7 @@ export type WireData = {
   tone?: WireTone;
   /** The signal's level, 0 to 1 (clamped; not a number is 0): thickness and brightness. None is the plain wire. */
   emphasis?: number;
-  /** Dashes: with a change tone, an edit queued until a save. */
+  /** Dashes. A change tone is always dashed, whatever this says. */
   dashed?: boolean;
   /** Dots moving along the wire toward the input; not drawn under reduced motion. */
   flow?: boolean;
@@ -34,6 +34,9 @@ export type WireEdge = Edge<WireData, "wire">;
 /** The arrowhead's length along the wire and half its width, in px. */
 const ARROW_LENGTH = 8;
 const ARROW_HALF = 4;
+
+/** The change tones: a queued edit, always drawn dashed so it never rests on colour alone. */
+const CHANGE_TONES: ReadonlySet<string> = new Set(["added", "removed", "renamed", "changed"]);
 
 /** A level as the wire draws it: 0 to 1, anything not a number 0. */
 function emphasisOf(value: unknown): number {
@@ -134,13 +137,14 @@ export function Wire({
   const emphasis = data?.emphasis === undefined ? undefined : emphasisOf(data.emphasis);
   const level = emphasis === undefined ? undefined : ({ "--pb-wire-emphasis": emphasis } as CSSProperties);
   const label = data?.label;
+  const dashed = data?.dashed === true || (data?.tone !== undefined && CHANGE_TONES.has(data.tone));
   return (
     <>
       <g
         className="pb-wire"
         data-tone={data?.tone}
         data-selected={selected === true ? "" : undefined}
-        data-dashed={data?.dashed === true ? "" : undefined}
+        data-dashed={dashed ? "" : undefined}
         data-emphasis={emphasis === undefined ? undefined : ""}
         style={level}
       >
