@@ -1,5 +1,6 @@
 import { Canvas, Meta } from "@storybook/addon-docs/blocks";
 import * as ConnectHintsStories from "../graph/connect-hints/useConnectHints.stories";
+import * as ConnectStatusStories from "../graph/connect-status/ConnectStatus.stories";
 import * as GhostWireStories from "../graph/ghost-wire/GhostWire.stories";
 import * as PortRowStories from "../graph/port-row/PortRow.stories";
 import * as ToasterStories from "../composites/toaster/Toaster.stories";
@@ -20,6 +21,13 @@ Drag from an output: the ports that accept the wire grow, the ones that refuse d
 
 <Canvas of={ConnectHintsStories.Drag} />
 
+The canvas's status line says, in words, why the port under the pointer refuses, and the verdict
+of a refused drop, so the reason is never only a tooltip:
+
+<Canvas of={ConnectStatusStories.Dragging} />
+
+<Canvas of={ConnectStatusStories.RefusedDrop} />
+
 A port with a problem says so in words:
 
 <Canvas of={PortRowStories.Problem} />
@@ -36,7 +44,5 @@ A refused request's reason goes in a toast, the ghost going with it:
 
 ## Not built yet
 
-- The canvas's status line, saying why a port refuses while a wire is dragged: `pb-nx9.78`.
-  Until then the reason is only the port's tooltip.
 - The ports `canConnect` accepts for one port, for the inspector's "Connect to" Select (the
   keyboard path): `pb-nx9.81`.

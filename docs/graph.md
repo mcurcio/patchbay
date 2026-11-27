@@ -10,7 +10,7 @@ while a wire is dragged).
 
 ```ts
 import "@xyflow/react/dist/style.css";
-import { CanvasTools, ConnectHints, GhostWire, mergeFlowProps, Meter, NodeBox, nodeBoxSize, PortRow, useAddAt, useConnectHints, useFollowFit, Wire } from "@mcurcio/patchbay/graph";
+import { CanvasTools, ConnectHints, ConnectStatus, GhostWire, mergeFlowProps, Meter, NodeBox, nodeBoxSize, PortRow, useAddAt, useConnectHints, useFollowFit, Wire } from "@mcurcio/patchbay/graph";
 ```
 
 Importing the layer loads its stylesheet (`dist/graph.css`) and imports `@xyflow/react` (React Flow
@@ -191,14 +191,17 @@ while a wire is dragged and for React Flow's own check on the drop.
 ```tsx
 const hints = useConnectHints(canConnect);
 <ConnectHints value={hints.value}>
-  <ReactFlow {...mergeFlowProps(hints.flowProps, { onConnect })} … />
+  <ReactFlow {...mergeFlowProps(hints.flowProps, { onConnect })} … >
+    <ConnectStatus value={hints.value} refused={hints.refused} />
+  </ReactFlow>
 </ConnectHints>
 ```
 
 - **The rule.** `canConnect(from, to) → true | false | string`, where `PortRef` is
   `{ nodeId, handleId: string | null }` (`null` for a handle without an id). `from` is always the
   output and `to` the input, whichever end the drag began at. `true` accepts; `false` refuses; a
-  string refuses and is the reason, which becomes the refusing handle's and row's tooltip. The
+  string refuses and is the reason, which becomes the refusing handle's and row's tooltip and
+  [`ConnectStatus`](#connectstatus)' words. The
   newest `canConnect` is used; it need not be stable.
 - **Once per candidate per drag.** Each pair's verdict is asked of the rule once between the drag's
   start and its end and kept, for the hints and the drop check alike; the next drag asks again.
@@ -207,6 +210,11 @@ const hints = useConnectHints(canConnect);
   check accepts only when `canConnect` says `true` for React Flow's source and target. The object
   is the same across renders. The hints' state changes twice per drag, at its start and its end,
   never per pointer move, so the rows re-render twice per drag.
+- **`refused`**: the last drop on a handle that the rule refused, `{ port, reason? }` (`port` a
+  `PortRef` with its `side`, `reason` the rule's string when it gave one), kept from the drag's end
+  until the next drag begins, for [`ConnectStatus`](#connectstatus); `null` after a drag that ended
+  otherwise (accepted, on empty canvas, or on the origin's own side, which is not a candidate). It
+  changes with the hints' two changes per drag, never between them.
 - **`value`** goes to `<ConnectHints>`, a context every `PortRow` inside it reads (`null` while no
   wire is dragged): the handle the drag began at is `origin`; each handle on the other side `ok` or
   `no` with its reason; handles on the origin's side `null`, as they are not candidates in React
@@ -224,6 +232,37 @@ object. A handler given by more than one object calls each in order, with the sa
 prop is the last object's that gives it, and an `undefined` object or prop gives nothing. It
 returns a new object each call (its handlers new too); React Flow takes changed handlers as they
 come.
+
+## `ConnectStatus`
+
+The canvas's status line for connecting, as a child of the app's `<ReactFlow>`: while a wire is
+dragged it says why the port under the pointer (or the finger) refuses it, and after a drop the
+rule refused, the verdict, so the reason is never only a tooltip ([U47, U59](ux-rules.md#feedback)).
+Its words come from [`useConnectHints`](#useconnecthints), the one rule the hints and the drop check
+use, so it never says what they do not.
+
+| Prop | What it is |
+|---|---|
+| `value` | `useConnectHints`'s `value`: the drag in progress, or `null` |
+| `refused` | `useConnectHints`'s `refused`: the last refused drop, or `null` |
+| `position?` | Its place, React Flow's `PanelPosition`: `"bottom-center"` by default. One it does not know is passed on, and React Flow places nothing |
+| `labels?` | Its words ([rule 8](components.md#rules-every-component-keeps)): `refuses(reason)`, over a refusing port, the rule's reason or "This port refuses the wire"; `notConnected(reason)`, after a refused drop, "Not connected: " and the reason or "that port refuses the wire"; `defaultConnectStatusLabels` |
+| `className?` | Added to the panel's `pb-connect-status` |
+
+- **What it says.** During a drag, for the handle React Flow's connection state has under the drag
+  (within `connectionRadius`, so a finger near a handle counts), the hint `value.hintFor` gives:
+  `no` says `labels.refuses(reason)`; `ok`, the origin's side and no handle say nothing. A row's own
+  `hint` is the app's drawing, not the rule, and the line does not read it. Once no wire is dragged,
+  a refused drop says `labels.notConnected(reason)` until the next drag begins.
+  `connectStatusWords(value, refused, over, labels?)` is that rule, exported and pure. It re-renders
+  only when the handle under the drag changes, never per pointer move.
+- **What is read.** The words are one `role="status"` region, there from the first render with
+  none, so each change is read politely ([U42](ux-rules.md#feedback)).
+- **Look.** `--pb-text-sm` words on `--pb-raised`, edged in `--pb-line` with the box radius and
+  `--pb-shadow`, 420 px wide at most; with no words it draws nothing. It takes no pointer events,
+  so a wire dragged under it still reaches the ports. It does not animate. **Forced colours:** the
+  edge in `CanvasText`.
+- It takes no focus and has no keys: it says, and does nothing.
 
 ## `Wire`
 

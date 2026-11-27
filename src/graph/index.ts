@@ -4,6 +4,7 @@
 export * from "./add-at";
 export * from "./canvas-tools";
 export * from "./connect-hints";
+export * from "./connect-status";
 export * from "./follow-fit";
 export * from "./ghost-wire";
 export * from "./meter";

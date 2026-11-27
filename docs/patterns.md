@@ -71,8 +71,8 @@ unplaced nodes by its layout, and puts an added node at the point it was asked.
 
 1. They drag from a handle ([`PortRow`](graph.md#portrow)). Either end may start the wire.
 2. Every candidate port says yes or no from the app's one rule
-   ([`useConnectHints`](graph.md#useconnecthints), U56, U57), and the canvas's status line says why
-   a port refuses (U59).
+   ([`useConnectHints`](graph.md#useconnecthints), U56, U57), and the canvas's status line
+   ([`ConnectStatus`](graph.md#connectstatus)) says why a port refuses (U59).
 3. They drop on an accepting handle. Applying at once, a [`GhostWire`](graph.md#ghostwire)
    `pending` shows the request until the source answers; queuing, a dashed [`Wire`](graph.md#wire)
    in `added` shows the queued change.

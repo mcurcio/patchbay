@@ -2,7 +2,7 @@
 // drag, from always the output, React Flow's check on the drop, the two state changes per drag, and PortRow reading
 // the hints from <ConnectHints> (its own hint prop winning).
 import { act, render, renderHook } from "@testing-library/react";
-import { type Node, type NodeProps, ReactFlow, ReactFlowProvider } from "@xyflow/react";
+import { type Node, type NodeProps, Position, ReactFlow, ReactFlowProvider } from "@xyflow/react";
 import { Profiler, type ReactNode } from "react";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { installFlowMeasuring } from "../../test/flow";
@@ -26,10 +26,22 @@ const start = (
     });
   });
 };
-const end = (hints: { current: ReturnType<typeof useConnectHints> }) => {
+/** A handle as React Flow's final connection state gives it; only its node, id and type are read. */
+const handleAt = (nodeId: string, id: string | null, side: "input" | "output") => ({
+  nodeId,
+  id,
+  type: side === "input" ? ("target" as const) : ("source" as const),
+  x: 0,
+  y: 0,
+  position: side === "input" ? Position.Left : Position.Right,
+  width: 10,
+  height: 10,
+});
+type At = ReturnType<typeof handleAt>;
+/** Ends the drag, dropped on `to` (a handle within reach) or on nothing, as React Flow's final state says. */
+const end = (hints: { current: ReturnType<typeof useConnectHints> }, from: At | null = null, to: At | null = null) => {
   act(() => {
-    // React Flow passes the final connection state; the hook reads none of it.
-    hints.current.flowProps.onConnectEnd(event, {} as never);
+    hints.current.flowProps.onConnectEnd(event, { fromHandle: from, toHandle: to } as never);
   });
 };
 const hintOf = (value: ConnectHintsValue, nodeId: string, handleId: string, side: "input" | "output") =>
@@ -46,6 +58,39 @@ describe("useConnectHints", () => {
   it("has no hints while no wire is dragged", () => {
     const { result } = renderHook(() => useConnectHints(rule));
     expect(result.current.value).toBeNull();
+    expect(result.current.refused).toBeNull();
+  });
+
+  it("keeps a drop the rule refused, with its reason, until the next drag begins", () => {
+    const { result } = renderHook(() => useConnectHints(rule));
+    const out = handleAt("a", "out", "output");
+    start(result, "a", "out", "output");
+    end(result, out, handleAt("b", "side", "input"));
+    expect(result.current.refused).toEqual({
+      port: { nodeId: "b", handleId: "side", side: "input" },
+      reason: "Takes control, not audio",
+    });
+    start(result, "a", "out", "output");
+    expect(result.current.refused).toBeNull();
+    end(result, out, handleAt("b", "other", "input"));
+    expect(result.current.refused).toEqual({ port: { nodeId: "b", handleId: "other", side: "input" } });
+    // From an input, the rule is asked from the output, and the refusal names the output dropped on.
+    start(result, "b", "side", "input");
+    end(result, handleAt("b", "side", "input"), handleAt("a", "out", "output"));
+    expect(result.current.refused).toEqual({
+      port: { nodeId: "a", handleId: "out", side: "output" },
+      reason: "Takes control, not audio",
+    });
+  });
+
+  it("keeps no refusal for an accepted drop, a drop on nothing, or one on the origin's own side", () => {
+    const { result } = renderHook(() => useConnectHints(rule));
+    const out = handleAt("a", "out", "output");
+    for (const to of [handleAt("b", "in", "input"), null, handleAt("b", "out", "output")]) {
+      start(result, "a", "out", "output");
+      end(result, out, to);
+      expect(result.current.refused).toBeNull();
+    }
   });
 
   it("marks the origin, judges the other side and leaves the origin's side out", () => {

@@ -173,9 +173,10 @@ cite them. How to read a rule (Built, The app's, Not yet):
   whatever a `title` says is also in words elsewhere: the inspector, a node's line, or the canvas's
   status line, which also says why a port refuses while a wire is dragged (U59). Tooltips stay, as
   a convenience. **Built:** CommandPalette, whose active row (every row on touch) is written out
-  whole (F20). **Not yet:** a wire's `title`, a meter's numbers, the gutter mark's list of
+  whole (F20); [`ConnectStatus`](graph.md#connectstatus), the canvas's status line, for a refusing
+  port's reason. **Not yet:** a wire's `title`, a meter's numbers, the gutter mark's list of
   diagnostics and a cut node title are in a tooltip only, with no place named for their words
-  (pb-nx9.79); the canvas has no status line (pb-nx9.78).
+  (pb-nx9.79).
 
 ## Confirmation and undo
 
@@ -229,7 +230,8 @@ are F10's:
   ghost too. **The app's:** removing the ghost with its toast.
 - **U59. A refusal's reason lands where it was asked,** in words (U44). While a wire is dragged,
   the canvas's status line says why the port under the pointer refuses, and the verdict of a
-  refused drop. **Not yet:** the reason is only the port's tooltip: pb-nx9.78.
+  refused drop. **Built:** [`ConnectStatus`](graph.md#connectstatus), fed by `useConnectHints`.
+  **The app's:** drawing it on the canvas.
 - **U60. A read-only graph turns off every edit and says why:** adding, connecting, removing,
   dragging and editing text, with a `quiet` Banner saying why and where it can be changed
   ([patterns](patterns.md#a-read-only-graph)). **Built:** the switches (`useAddAt`'s `enabled`,
