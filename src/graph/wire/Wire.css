@@ -1,8 +1,15 @@
-/* A wire: the stroke in its tone (React Flow's edge stroke when it has none it knows), the accent when selected. A level
+/* A wire: the stroke in its tone (React Flow's edge stroke when it has none, muted for one it does not know), the
+   accent when selected. A level
    is --pb-wire-emphasis, 0 to 1, set on the group: 1.5 px to 3.5 px thick and dim to full, so a change of level restyles
    the path rather than rebuilding it. */
 .pb-wire {
   --pb-wire-color: var(--xy-edge-stroke);
+}
+
+/* A tone it does not know: the muted stroke every unknown tone on a wire has (docs/foundations.md#tones, F7). The tones
+   it knows follow and win. */
+.pb-wire[data-tone] {
+  --pb-wire-color: var(--pb-muted);
 }
 
 .pb-wire[data-tone="ok"] {
@@ -19,8 +26,7 @@
   --pb-wire-color: var(--pb-err);
 }
 
-.pb-wire[data-tone="quiet"],
-.pb-wire[data-tone="pending"] {
+.pb-wire[data-tone="quiet"] {
   --pb-wire-color: var(--pb-quiet);
 }
 
@@ -44,6 +50,10 @@
   --pb-wire-color: var(--pb-removed);
 }
 
+.pb-wire[data-tone="renamed"] {
+  --pb-wire-color: var(--pb-renamed);
+}
+
 /* After the tones, so a selected wire is the accent whatever its tone. */
 .pb-wire[data-selected] {
   --pb-wire-color: var(--pb-accent);
@@ -65,6 +75,46 @@
 
 .pb-wire[data-dashed] .react-flow__edge-path.pb-wire-path {
   stroke-dasharray: 6 4;
+}
+
+/* React Flow's edge wrapper holds the focus and, focused, would restroke the path in its selected colour, which is the
+   selected look. The wire keeps its own stroke, so focus and selection are two looks and can show at once. */
+.react-flow__edge:focus .pb-wire .react-flow__edge-path.pb-wire-path,
+.react-flow__edge:focus-visible .pb-wire .react-flow__edge-path.pb-wire-path {
+  stroke: var(--pb-wire-color);
+}
+
+/* Focus (docs/ux-rules.md#focus-and-keyboard, U1, U17): a 2 px ring in the accent, 2 px clear of the stroke, along the
+   whole path: a wide accent path under a narrower one in the canvas's surface, under the wire. Hidden until the edge
+   wrapper has :focus-visible; neither takes the pointer. */
+.pb-wire-focus-ring,
+.pb-wire-focus-gap {
+  visibility: hidden;
+  pointer-events: none;
+  stroke-linecap: round;
+}
+
+.pb-wire-focus-ring {
+  stroke: var(--pb-accent);
+  stroke-width: calc(1.5px + 8px);
+}
+
+.pb-wire-focus-gap {
+  stroke: var(--pb-surface);
+  stroke-width: calc(1.5px + 4px);
+}
+
+.pb-wire[data-emphasis] .pb-wire-focus-ring {
+  stroke-width: calc(1.5px + 2px * var(--pb-wire-emphasis) + 8px);
+}
+
+.pb-wire[data-emphasis] .pb-wire-focus-gap {
+  stroke-width: calc(1.5px + 2px * var(--pb-wire-emphasis) + 4px);
+}
+
+.react-flow__edge:focus-visible .pb-wire-focus-ring,
+.react-flow__edge:focus-visible .pb-wire-focus-gap {
+  visibility: visible;
 }
 
 /* The flow: round dots 12 px apart moving from the output toward the input, one period per --pb-motion-flow. */
@@ -111,7 +161,8 @@
   }
 }
 
-/* Forced colours: the stroke and the arrow in the system's text colour, the highlight when selected; dashes stay. */
+/* Forced colours: the stroke and the arrow in the system's text colour, the highlight when selected; dashes stay. The
+   focus ring is the text colour, its gap the canvas. */
 @media (forced-colors: active) {
   .pb-wire .react-flow__edge-path.pb-wire-path {
     stroke: CanvasText;
@@ -131,5 +182,13 @@
 
   .pb-wire-label {
     border-color: CanvasText;
+  }
+
+  .pb-wire-focus-ring {
+    stroke: CanvasText;
+  }
+
+  .pb-wire-focus-gap {
+    stroke: Canvas;
   }
 }

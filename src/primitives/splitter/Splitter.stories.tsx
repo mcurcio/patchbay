@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { expect, fn, waitFor } from "storybook/test";
+import { tokenColor } from "../../test/token-color";
+import { underTouch } from "../../test/touch-rules";
 import { Splitter, type SplitterProps } from "./Splitter";
 
 /** The splitter on the edge of a pane it resizes, inside a frame, with the size held by the story as an app holds it. */
@@ -163,11 +165,41 @@ export const RightToLeft: Story = {
   },
 };
 
-/** Focused, as after a Tab: the accent bar is the cue. */
+/** Focused, as after a Tab: the accent bar, and the 2 px accent ring 1 px clear of it that every control has. */
 export const Focused: Story = {
-  play: async ({ canvas, userEvent }) => {
+  play: async ({ canvas, canvasElement, userEvent }) => {
     await userEvent.tab();
-    await expect(canvas.getByRole("separator")).toHaveFocus();
+    const splitter = canvas.getByRole("separator");
+    await expect(splitter).toHaveFocus();
+    const style = getComputedStyle(splitter);
+    await expect(style.outlineStyle).toBe("solid");
+    await expect(style.outlineWidth).toBe("2px");
+    await expect(style.outlineOffset).toBe("1px");
+    // Read once: tokenColor draws a probe, and a waitFor that drew one would wake itself on its own change.
+    const accent = tokenColor(canvasElement, "accent");
+    await expect(style.outlineColor).toBe(accent);
+    // The fill fades in over --pb-motion-fast.
+    await waitFor(() => expect(getComputedStyle(splitter).backgroundColor).toBe(accent));
+  },
+};
+
+/**
+ * On a touch screen, where nothing hovers, the bar draws its grip at rest (a short line-strong bar across its middle),
+ * so it can be found; its hit area is 36 px across. A desktop browser matches no coarse pointer, so the story applies
+ * the page's touch rules while it measures.
+ */
+export const Touch: Story = {
+  play: async ({ canvas, canvasElement }) => {
+    const splitter = canvas.getByRole("separator");
+    const edge = tokenColor(canvasElement, "line-strong");
+    await expect(getComputedStyle(splitter, "::after").content).toBe("none");
+    await underTouch(async () => {
+      const grip = getComputedStyle(splitter, "::after");
+      await expect(grip.backgroundColor).toBe(edge);
+      await expect(grip.width).toBe("4px");
+      await expect(grip.height).toBe("32px");
+      await expect(getComputedStyle(splitter, "::before").width).toBe("36px");
+    });
   },
 };
 

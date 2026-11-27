@@ -5,7 +5,15 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import { createRef, Profiler } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { LiveSubscribe } from "../../hooks";
-import { defaultMeterTitle, Meter, type MeterHandle, meterFraction, toDb } from "./Meter";
+import {
+  defaultMeterLabels,
+  defaultMeterTitle,
+  formatMeterDb,
+  Meter,
+  type MeterHandle,
+  meterFraction,
+  toDb,
+} from "./Meter";
 import css from "./Meter.css?raw";
 
 function source(initial: readonly [number, number] = [0, 0]) {
@@ -75,14 +83,23 @@ describe("the scale", () => {
     expect(defaultMeterTitle(-12, -18.34, false)).toBe("peak -12.0 dB, rms -18.3 dB");
     expect(defaultMeterTitle(-Infinity, -Infinity, false)).toBe("peak −∞ dB, rms −∞ dB");
   });
+
+  it("formats a level as the tooltip does, for an app writing the numbers in words", () => {
+    expect(formatMeterDb(toDb(0.25))).toBe("-12.0");
+    expect(formatMeterDb(-Infinity)).toBe("−∞");
+    expect(formatMeterDb(0)).toBe("0.0");
+  });
 });
 
 describe("Meter", () => {
-  it("is an image named Level by default, or by its label", () => {
+  it("is an image named by labels.name (Level by default), and by its label, which wins", () => {
     const hot = source();
     const { rerender } = render(<Meter subscribe={hot.subscribe} read={hot.read} />);
-    expect(meter()).toHaveAccessibleName("Level");
-    rerender(<Meter subscribe={hot.subscribe} read={hot.read} label="Left output" />);
+    expect(meter()).toHaveAccessibleName(defaultMeterLabels.name);
+    expect(defaultMeterLabels.name).toBe("Level");
+    rerender(<Meter subscribe={hot.subscribe} read={hot.read} labels={{ name: "Signal" }} />);
+    expect(meter()).toHaveAccessibleName("Signal");
+    rerender(<Meter subscribe={hot.subscribe} read={hot.read} labels={{ name: "Signal" }} label="Left output" />);
     expect(meter()).toHaveAccessibleName("Left output");
   });
 
@@ -276,6 +293,16 @@ describe("Meter", () => {
     expect(new Set(keyed)).toEqual(new Set(["vertical"]));
     rerender(<Meter subscribe={hot.subscribe} read={hot.read} orientation="vertical" />);
     expect(meter()).toHaveAttribute("data-orientation", "vertical");
+  });
+
+  it("fills a horizontal bar from the inline start in right-to-left text, and a vertical one from the bottom", () => {
+    // The RTL rule names horizontal by excluding vertical, so an unknown orientation mirrors too.
+    expect(css).toMatch(
+      /\.pb-meter:not\(\[data-orientation="vertical"\]\):dir\(rtl\) \.pb-meter-bar \{\s*background: linear-gradient\(\s*to left,/,
+    );
+    expect(css).toMatch(/clip-path: inset\(0 0 0 calc\(\(1 - var\(--pb-meter-level\)\) \* 100%\)\);/);
+    expect(css).toMatch(/\.pb-meter-peak \{[^}]*inset-inline-start: calc\(var\(--pb-meter-tick\) \* \(100% - 2px\)\);/);
+    expect(css).not.toMatch(/\b(left|right):/);
   });
 
   it("never re-renders for a level", () => {

@@ -1,6 +1,7 @@
 // One rule for which ports may be joined (docs/graph.md#useconnecthints), used both for the hints every PortRow shows
 // while a wire is dragged and for React Flow's own check on the drop. The state changes twice per drag, at its start
-// and its end, never per pointer move; each candidate handle's verdict is asked of the rule once per drag and kept.
+// and its end, never per pointer move; each candidate handle's verdict is asked of the rule once per drag and kept. A
+// drop the rule refused is kept, with its reason, until the next drag begins, for the canvas's status line.
 import type { Connection, Edge, OnConnectEnd, OnConnectStart } from "@xyflow/react";
 import { createContext, type ReactNode, useContext, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { PortHint, PortSide } from "../port-row";
@@ -24,6 +25,9 @@ export type ConnectHintsValue = {
   /** The hint for one handle: `origin`, `ok` or `no` (with its reason) on the other side, `null` on the origin's. */
   hintFor: (port: PortRef, side: PortSide) => PortHintOf;
 } | null;
+
+/** A drop on a handle the rule refused: that handle, its side, and the rule's reason when it gave one. */
+export type ConnectRefusal = { port: PortRef & { side: PortSide }; reason?: string };
 
 /** The handlers `useConnectHints` gives `<ReactFlow>`. */
 export type ConnectHintsFlowProps = {
@@ -54,6 +58,8 @@ const samePort = (a: PortRef, b: PortRef) => a.nodeId === b.nodeId && a.handleId
  */
 export function useConnectHints(canConnect: CanConnect): {
   value: ConnectHintsValue;
+  /** The last drop the rule refused, until the next drag begins; `null` when the last drag ended otherwise. */
+  refused: ConnectRefusal | null;
   flowProps: ConnectHintsFlowProps;
 } {
   const rule = useRef(canConnect);
@@ -63,6 +69,7 @@ export function useConnectHints(canConnect: CanConnect): {
   // The verdicts of the drag in progress, so each candidate is judged once per drag; none outside a drag.
   const verdicts = useRef<Map<string, boolean | string> | null>(null);
   const [origin, setOrigin] = useState<(PortRef & { side: PortSide }) | null>(null);
+  const [refused, setRefused] = useState<ConnectRefusal | null>(null);
 
   const judge = useMemo(
     () =>
@@ -85,10 +92,26 @@ export function useConnectHints(canConnect: CanConnect): {
         if (nodeId === null) return;
         verdicts.current = new Map();
         setOrigin({ nodeId, handleId, side: handleType === "target" ? "input" : "output" });
+        setRefused(null);
       },
-      onConnectEnd: () => {
+      onConnectEnd: (_event, connection) => {
+        // A drop on a handle of the other side that the rule refused; a drop on empty canvas, or on the origin's own
+        // side (not a candidate), is no refusal.
+        const { fromHandle, toHandle } = connection;
+        let refusal: ConnectRefusal | null = null;
+        if (fromHandle !== null && toHandle !== null && fromHandle.type !== toHandle.type) {
+          const from: PortRef = { nodeId: fromHandle.nodeId, handleId: fromHandle.id ?? null };
+          const to: PortRef = { nodeId: toHandle.nodeId, handleId: toHandle.id ?? null };
+          const toInput = toHandle.type === "target";
+          const verdict = toInput ? judge(from, to) : judge(to, from);
+          if (verdict !== true) {
+            const port = { ...to, side: toInput ? ("input" as const) : ("output" as const) };
+            refusal = typeof verdict === "string" ? { port, reason: verdict } : { port };
+          }
+        }
         verdicts.current = null;
         setOrigin(null);
+        setRefused(refusal);
       },
       isValidConnection: (connection) =>
         judge(
@@ -113,5 +136,5 @@ export function useConnectHints(canConnect: CanConnect): {
     };
   }, [origin, judge]);
 
-  return { value, flowProps };
+  return { value, refused, flowProps };
 }

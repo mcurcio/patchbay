@@ -5,6 +5,7 @@ import { expect, waitFor } from "storybook/test";
 import type { LiveSubscribe } from "../../hooks";
 import { Badge, Button, Pill } from "../../primitives";
 import { type BoxNode, StoryCanvas, storyNodeTypes } from "../../test/story-canvas";
+import { tokenColor } from "../../test/token-color";
 import { Meter } from "../meter";
 import { nodeBoxSize } from "./geometry";
 import { NodeBox, type NodeBoxProps, type PortSpec } from "./NodeBox";
@@ -102,6 +103,22 @@ export const StagedEdit: Story = {
   },
 };
 
+/** A tone it does not know: its stripe in line-strong. */
+export const UnknownTone: Story = {
+  render: () => (
+    <StoryCanvas height={160} nodes={[node("n", 0, 0, { title: "node-1", subtitle: "tone", tone: "sparkly" })]} />
+  ),
+  play: async ({ canvasElement }) => {
+    const box = await waitFor(() => {
+      const found = canvasElement.querySelector(".pb-node-box");
+      if (found === null) throw new Error("no node yet");
+      return found;
+    });
+    await expect(box).toHaveAttribute("data-tone", "sparkly");
+    await expect(getComputedStyle(box, "::before").backgroundColor).toBe(tokenColor(canvasElement, "line-strong"));
+  },
+};
+
 /** Every tone's stripe, and one it does not know in --pb-line-strong. */
 export const Tones: Story = {
   render: () => (
@@ -176,15 +193,24 @@ export const UnknownLayout: Story = { args: { ...stagedNode, ports: "diagonal" }
 /** A wider box, by the width prop. */
 export const Wide: Story = { args: { ...levelNode, width: 320 } };
 
-/** The keyboard: React Flow's node wrapper takes the focus and the box shows it; the box adds no tab stop. */
+/**
+ * The keyboard: React Flow's node wrapper takes the focus and the box shows it; the box adds no tab stop, and leaves
+ * React Flow's keys alone, so Enter selects the node and an arrow key moves it.
+ */
 export const Keyboard: Story = {
   args: { ...stagedNode },
   play: async ({ canvas, userEvent }) => {
     const box = await canvas.findByRole("group", { name: "mix-2" });
     await userEvent.tab();
-    await expect(document.activeElement).toBe(box.parentElement);
+    const wrapper = box.parentElement;
+    await expect(document.activeElement).toBe(wrapper);
     await expect(getComputedStyle(box).outlineStyle).toBe("solid");
     await expect(box.querySelectorAll("[tabindex], a, button, input, select, textarea")).toHaveLength(0);
+    const before = wrapper?.style.transform;
+    await userEvent.keyboard("{Enter}");
+    await waitFor(() => expect(wrapper).toHaveClass("selected"));
+    await userEvent.keyboard("{ArrowRight}");
+    await waitFor(() => expect(wrapper?.style.transform).not.toBe(before));
   },
 };
 

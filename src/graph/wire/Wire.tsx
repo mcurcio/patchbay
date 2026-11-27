@@ -7,16 +7,16 @@ import { type CSSProperties, memo, type ReactNode, useMemo } from "react";
 import type { PillTone } from "../../primitives";
 import "./Wire.css";
 
-/** Pill's tones, the changes, `pending` and `refused`; any other string is drawn in the edge stroke. */
-export type WireTone = PillTone | "added" | "removed" | "changed" | "pending" | "refused" | (string & {});
+/** Pill's tones, the changes and `refused`; any other string is drawn in the muted stroke. */
+export type WireTone = PillTone | "added" | "removed" | "renamed" | "changed" | "refused" | (string & {});
 
 /** A wire's look, as React Flow's edge `data`. */
 export type WireData = {
-  /** The stroke's tone; none, or one it does not know, is React Flow's edge stroke. */
+  /** The stroke's tone; none is React Flow's edge stroke, and one it does not know the muted one. */
   tone?: WireTone;
   /** The signal's level, 0 to 1 (clamped; not a number is 0): thickness and brightness. None is the plain wire. */
   emphasis?: number;
-  /** Dashes: an edit not yet saved. */
+  /** Dashes. A change tone is always dashed, whatever this says. */
   dashed?: boolean;
   /** Dots moving along the wire toward the input; not drawn under reduced motion. */
   flow?: boolean;
@@ -34,6 +34,9 @@ export type WireEdge = Edge<WireData, "wire">;
 /** The arrowhead's length along the wire and half its width, in px. */
 const ARROW_LENGTH = 8;
 const ARROW_HALF = 4;
+
+/** The change tones: a queued edit, always drawn dashed so it never rests on colour alone. */
+const CHANGE_TONES: ReadonlySet<string> = new Set(["added", "removed", "renamed", "changed"]);
 
 /** A level as the wire draws it: 0 to 1, anything not a number 0. */
 function emphasisOf(value: unknown): number {
@@ -80,6 +83,8 @@ const WireBody = memo(function WireBody({
 }: WireBodyProps) {
   return (
     <>
+      <path d={path} fill="none" className="pb-wire-focus-ring" aria-hidden="true" />
+      <path d={path} fill="none" className="pb-wire-focus-gap" aria-hidden="true" />
       <BaseEdge
         id={id}
         path={path}
@@ -134,13 +139,14 @@ export function Wire({
   const emphasis = data?.emphasis === undefined ? undefined : emphasisOf(data.emphasis);
   const level = emphasis === undefined ? undefined : ({ "--pb-wire-emphasis": emphasis } as CSSProperties);
   const label = data?.label;
+  const dashed = data?.dashed === true || (data?.tone !== undefined && CHANGE_TONES.has(data.tone));
   return (
     <>
       <g
         className="pb-wire"
         data-tone={data?.tone}
         data-selected={selected === true ? "" : undefined}
-        data-dashed={data?.dashed === true ? "" : undefined}
+        data-dashed={dashed ? "" : undefined}
         data-emphasis={emphasis === undefined ? undefined : ""}
         style={level}
       >

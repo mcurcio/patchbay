@@ -172,6 +172,19 @@ describe("the components", () => {
     expect(failures).toEqual([]);
   });
 
+  it("emphasise at 600, never more", () => {
+    const failures: string[] = [];
+    for (const [file, text] of sources) {
+      if (!file.endsWith(".css")) continue;
+      for (const match of stripComments(text).matchAll(/\bfont-weight\s*:\s*([^;}]+)/g)) {
+        const value = (match[1] ?? "").trim();
+        if (/^bold(er)?$/.test(value) || (/^\d+$/.test(value) && Number(value) > 600))
+          failures.push(`${file}: ${match[0]}`);
+      }
+    }
+    expect(failures).toEqual([]);
+  });
+
   it("hold no radius of their own", () => {
     const failures: string[] = [];
     for (const [file, text] of sources) {

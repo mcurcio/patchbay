@@ -31,14 +31,6 @@ A queued edit, drawn by its own word on the node:
 
 <Canvas of={NodeBoxStories.Changes} />
 
-And as a wire's stroke:
+And as a wire's stroke, always dashed:
 
-<Canvas of={WireStories.Tone} />
-
-## Not built yet
-
-- One tone set for every tone-taking component (Banner, StatusWords, Toaster and KeyValue take
-  five; Wire has no `renamed`): `pb-nx9.75`.
-- One look for a tone a component does not know: `pb-nx9.76`.
-- Wire's own `pending` tone goes; a queued wire is a change tone with dashes: `pb-nx9.74`.
-- Wire and KeyValue tones carried by more than colour: `pb-nx9.77`.
+<Canvas of={WireStories.Changes} />

@@ -80,7 +80,7 @@ describe("Toaster", () => {
     expect(screen.getByRole("status")).toHaveTextContent("Idle.");
     expect(screen.getByRole("listitem")).toHaveAttribute("data-tone", "sleeping");
     const tones = new Set([...css.matchAll(/data-tone="([^"]+)"/g)].map((match) => match[1]));
-    expect([...tones].sort()).toEqual(["err", "off", "ok", "quiet", "warn"]);
+    expect([...tones].sort()).toEqual(["accent", "err", "muted", "off", "ok", "quiet", "warn"]);
   });
 
   it("puts the newest nearest the edge: last at the bottom, first at the top", () => {
@@ -111,6 +111,12 @@ describe("Toaster", () => {
     const onDismiss = vi.fn();
     render(<Toaster toasts={two} onDismiss={onDismiss} />);
     const buttons = screen.getAllByRole("button", { name: "Dismiss" });
+    // The close glyph on an IconButton, named and titled by the word, as a banner's Dismiss and a dialog's Close.
+    for (const button of buttons) {
+      expect(button).toHaveClass("pb-icon-button");
+      expect(button).toHaveAttribute("title", "Dismiss");
+      expect(button.querySelector("svg.pb-close-glyph")).not.toBeNull();
+    }
     expect(buttons[1]).toHaveAccessibleDescription("The edit was refused.");
     await userEvent.click(buttons[1] as HTMLElement);
     expect(onDismiss).toHaveBeenCalledWith(2);
@@ -148,6 +154,17 @@ describe("Toaster", () => {
     expect(screen.getByRole("button", { name: "Schließen" })).toBeInTheDocument();
     expect(screen.getByText("und 1 weitere")).toBeInTheDocument();
     expect(screen.getByRole("status")).toHaveTextContent("2 Mal");
+  });
+
+  it("leaves an Escape inside an input method's composition to the input method", () => {
+    const onDismiss = vi.fn();
+    render(<Toaster toasts={two} onDismiss={onDismiss} />);
+    const toast = screen.getAllByRole("listitem")[0];
+    if (toast === undefined) throw new Error("no toast");
+    expect(fireEvent.keyDown(toast, { key: "Escape", isComposing: true })).toBe(true);
+    expect(onDismiss).not.toHaveBeenCalled();
+    fireEvent.keyDown(toast, { key: "Escape" });
+    expect(onDismiss).toHaveBeenCalledOnce();
   });
 
   it("dismisses the focused toast on Escape, alone, and moves the focus to the one beside it, then back", async () => {

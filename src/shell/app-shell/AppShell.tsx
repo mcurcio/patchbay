@@ -3,11 +3,22 @@
 // the inspector's width, the drawer's height and whether each is open are the app's props, drawn within the shell's
 // bounds (bounds.ts) and changed through callbacks. Below 760 px the inspector is a Sheet over the canvas's inline
 // end, below 600 px one rising from the bottom (useMediaBreakpoint's widths). With the inspector's title or actions,
-// the shell draws its one header row: a Panel's when wide, the sheet's own when narrow. The drawer's body stays
-// mounted while it is closed, so what it holds (a draft, a caret, a scroll position) is still there when it opens.
-import { type ReactNode, useId, useSyncExternalStore } from "react";
+// the shell draws its one header row: a Panel's when wide, the sheet's own when narrow. The inspector's content is drawn
+// once, into an element of its own that moves between the region and the sheet, so a draft held in it survives the
+// window crossing a width (docs/components.md#appshell). The drawer's body stays mounted while it is closed, so what it
+// holds (a draft, a caret, a scroll position) is still there when it opens.
+import {
+  type KeyboardEvent,
+  type ReactNode,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
+import { createPortal } from "react-dom";
 import { useMediaBreakpoint } from "../../hooks";
-import { IconButton, Panel, Sheet, Splitter } from "../../primitives";
+import { Glyph, IconButton, Panel, Sheet, Splitter } from "../../primitives";
 import { clampDrawerHeight, clampInspectorWidth, drawerBounds, drawerMaxHeight, inspectorBounds } from "./bounds";
 import "./AppShell.css";
 
@@ -124,10 +135,36 @@ function useWindowHeight(): number {
 /** A chevron pointing up (show) or down (hide), in the current text colour. */
 function DrawerGlyph({ open }: { open: boolean }) {
   return (
-    <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
-      <path d={open ? "M3 6l5 5 5-5" : "M3 10l5-5 5 5"} fill="none" stroke="currentColor" strokeWidth="1.75" />
-    </svg>
+    <Glyph>
+      <path d={open ? "M4 6l4 4 4-4" : "M4 10l4-4 4 4"} />
+    </Glyph>
   );
+}
+
+/** The element focused inside a content's holder as it left one slot, focused again in the next. */
+const focusedIn = new WeakMap<HTMLElement, HTMLElement>();
+
+/**
+ * Where the inspector's content shows: it moves the content's own element (the `holder`) in here while mounted, and out
+ * again when it goes. A focus inside the content is kept across the move, as a moved element loses it.
+ */
+function InspectorSlot({ holder }: { holder: HTMLElement }) {
+  const slot = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const here = slot.current;
+    if (here === null) return;
+    here.appendChild(holder);
+    const back = focusedIn.get(holder);
+    focusedIn.delete(holder);
+    if (back !== undefined && holder.contains(back) && document.activeElement !== back)
+      back.focus({ preventScroll: true });
+    return () => {
+      const active = document.activeElement;
+      if (active instanceof HTMLElement && holder.contains(active)) focusedIn.set(holder, active);
+      if (holder.parentNode === here) here.removeChild(holder);
+    };
+  }, [holder]);
+  return <div ref={slot} className="pb-shell-inspector-slot" />;
 }
 
 function TopBar({ brand, status, start, end }: AppShellTopBar) {
@@ -191,6 +228,24 @@ export function AppShell({ topBar, inspector, drawer, children, labels, classNam
   const width = inspector === undefined ? 0 : clampInspectorWidth(inspector.width);
   const wide = layout === "wide";
   const headed = inspector !== undefined && (inspector.title !== undefined || inspector.actions !== undefined);
+  // The content's own element, made once (none without a document, where the content is drawn in place).
+  const [holder] = useState(() => {
+    if (typeof document === "undefined") return null;
+    const element = document.createElement("div");
+    element.className = "pb-shell-inspector-content";
+    return element;
+  });
+  const shown = inspector?.open === true;
+  const body = inspector === undefined ? null : holder === null ? inspector.content : <InspectorSlot holder={holder} />;
+  // The content's events reach React through the shell, not the sheet around it, so the sheet's Escape is taken here:
+  // the press is the sheet's when the window is narrow and not already handled (docs/ux-rules.md#escape, U14, U19).
+  const onContentKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (wide || inspector === undefined) return;
+    if (event.defaultPrevented || event.nativeEvent.isComposing || event.key !== "Escape") return;
+    event.preventDefault();
+    event.stopPropagation();
+    inspector.onOpen(false);
+  };
   return (
     <div
       className={className === undefined ? "pb-shell" : `pb-shell ${className}`}
@@ -215,7 +270,7 @@ export function AppShell({ topBar, inspector, drawer, children, labels, classNam
               width={width}
               labels={{ close: words.close }}
             >
-              {inspector.content}
+              {body}
             </Sheet>
           )}
         </main>
@@ -233,16 +288,26 @@ export function AppShell({ topBar, inspector, drawer, children, labels, classNam
             <div className="pb-shell-inspector-body">
               {headed ? (
                 <Panel className="pb-shell-inspector-panel" title={inspector.title} actions={inspector.actions}>
-                  {inspector.content}
+                  {body}
                 </Panel>
               ) : (
-                inspector.content
+                body
               )}
             </div>
           </aside>
         )}
       </div>
       {drawer !== undefined && <Drawer drawer={drawer} words={words} />}
+      {inspector !== undefined &&
+        holder !== null &&
+        shown &&
+        createPortal(
+          // A wrapper with no box of its own (display: contents), for the sheet's Escape.
+          <div className="pb-shell-inspector-events" onKeyDown={onContentKeyDown}>
+            {inspector.content}
+          </div>,
+          holder,
+        )}
     </div>
   );
 }

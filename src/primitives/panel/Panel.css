@@ -23,13 +23,13 @@
   border-bottom: 1px solid var(--pb-line);
 }
 
-/* A header with only actions puts them at the far end. */
+/* A header with only actions puts them at the inline end, the left in right-to-left text. */
 .pb-panel-actions {
   display: flex;
   flex: none;
   align-items: center;
   gap: var(--pb-space-2);
-  margin-left: auto;
+  margin-inline-start: auto;
 }
 
 .pb-panel-title {

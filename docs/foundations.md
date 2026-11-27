@@ -48,24 +48,21 @@ The change tones draw an edit that is queued, not true yet (F10):
 
 - **F6. One tone set.** Every component that takes a tone takes all seven state tones, and every
   one that draws edits takes all four change tones, so an app maps a state once, whatever draws it.
-  **Built:** Pill, Badge, NodeBox. **Not yet:** Banner, StatusWords, Toaster and KeyValue take five
-  (no `accent`, `muted`), and Wire has no `renamed`: pb-nx9.75.
+  **Built:** Pill, Badge, Banner, StatusWords, Toaster, KeyValue, NodeBox, Wire, ChangeList
+  (through its Badge).
 - **F7. One look for a tone it does not know:** its words in `muted`, its edge or stripe in
   `line-strong`, and a wire, which has no words, in the `muted` stroke. It is drawn, never refused
-  ([`components.md`](components.md#rules-every-component-keeps), rule 2). **Not yet:** the
-  fallbacks differ (Badge's plain line, Banner's and Toaster's plain stripe, GhostWire's `pending`):
-  pb-nx9.76.
+  ([`components.md`](components.md#rules-every-component-keeps), rule 2). **Built:** Pill, Badge,
+  Banner, StatusWords, Toaster, KeyValue, NodeBox, Wire, GhostWire.
 - **F8. A severity is not a tone.** CodeEditor's diagnostics say `error` and `warning`, the words
   checkers emit; they are drawn as `err` and `warn`, and any other severity as `muted`
-  ([`components.md`](components.md#code), CodeEditor). **Built:** CodeEditor.
+  ([`components.md`](components.md#code), CodeEditor). **Built:** CodeEditor, DiagnosticList.
 - **F9. Pending is `quiet`, not `off`.** A request on its way is drawn in `--pb-quiet`, as
   GhostWire's `pending` is ([`graph.md`](graph.md#ghostwire)); `off` is stopped, or not a
   candidate. **Built:** GhostWire.
 - **F10. Pending and queued are two words.** **Pending** is a request sent and not answered yet:
   GhostWire's `pending` tone, a busy Button. **Queued** is a change held here until a save: a change
-  tone with dashes (U53). **Not yet:** Wire also takes a `pending` tone, meaning not saved, which
-  dashed looks like a GhostWire; it goes, and a queued wire is a change tone with `dashed`:
-  pb-nx9.74.
+  tone with dashes (U53). Wire has no `pending` tone. **Built:** GhostWire, Button, Wire.
 - **F11. warn and err fill on their soft surfaces.** An outlined Badge, a Banner, a Toast and a
   failed node's header put the tone on `warn-soft` or `err-soft`. **Built:** Badge, Banner,
   Toaster, NodeBox.
@@ -77,7 +74,9 @@ The change tones draw an edit that is queued, not true yet (F10):
   gutter circle, diamond and ring, PortRow's accepting handle growing. A wire's change tone is
   always dashed; an `err` or `refused` wire carries a label, or its reason in the inspector; a
   KeyValue value's tone adds a dot, as Pill's. **Built:** Pill, Badge, NodeBox, DiffView,
-  CodeEditor, PortRow. **Not yet:** Wire and KeyValue tones are colour only: pb-nx9.77.
+  CodeEditor, PortRow, KeyValue, Wire (a change tone dashed whatever `dashed` says). **The app's:**
+  the words of an `err` or `refused` wire, as its `label` or, for a longer reason, in the
+  inspector when it is selected.
 
 ## Type
 
@@ -85,8 +84,8 @@ The change tones draw an edit that is queued, not true yet (F10):
   text, badges, hints, ports and group headings ([`tokens.md`](tokens.md#the-tokens), Type).
 - **F15. Titles, headings and emphasis.** Panel, Dialog, Sheet, SectionTitle and NodeBox titles are
   `text-md` at weight 600. Group headings (a palette's, a shortcut sheet's) are `text-sm` at 600 in
-  `muted`. Emphasis is 600, never more. **Built:** their stylesheets. **Not yet:** the palette's
-  matched letters and WarnMark's "!" are at 700: pb-nx9.72.
+  `muted`. Emphasis is 600, never more, the palette's matched letters and WarnMark's "!" included
+  ([`tokens.md`](tokens.md#the-tests)). **Built:** their stylesheets.
 - **F16. Code face for code.** A value written as code takes `--pb-font-code`: `font="code"` on
   TextInput and Select, port types, a Pill's `detail`, key caps, code boxes.
 - **F17. One code size.** `--pb-code-size` is shared by a code box's textarea, highlighted copy and
@@ -99,8 +98,10 @@ The change tones draw an edit that is queued, not true yet (F10):
 - **F20. One line truncates, and the whole is readable elsewhere.** A one-line label (a node's
   title and line, a port's label, a palette row's label and hint) ends in an ellipsis, and its
   whole text is written out somewhere a person can read it without hovering (U47): a node's in the
-  inspector, which the app titles with it. **Built:** NodeBox, PortRow (cut, with a tooltip).
-  **Not yet:** a cut palette row is whole only in its accessible name: pb-nx9.80.
+  inspector, which the app titles with it; a palette row's in the row itself while it is the
+  active one, and in every row on touch, where a tap runs a row before it is active. **Built:**
+  NodeBox, PortRow (cut, with a tooltip), CommandPalette
+  ([`components.md`](components.md#commands-and-keys)).
 
 ## Space
 
@@ -171,11 +172,12 @@ Reduced motion: [ux-rules](ux-rules.md#reduced-motion).
   not: a splitter's bar, a gutter mark ([`components.md`](components.md#layout), Splitter;
   [`components.md`](components.md#code), CodeEditor).
 - **F39. The component draws its own press.** Pressable things set
-  `-webkit-tap-highlight-color: transparent`. **Built:** Button, ToolGroup, ThemeSwitch, Checkbox,
-  RadioGroup, Splitter, DiffView.
+  `-webkit-tap-highlight-color: transparent`. **Built:** Button (and so IconButton and ThemeSwitch),
+  ToolGroup, Checkbox, RadioGroup, Splitter, DiffView.
 - **F40. A target can be found without hover.** On touch, an IconButton has its `line-strong` edge
-  at rest and a Splitter draws its grip (a short bar) at rest. **Not yet:** both appear only on
-  hover or touch: pb-nx9.85.
+  at rest and a Splitter draws its grip (a short bar) at rest. **Built:** IconButton, Splitter
+  ([`components.md`](components.md#actions), IconButton; [`components.md`](components.md#layout),
+  Splitter).
 
 ## Widths
 
@@ -183,8 +185,9 @@ Reduced motion: [ux-rules](ux-rules.md#reduced-motion).
   [`useMediaBreakpoint`](components.md#usemediabreakpoint) names them and exports them. Narrow moves
   the inspector into a sheet and phone moves it to the bottom
   ([`AppShell`](components.md#appshell)); at phone width a dialog, the palette and the toasts take
-  the width less the gutters. **Not yet:** Dialog, CommandPalette and ThemeSwitch write the phone
-  width as a CSS literal of their own: pb-nx9.73.
+  the width less the gutters. **Built:** `mediaQueries` is the one source; a stylesheet that
+  changes at a width (Dialog, CommandPalette, ThemeSwitch) writes its query exactly, and a test
+  fails on any other width or touch query ([`components.md`](components.md#usemediabreakpoint)).
 - **F42. Pane sizes have bounds.** The inspector, the drawer and an inline sheet are held to
   bounds, and a kept size out of bounds is drawn within them and not written back
   ([`components.md`](components.md#appshell), Sizes; [`components.md`](components.md#overlays),
@@ -200,9 +203,9 @@ Reduced motion: [ux-rules](ux-rules.md#reduced-motion).
 - **F45. No flash.** `themeScript` in the page's `<head>` applies a kept choice before the first
   paint ([`components.md`](components.md#usetheme)).
 - **F46. One theme switch.** [`ThemeSwitch`](components.md#actions) cycles system, light and dark,
-  named by the choice; an app uses it and its words rather than a switch of its own. **Not yet:**
-  ThemeSwitch keeps its own theme cycle (pb-nx9.22) and copies Button's look in its own stylesheet
-  rather than drawing with Button: pb-nx9.68.
+  named by the choice; an app uses it and its words rather than a switch of its own. **Built:**
+  ThemeSwitch, drawn with a neutral Button. **Not yet:** ThemeSwitch keeps its own theme cycle:
+  pb-nx9.22.
 - **F47. A brand overrides tokens and adds none,** each override with its reason, and passes the
   contrast check apps run from `/testing` ([`tokens.md`](tokens.md#writing-a-brand)).
 - **F48. React Flow follows the tokens.** Its `--xy-*` variables point at them; its `colorMode` is
@@ -213,6 +216,7 @@ Reduced motion: [ux-rules](ux-rules.md#reduced-motion).
 - **F49. Glyphs are SVG, hidden from screen readers,** and the control's name carries their
   meaning ([`components.md`](components.md#actions), IconButton). **Built:** every glyph.
 - **F50. One glyph grid.** A glyph is drawn 12 px inside a 16 px box, at a 1.75 stroke with round
-  caps, in `currentColor`, so an app's own glyphs sit beside patchbay's. **Not yet:** glyphs are
-  drawn at 10 to 14 px and strokes of 1.5 to 2, chosen per component, and ToolGroup sets a 15 px
-  font for text glyphs: pb-nx9.91.
+  caps, in `currentColor`, so an app's own glyphs sit beside patchbay's. **Built:**
+  [`Glyph`](components.md#actions), which CloseGlyph, ThemeSwitch, DiffView, AppShell and
+  CanvasTools draw with, and which an app draws its own with; IconButton and ToolGroup set a text
+  glyph at 16 px, the same box.

@@ -10,7 +10,7 @@ while a wire is dragged).
 
 ```ts
 import "@xyflow/react/dist/style.css";
-import { CanvasTools, ConnectHints, GhostWire, mergeFlowProps, Meter, NodeBox, nodeBoxSize, PortRow, useAddAt, useConnectHints, useFollowFit, Wire } from "@mcurcio/patchbay/graph";
+import { CanvasTools, ConnectHints, ConnectStatus, connectTargets, EmptyCanvasHint, GhostNode, GhostWire, mergeFlowProps, Meter, NodeBox, nodeBoxSize, PortRow, useAddAt, useConnectHints, useContextAt, useFollowFit, Wire } from "@mcurcio/patchbay/graph";
 ```
 
 Importing the layer loads its stylesheet (`dist/graph.css`) and imports `@xyflow/react` (React Flow
@@ -45,8 +45,8 @@ React for a level: it reads its source through [`useLiveValue`](components.md#us
 | `fallDbPerS?` | 20: then the tick falls at this rate until it meets the current peak, which it then rides |
 | `clipAt?` | 1.0 (0 dBFS), linear: a peak at or above it lights the clip lamp (`--pb-meter-hot`) |
 | `clipHoldMs?` | 2000: how long the lamp stays lit after the last such peak |
-| `label?` | Its accessible name (`role="img"`), "Level" by default; the numbers are never announced |
-| `labels?` | Its words ([rule 8](components.md#rules-every-component-keeps)): `title`, `(peakDb, rmsDb, clipped) => string`, writes the tooltip; the default, `defaultMeterTitle`, reads "peak -12.0 dB, rms -18.3 dB" (−∞ for silence) |
+| `label?` | Its accessible name (`role="img"`): what it measures, the app's words ("Left output"), winning over `labels.name`; the numbers are never announced |
+| `labels?` | Its words ([rule 8](components.md#rules-every-component-keeps)), English in `defaultMeterLabels`: `name`, its accessible name when no `label` is given, "Level"; `title`, `(peakDb, rmsDb, clipped) => string`, writes the tooltip; the default, `defaultMeterTitle`, reads "peak -12.0 dB, rms -18.3 dB" (−∞ for silence) |
 | `ref?` | A `MeterHandle`: `reset()` empties the bar and clears the hold and the lamp, as when the source closes |
 
 Other native `<div>` props (`className`, `id`, `data-*`, pointer handlers) pass through.
@@ -60,11 +60,19 @@ Other native `<div>` props (`className`, `id`, `data-*`, pointer handlers) pass 
   When all is still, no frame is asked for. A new floor, hold, fall or lamp time redraws the level
   on it.
 - **The tooltip** is written on pointer entry and then at most every 250 ms while the pointer stays
-  (`meterTitleEveryMs`); it is never written while nobody hovers.
-- **Size.** Horizontal fills its container's width (48 px when the container gives none) and is 6
-  px thick, the lamp a 6 px square at the right end; vertical is 6 px wide and fills its
-  container's height (48 px at least), filling from the bottom with the lamp on top. The zones keep
-  their places along the bar: the bar is drawn whole and clipped to the level.
+  (`meterTitleEveryMs`); it is never written while nobody hovers. It is a convenience: it shows on
+  neither touch nor focus, and the numbers are never announced, so an app that needs them read
+  writes them in the inspector ([U47](ux-rules.md#feedback)), from the same `read` through
+  [`useLiveValue`](components.md#uselivevalue) painting a text node, with `toDb` and
+  `formatMeterDb` (one decimal, −∞ for silence) or `labels.title` itself, so they read as the
+  tooltip does.
+- **Size and direction.** Horizontal fills its container's width (48 px when the container gives
+  none) and is 6 px thick, filling from the inline start with the lamp, a 6 px square, at the
+  inline end: from the left in left-to-right text and from the right in right-to-left text, and a
+  change of `dir` is followed at once ([U72](ux-rules.md#right-to-left)). Vertical is 6 px wide and
+  fills its container's height (48 px at least), filling from the bottom with the lamp on top, in
+  either direction. The zones keep their places along the bar: the bar is drawn whole and clipped
+  to the level.
 - **Its CSS variables.** It sets four fractions on its element, 0 at the floor and 1 at 0 dBFS:
   `--pb-meter-level` and `--pb-meter-tick` as the level moves, `--pb-meter-mid-at` and
   `--pb-meter-hot-at` from `zones`. They are its own, not tokens; a brand changes the meter's
@@ -123,7 +131,7 @@ const nodeTypes = { source: SourceBox };
 
 | Prop | What it is |
 |---|---|
-| `title` | `ReactNode`, one line, cut with an ellipsis; a string is also the header's tooltip. It names the box's group |
+| `title` | `ReactNode`, one line, cut with an ellipsis; a string is also the header's tooltip, a convenience: a cut title is written out whole as the inspector's title when the node is selected, the app's ([U47](ux-rules.md#feedback), [F20](foundations.md#type)). It names the box's group |
 | `subtitle?` | `ReactNode`, the second header line in `--pb-muted` (the type) |
 | `tone?` | `"ok" \| "warn" \| "err" \| "quiet" \| "off" \| "accent" \| "muted"`, open: a 4 px stripe down the box's start edge in the tone's token. None, or a tone it does not know, draws it in `--pb-line-strong` |
 | `disabled?` | A dashed border, the stripe hatched (the tone and the surface in stripes), the words in `--pb-muted`. Drawing only: whether its ports still connect is the app's rule |
@@ -131,7 +139,7 @@ const nodeTypes = { source: SourceBox };
 | `change?` | `"added" \| "removed" \| "renamed" \| "changed"`, open: an edit not yet applied. A 2 px border in `--pb-added`, `--pb-removed`, `--pb-renamed` or `--pb-warn`, drawn inward so the size holds, and a [`Badge`](components.md#state) of the same tone in the header with the change's word, so it never rests on colour; `removed` also strikes the title through. A change it does not know: a `--pb-line-strong` border, and the string itself as the badge's word |
 | `labels?` | Its words ([rule 8](components.md#rules-every-component-keeps)): the change badge's `added`, `removed`, `renamed` and `changed`, English in `defaultNodeBoxLabels` |
 | `status?` | Slot at the header's end (a `Pill`) |
-| `line?` | `ReactNode`, one row under the header saying why the node is silent: `--pb-muted`, `--pb-err` when `failed`; one line, ellipsis; a string is also its tooltip |
+| `line?` | `ReactNode`, one row under the header saying why the node is silent: `--pb-muted`, `--pb-err` when `failed`; one line, ellipsis; a string is also its tooltip, and a cut line is written out whole in the inspector with the node's state, the app's ([U47](ux-rules.md#feedback)) |
 | `inputs?`, `outputs?` | `PortSpec[]`: each [`PortRow`](#portrow)'s props without `side` (`NodeBox` sets it), keyed by `id` |
 | `ports?` | `"stacked"` (the default: the inputs' rows, then the outputs') or `"side-by-side"` (two columns, the inputs on the left and the outputs on the right, row *n* of each on one line), open; one it does not know is stacked |
 | `footer?` | Slot: one row at the foot (badges), above a `--pb-line` rule |
@@ -161,10 +169,10 @@ drawing a box of its own may use it alone, inside a React Flow node.
 |---|---|
 | `id` | The handle id, passed to React Flow's `<Handle id>` unchanged (the app's own scheme) |
 | `side` | `"input"` (a `target` handle on the left edge) or `"output"` (a `source` handle on the right). React Flow's positions are physical, so right-to-left text does not mirror the handles; the row's words follow its handle |
-| `label` | `ReactNode`, the port's name; a string is also the row's tooltip |
+| `label` | `ReactNode`, the port's name; a string is also the row's tooltip, and a cut name is written out whole in the inspector's list of the node's ports, the app's ([U47](ux-rules.md#feedback)) |
 | `typeLabel?` | `ReactNode`, after the label in `--pb-muted`, the code face (the port's type) |
 | `hint?` | `"ok" \| "no" \| "origin" \| null`, open, while a wire is dragged: `origin` the handle the drag began at (an accent ring); `ok` accepts it (the dot in `--pb-ok`, grown to 12 px); `no` refuses it (the dot in `--pb-off`, the words muted, a not-allowed cursor); `null` no drag. One it does not know is drawn as `null`. Not given, the row takes its hint from the nearest [`<ConnectHints>`](#useconnecthints) (none outside one); given, even as `null`, it wins over that |
-| `reason?` | Why `no`: the handle's and the row's tooltip while `hint` is `no`. A reason from `<ConnectHints>` comes first |
+| `reason?` | Why `no`: the handle's and the row's tooltip while `hint` is `no`. A reason from `<ConnectHints>` comes first, and is also [`ConnectStatus`](#connectstatus)' words; a row's own `reason` is not, so the app says it in words too ([U47](ux-rules.md#feedback)) |
 | `problem?` | `string`: a [`WarnMark`](components.md#state) beside the label, with this as its words |
 | `trailing?` | Slot at the row's inner end, toward the box's centre (a [`Meter`](#meter)) |
 | `connectable?` | `true` by default; `<Handle isConnectable>` |
@@ -188,14 +196,17 @@ while a wire is dragged and for React Flow's own check on the drop.
 ```tsx
 const hints = useConnectHints(canConnect);
 <ConnectHints value={hints.value}>
-  <ReactFlow {...mergeFlowProps(hints.flowProps, { onConnect })} … />
+  <ReactFlow {...mergeFlowProps(hints.flowProps, { onConnect })} … >
+    <ConnectStatus value={hints.value} refused={hints.refused} />
+  </ReactFlow>
 </ConnectHints>
 ```
 
 - **The rule.** `canConnect(from, to) → true | false | string`, where `PortRef` is
   `{ nodeId, handleId: string | null }` (`null` for a handle without an id). `from` is always the
   output and `to` the input, whichever end the drag began at. `true` accepts; `false` refuses; a
-  string refuses and is the reason, which becomes the refusing handle's and row's tooltip. The
+  string refuses and is the reason, which becomes the refusing handle's and row's tooltip and
+  [`ConnectStatus`](#connectstatus)' words. The
   newest `canConnect` is used; it need not be stable.
 - **Once per candidate per drag.** Each pair's verdict is asked of the rule once between the drag's
   start and its end and kept, for the hints and the drop check alike; the next drag asks again.
@@ -204,6 +215,11 @@ const hints = useConnectHints(canConnect);
   check accepts only when `canConnect` says `true` for React Flow's source and target. The object
   is the same across renders. The hints' state changes twice per drag, at its start and its end,
   never per pointer move, so the rows re-render twice per drag.
+- **`refused`**: the last drop on a handle that the rule refused, `{ port, reason? }` (`port` a
+  `PortRef` with its `side`, `reason` the rule's string when it gave one), kept from the drag's end
+  until the next drag begins, for [`ConnectStatus`](#connectstatus); `null` after a drag that ended
+  otherwise (accepted, on empty canvas, or on the origin's own side, which is not a candidate). It
+  changes with the hints' two changes per drag, never between them.
 - **`value`** goes to `<ConnectHints>`, a context every `PortRow` inside it reads (`null` while no
   wire is dragged): the handle the drag began at is `origin`; each handle on the other side `ok` or
   `no` with its reason; handles on the origin's side `null`, as they are not candidates in React
@@ -211,7 +227,35 @@ const hints = useConnectHints(canConnect);
   `PortRef` and `side`; `value.hintFor(port, side)` is the hint for one handle, as `PortRow` asks.
 - It draws nothing and has no keyboard path of its own: React Flow's connections are made with a
   pointer (or touch), and the keyboard's is the inspector's "Connect to"
-  ([patterns](patterns.md#connecting)).
+  ([patterns](patterns.md#connecting)), listed by [`connectTargets`](#connecttargets) from the
+  same rule.
+
+### `connectTargets`
+
+`connectTargets(port, side, candidates, canConnect) → { accepted, refused }` lists the ports one
+port may be joined to, for the inspector's "Connect to" [`Select`](components.md#forms), the
+keyboard's path for connecting ([U2](ux-rules.md#focus-and-keyboard),
+[U56](ux-rules.md#live-pending-queued-refused)). It judges by the same
+`canConnect` and the same verdicts as the hints and the drop, so the choice never offers what a
+drag would refuse.
+
+```tsx
+const { accepted } = connectTargets(port, "input", graphPorts, canConnect);
+<Select onChange={(e) => connect(e.target.value)}>{accepted.map((p) => <option key={key(p)} value={key(p)}>{name(p)}</option>)}</Select>
+```
+
+- **`port`** is a [`PortRef`](#useconnecthints) and `side` its side; **`candidates`** are the
+  app's ports as `ConnectCandidate`s (`PortRef` with its `side`), any type that carries those, so
+  each keeps the app's own fields (a label) through the lists.
+- **The verdicts.** The rule is asked with the output first, whichever side `port` is on, as a
+  drag would ask it: `true` accepts; `false` refuses; a string refuses and is the reason.
+  Candidates on `port`'s own side are not candidates, as in React Flow's strict connection mode,
+  and are in neither list. Each pair is asked once.
+- **`accepted`** is the accepted candidates in the order given; **`refused`** the refused ones on
+  the other side, in order, each `{ port, reason? }` with the rule's string when it gave one.
+- It is pure and draws nothing. The `Select`, its words and what choosing does (a request, or a
+  queued change, as a drop) are the app's. Moving a node from the keyboard is React Flow's own:
+  Enter selects the focused node and the arrow keys move it, which `NodeBox` leaves alone.
 
 ### `mergeFlowProps`
 
@@ -221,6 +265,70 @@ object. A handler given by more than one object calls each in order, with the sa
 prop is the last object's that gives it, and an `undefined` object or prop gives nothing. It
 returns a new object each call (its handlers new too); React Flow takes changed handlers as they
 come.
+
+## `ConnectStatus`
+
+The canvas's status line for connecting, as a child of the app's `<ReactFlow>`: while a wire is
+dragged it says why the port under the pointer (or the finger) refuses it, and after a drop the
+rule refused, the verdict, so the reason is never only a tooltip ([U47, U59](ux-rules.md#feedback)).
+Its words come from [`useConnectHints`](#useconnecthints), the one rule the hints and the drop check
+use, so it never says what they do not.
+
+| Prop | What it is |
+|---|---|
+| `value` | `useConnectHints`'s `value`: the drag in progress, or `null` |
+| `refused` | `useConnectHints`'s `refused`: the last refused drop, or `null` |
+| `position?` | Its place, React Flow's `PanelPosition`: `"bottom-center"` by default. One it does not know is passed on, and React Flow places nothing |
+| `labels?` | Its words ([rule 8](components.md#rules-every-component-keeps)): `refuses(reason)`, over a refusing port, the rule's reason or "This port refuses the wire"; `notConnected(reason)`, after a refused drop, "Not connected: " and the reason or "that port refuses the wire"; `defaultConnectStatusLabels` |
+| `className?` | Added to the panel's `pb-connect-status` |
+
+- **What it says.** During a drag, for the handle React Flow's connection state has under the drag
+  (within `connectionRadius`, so a finger near a handle counts), the hint `value.hintFor` gives:
+  `no` says `labels.refuses(reason)`; `ok`, the origin's side and no handle say nothing. A row's own
+  `hint` is the app's drawing, not the rule, and the line does not read it. Once no wire is dragged,
+  a refused drop says `labels.notConnected(reason)` until the next drag begins.
+  `connectStatusWords(value, refused, over, labels?)` is that rule, exported and pure. It re-renders
+  only when the handle under the drag changes, never per pointer move.
+- **What is read.** The words are one `role="status"` region, there from the first render with
+  none, so each change is read politely ([U42](ux-rules.md#feedback)).
+- **Look.** `--pb-text-sm` words on `--pb-raised`, edged in `--pb-line` with the box radius and
+  `--pb-shadow`, 420 px wide at most; with no words it draws nothing. It takes no pointer events,
+  so a wire dragged under it still reaches the ports. It does not animate. **Forced colours:** the
+  edge in `CanvasText`.
+- It takes no focus and has no keys: it says, and does nothing.
+
+## `EmptyCanvasHint`
+
+An empty canvas's words, as a child of the app's `<ReactFlow>`: what to do, and the add gestures,
+drawn on the canvas itself in React Flow's `<Panel>`, gone with the first node
+([U35](ux-rules.md#states)).
+
+```tsx
+<ReactFlow {...addAt.flowProps} … >
+  <EmptyCanvasHint keys="A" add={!readOnly}>
+    <p>This graph has no nodes yet.</p>
+  </EmptyCanvasHint>
+</ReactFlow>
+```
+
+| Prop | What it is |
+|---|---|
+| `children?` | The app's own words, above the gestures; none by default |
+| `empty?` | Whether the graph is empty; without it, while React Flow holds no nodes. An app that draws a node that is not yet the graph's (a [`GhostNode`](#ghostnode)) passes it |
+| `add?` | Whether adding is on, so the gestures are said; `true` by default. Pass `useAddAt`'s `enabled`, so a read-only graph keeps the app's words alone. With neither words nor gestures it draws nothing |
+| `keys?` | The app's add key, a key string as [`useShortcuts`](components.md#useshortcuts) takes it (`"A"`), written through `keyLabel` after the gestures; the hint binds nothing |
+| `platform?` | The platform the key is written for; the browser's by default |
+| `position?` | Its place, React Flow's `PanelPosition`: `"top-center"` by default. One it does not know is passed on, and React Flow places nothing |
+| `labels?` | Its words ([rule 8](components.md#rules-every-component-keeps)): `add(gesture, keys)`, the gestures, "Double-click to add a node" with a pointer and "Double-tap to add a node" on a touch screen ([`useMediaBreakpoint`](components.md#usemediabreakpoint)`().touch`), then ", or press A" with the key; `defaultEmptyCanvasHintLabels` |
+| `className?` | Added to the panel's `pb-empty-canvas` |
+
+- **What is read.** Its words are ordinary text, not a live region: they are there while the canvas
+  is empty, and a node arriving is the canvas's own news.
+- **Look.** `--pb-text-md` words, the gestures under them in `--pb-text-sm` and `--pb-muted`, on
+  `--pb-raised`, edged in `--pb-line` with the box radius and `--pb-shadow`, 420 px wide at most and
+  centred. It takes no pointer events, so a double-click on it reaches the canvas and adds. It does
+  not animate. **Forced colours:** the edge in `CanvasText`.
+- It takes no focus and has no keys: the add key is the app's.
 
 ## `Wire`
 
@@ -234,13 +342,13 @@ const edge: WireEdge = { id, source, sourceHandle, target, targetHandle, type: "
 
 | `WireData` | What it is |
 |---|---|
-| `tone?` | [`Pill`](components.md#state)'s tones (`ok`, `warn`, `err`, `quiet`, `off`, `accent`, `muted`), the changes (`added` in `--pb-added`, `removed` in `--pb-removed`, `changed` in `--pb-warn`), `pending` (`--pb-quiet`) and `refused` (`--pb-err`); open. None, or one it does not know, is React Flow's edge stroke (`--xy-edge-stroke`, which `tokens.css` points at `--pb-muted`). Selected, the wire is `--pb-accent` whatever its tone |
+| `tone?` | [`Pill`](components.md#state)'s tones (`ok`, `warn`, `err`, `quiet`, `off`, `accent`, `muted`), the changes (`added` in `--pb-added`, `removed` in `--pb-removed`, `renamed` in `--pb-renamed`, `changed` in `--pb-warn`) and `refused` (`--pb-err`); open. None is React Flow's edge stroke (`--xy-edge-stroke`, which `tokens.css` points at `--pb-muted`), and one it does not know is `--pb-muted` ([F7](foundations.md#tones)). Selected, the wire is `--pb-accent` whatever its tone |
 | `emphasis?` | The signal's level, `0` to `1` (clamped; not a number is `0`): 1.5 px to 3.5 px thick and from 45 % to full opacity. None is the plain wire, 1.5 px at full opacity |
-| `dashed?` | Dashes (6 on, 4 off): an edit not yet saved. A queued edit is `tone` (a change) and `dashed` |
+| `dashed?` | Dashes (6 on, 4 off). A queued edit is `tone` (a change) and `dashed`; a change tone is dashed whatever this says, so it never rests on colour ([F13](foundations.md#tones)). A request on its way is a [`GhostWire`](#ghostwire), not a `Wire` |
 | `flow?` | Round dots 12 px apart moving along the wire toward the input, one period per `--pb-motion-flow` |
 | `arrow?` | An arrowhead at the input end, its tip on the handle and pointing into the node from the handle's side, 8 px long; drawn by `Wire` (not an SVG `<marker>`), so it takes the tone |
-| `label?` | `ReactNode` at the midpoint, on the raised surface in `--pb-text-sm`, through React Flow's `EdgeLabelRenderer`; it takes no pointer events |
-| `title?` | `string`: a `<title>` on the hit path, the wire's tooltip |
+| `label?` | `ReactNode` at the midpoint, on the raised surface in `--pb-text-sm`, through React Flow's `EdgeLabelRenderer`; it takes no pointer events. An `err` or `refused` wire says why in it, or in the inspector when the reason is longer ([F13](foundations.md#tones)) |
+| `title?` | `string`: a `<title>` on the hit path, the wire's tooltip. A convenience only, for a pointer: what it says is also in words, in `label` or in the inspector when the wire is selected ([U47](ux-rules.md#feedback)) |
 
 - **React Flow's edge.** The visible path is React Flow's `BaseEdge`, so it keeps
   `react-flow__edge-path` (`Wire` adds `pb-wire-path`) and the edge's `markerStart`, `markerEnd`
@@ -248,6 +356,13 @@ const edge: WireEdge = { id, source, sourceHandle, target, targetHandle, type: "
   and the edge's `interactionWidth` (20 px by default, none at 0), so it can carry the `<title>`.
   React Flow's wrapper keeps the edge's focus, selection and Delete key. The path is React Flow's
   bezier.
+- **Focus.** While React Flow's edge wrapper has `:focus-visible`, `Wire` draws a 2 px ring in the
+  accent along the whole path, 2 px clear of the stroke at any level (two paths under the wire, the
+  ring and a gap in `--pb-surface`, hidden otherwise and taking no pointer events). The stroke
+  keeps its tone while focused (React Flow's own focus rule would restroke it in the selected
+  colour), so focus and selection are two looks and show together on a focused, selected wire
+  ([U17](ux-rules.md#focus-and-keyboard)). Forced colours: the ring in `CanvasText`, its gap
+  `Canvas`.
 - **The level without a rebuild.** The path, the flow and the arrow are built only when an end, the
   flow, the arrow or the tooltip changes. The level is set as `--pb-wire-emphasis` on the wire's
   group (`.pb-wire`, which also carries `data-tone`, `data-selected`, `data-dashed` and
@@ -267,13 +382,40 @@ removes it when the request is answered; a refused one goes with the toast that 
 
 | `GhostWireData` | What it is |
 |---|---|
-| `tone?` | `"pending"` (the default: dashed in `--pb-quiet` at 60 % opacity) or `"refused"` (dashed in `--pb-err`, at full opacity); open, and one it does not know is drawn as `pending` |
-| `label?` | `ReactNode` at the midpoint, through `EdgeLabelRenderer`, its border in the tone |
+| `tone?` | `"pending"` (the default: dashed in `--pb-quiet` at 60 % opacity) or `"refused"` (dashed in `--pb-err`, at full opacity); open, and one it does not know is dashed in `--pb-muted` at 60 % opacity ([F7](foundations.md#tones)) |
+| `label?` | `ReactNode` at the midpoint, through `EdgeLabelRenderer`, its dashed border in the tone (`--pb-line-strong` for one it does not know), its words in `--pb-muted` (`--pb-err` when refused) |
 
 - It draws with React Flow's `BaseEdge` (`react-flow__edge-path`, plus `pb-ghost-wire-path`) and
   no hit path, and takes no pointer events: it is a sign of a request, not a thing to act on. Its
   drawing is `aria-hidden`; React Flow's wrapper names the edge as it names any.
 - **Forced colours:** the dashes in `GrayText`, `CanvasText` when refused.
+
+## `GhostNode`
+
+An add on its way, before the app's graph holds the node: a node type the app registers as
+`ghost` (`nodeTypes={{ ghost: GhostNode }}`) and places at the point the add was asked, with
+`selectable`, `focusable`, `deletable`, `draggable` and `connectable` false, removing it when the
+request is answered ([U51, U52](ux-rules.md#live-pending-queued-refused)). `data` is a
+`GhostNodeData` (`type GhostNodeNode = Node<GhostNodeData, "ghost">`):
+
+| `GhostNodeData` | What it is |
+|---|---|
+| `title` | `ReactNode`, the node's name as it will be (`type 2`); one line, cut with an ellipsis |
+| `subtitle?` | `ReactNode`, the second header line (its type) |
+| `line?` | `ReactNode`, one row under the header ("Adding"); none by default |
+| `inputs?`, `outputs?`, `ports?`, `footer?`, `width?` | The shape of the node it stands for, as [`nodeBoxSize`](#geometry) takes it (no ports, stacked, no footer, `NODE_WIDTH` by default), so the ghost takes the room the node will |
+
+- **Size.** `ghostNodeSize(data)` is `nodeBoxSize` of that shape, its `line` counting as the node's
+  line row; the ghost is drawn at that size, its 1 px border inside it, so a layout that sized the
+  node sizes the ghost.
+- **Look.** A 1 px dashed border in `--pb-quiet` with the box radius, no surface and no shadow, its
+  words in `--pb-muted` (the title at weight 600, the subtitle and line in `--pb-text-sm`), at 60 %
+  opacity, as a pending [`GhostWire`](#ghostwire) is ([F9](foundations.md#tones)). It has no
+  handles and no tone: a refused add's reason stays where it was asked (the form), and the ghost
+  goes. **Forced colours:** the dashes and the words in `GrayText`.
+- **Not a thing.** It takes no pointer events, nor does React Flow's wrapper round it (even when
+  the app gives the canvas node handlers), so a press on it reaches the canvas. Its drawing is
+  `aria-hidden`: the busy button that sent the request says it is on its way. It does not animate.
 
 ## `CanvasTools`
 
@@ -285,7 +427,7 @@ gives them, tidy and the minimap, as one [`ToolGroup`](components.md#layout) in 
 ```tsx
 const follow = useFollowFit({ key: layoutKey, onFitted });
 <ReactFlow {...mergeFlowProps(follow.flowProps, addAt.flowProps)} … >
-  <CanvasTools onFit={follow.fit} onTidy={tidy} minimap={minimap} onMinimap={setMinimap} />
+  <CanvasTools onFit={follow.fit} onViewMove={follow.stop} onTidy={tidy} minimap={minimap} onMinimap={setMinimap} />
 </ReactFlow>
 ```
 
@@ -294,6 +436,7 @@ const follow = useFollowFit({ key: layoutKey, onFitted });
 | `position?` | The panel's place, React Flow's `PanelPosition`: `"bottom-left"` by default. One it does not know is passed on, and React Flow places nothing |
 | `fitOptions?` | React Flow's `FitViewOptions` for the fit tool |
 | `onFit?` | Replaces the fit tool's own fit; pass `useFollowFit`'s `fit`, so the tool also follows again |
+| `onViewMove?` | Called when the person moves the view through the tools: each press of a zoom tool (before it zooms), and each change of the viewport while a press is down on the minimap or during a wheel on it. Pass `useFollowFit`'s `stop`, so these moves stop following as a pan on the canvas does ([U63](ux-rules.md#the-view-and-the-canvas)) |
 | `onTidy?` | The tidy tool, shown only when given: the layout is the app's |
 | `minimap?`, `onMinimap?` | The minimap tool, shown only with `onMinimap(next)`, pressed (`aria-pressed`) while `minimap` is true; `<MiniMap>` is drawn while `minimap` is true, named by the tool's word |
 | `minimapNodeClassName?` | `string` or `(node) → string`, React Flow's `<MiniMap nodeClassName>`, so the app colours the minimap by its nodes' state |
@@ -306,9 +449,14 @@ const follow = useFollowFit({ key: layoutKey, onFitted });
   element at each move, so a brand's duration holds and reduced motion (where `tokens.css` sets it
   to 0 ms) moves at once; without the tokens loaded, 180 ms, or none under reduced motion.
 - The minimap is React Flow's, coloured by `tokens.css`'s `--xy-minimap-*` map, framed in
-  `--pb-line` with the group's radius and shadow (`pb-canvas-minimap`). **Forced colours:** the
+  `--pb-line` with the group's radius and shadow (`pb-canvas-minimap`). It is pannable and
+  zoomable, as React Flow's own `pannable` and `zoomable` make it: a drag on it moves the view and a
+  wheel on it zooms. React Flow moves the view by code for these, with no event, so `onViewMove`
+  is how they reach `useFollowFit`. **Forced colours:** the
   frame in `CanvasText`.
-- The glyphs are SVG, hidden from screen readers; each tool is named by its word.
+- The glyphs are drawn with [`Glyph`](components.md#actions), hidden from screen readers; each tool
+  is named by its word. A tool the app adds draws its glyph with `Glyph` too, so it sits beside
+  them.
 
 ## `useAddAt`
 
@@ -333,6 +481,44 @@ Adding a node at a place on the canvas: `useAddAt(onAddAt, options?)` → `{ flo
 - A double-click has no keyboard path; the app's own add command (a palette entry, a button) is
   that path.
 
+## `useContextAt`
+
+A context menu at a point on the canvas: `useContextAt(onContextAt, options?)` → `{ flowProps }`.
+A right-click, or a long-press on a touch screen, on a node or on empty canvas asks the app to open
+its [`CommandPalette`](components.md#commands-and-keys) there, with the selection's (or the pressed
+node's) commands first; there is no menu of its own ([U66](ux-rules.md#the-view-and-the-canvas)).
+
+```tsx
+const context = useContextAt(({ at, node }) => openPalette({ at, node }));
+<ReactFlow {...mergeFlowProps(addAt.flowProps, context.flowProps)} … />
+```
+
+- **`onContextAt({ point, at, node?, by })`.** `point` is in flow coordinates, as `useAddAt`'s;
+  `at` is the same point in the window's, as the palette's `at` takes it; `node` is the node
+  pressed, as React Flow holds it (absent on empty canvas); `by` is `"contextmenu"` (a right-click) or
+  `"long-press"`.
+- **What counts.** React Flow's pane and its nodes. A handle, an edge or a panel is not a place for
+  it: a right-click there is the browser's, and a long-press there nothing.
+- **The right-click** is React Flow's `onPaneContextMenu` and `onNodeContextMenu`; the browser's own
+  menu is prevented where it asks.
+- **The long-press.** Touch has no contextmenu on every browser (iOS fires none), so the hook times
+  it: a primary touch held for `LONG_PRESS_MS` (500 ms) without moving more than `LONG_PRESS_SLOP`
+  (10 px) asks, at the point where it began. A move past the slop (a pan or a drag), a lift, a
+  cancel or a second finger (a pinch) before then asks nothing. A contextmenu that comes while the
+  touch is held (Android fires one) is that same long-press, so a press asks once. The click its lift
+  makes is swallowed, so it neither selects nor clears the selection the menu is for; the next press
+  anywhere on the page ends the swallow, so a lift that makes no click leaves the menu's own click
+  alone. A mouse's or
+  a pen's press is never timed.
+- **`flowProps`**: `onPaneContextMenu`, `onNodeContextMenu` and the pointer handlers
+  (`onPointerDown`, `onPointerMove`, `onPointerUp`, `onPointerCancel`), for `<ReactFlow>` (with
+  others through [`mergeFlowProps`](#mergeflowprops)). The object is the same across renders, and
+  the newest `onContextAt` is called.
+- **`options.enabled`** (`true`) switches it off, as an app with no commands at a point would: a
+  right-click is the browser's again, and a long-press nothing.
+- It draws nothing. Its keyboard path is the palette's own key (Mod+K, U18), whose commands act on
+  the selection ([U2](ux-rules.md#focus-and-keyboard)).
+
 ## `useFollowFit`
 
 Keeping the whole graph in view until the person takes the view over:
@@ -347,9 +533,10 @@ Keeping the whole graph in view until the person takes the view over:
   end, because d3-zoom folds a fit that lands during the person's move into the person's gesture,
   which can then end where it began. A press that moves nothing (React Flow starts a move on every
   press on the pane, so a click to deselect or a double-click to add) keeps following, and a move
-  made by code has no event and changes nothing, so CanvasTools' zoom tools do not stop following.
-  `stop()` stops following as the person's move does, for an app that moves the view itself (going
-  to a node). `fit()` fits now, moving as the fit tool does (over `--pb-motion-slow`), and follows
+  made by code has no event and changes nothing. `stop()` stops following as the person's move does,
+  for every move the person asks for that the view makes by code: [`CanvasTools`](#canvastools)'
+  zoom tools and minimap (pass it as their `onViewMove`), the app's own zoom keys (call it beside
+  the zoom), and going to a node ([U63](ux-rules.md#the-view-and-the-canvas)). `fit()` fits now, moving as the fit tool does (over `--pb-motion-slow`), and follows
   again.
 - **`onFitted(viewport)`** is called after each fit has landed, in the frame after the viewport is
   set, with React Flow's viewport: an app, or its browser tests, can mark the layout ready on it

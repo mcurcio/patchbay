@@ -2,6 +2,7 @@
 // each keeping its "+" or "-" so the change never rests on colour alone. Given files, each is a section of its own
 // under a heading, labelled by its file name with its whole path on hover, that the person can fold away.
 import { useId, useState, type ComponentPropsWithRef } from "react";
+import { Glyph } from "../../primitives";
 import "./DiffView.css";
 
 export type DiffFile = {
@@ -111,9 +112,9 @@ export function DiffView({ diff, files, level = 3, collapsed, onToggle, classNam
                     toggle(file.path, !open);
                   }}
                 >
-                  <svg className="pb-diff-chevron" viewBox="0 0 16 16" width="10" height="10" aria-hidden="true">
-                    <path d="M5 3l5 5-5 5" fill="none" stroke="currentColor" strokeWidth="2" />
-                  </svg>
+                  <Glyph className="pb-diff-chevron">
+                    <path d="M6.5 4.5l3.5 3.5-3.5 3.5" />
+                  </Glyph>
                   {baseName(file.path)}
                 </button>
               </Heading>

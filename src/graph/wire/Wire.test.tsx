@@ -36,6 +36,16 @@ const group = (container: HTMLElement) => {
 const emphasis = (container: HTMLElement) => group(container).style.getPropertyValue("--pb-wire-emphasis");
 
 describe("Wire", () => {
+  it("draws its focus ring under the wire, hidden from screen readers", () => {
+    const { container } = draw();
+    const ring = container.querySelector(".pb-wire-focus-ring");
+    const gap = container.querySelector(".pb-wire-focus-gap");
+    expect(ring).toHaveAttribute("aria-hidden", "true");
+    expect(gap).toHaveAttribute("aria-hidden", "true");
+    expect(ring?.nextElementSibling).toBe(gap);
+    expect(gap?.nextElementSibling).toHaveClass("pb-wire-path");
+  });
+
   it("keeps React Flow's edge path and hit path", () => {
     const { container } = draw();
     const path = container.querySelector(".react-flow__edge-path");
@@ -54,7 +64,7 @@ describe("Wire", () => {
     expect(none.container.querySelector(".react-flow__edge-interaction")).toBeNull();
   });
 
-  it.each(["ok", "refused", "added", "maybe"])("marks the tone %s for the stylesheet", (tone) => {
+  it.each(["ok", "refused", "added", "renamed", "maybe"])("marks the tone %s for the stylesheet", (tone) => {
     const { container } = draw({ tone });
     expect(group(container)).toHaveAttribute("data-tone", tone);
   });
@@ -87,6 +97,15 @@ describe("Wire", () => {
     expect(emphasis(container)).toBe("0.9");
     expect(vi.mocked(getBezierPath).mock.calls.length).toBe(built);
     expect(container.querySelector(".pb-wire-path")).toBe(path);
+  });
+
+  it.each(["added", "removed", "renamed", "changed"])("dashes the change tone %s whatever dashed says", (tone) => {
+    expect(group(draw({ tone }).container)).toHaveAttribute("data-dashed");
+    expect(group(draw({ tone, dashed: false }).container)).toHaveAttribute("data-dashed");
+  });
+
+  it.each(["ok", "err", "refused", "maybe"])("leaves the tone %s solid unless dashed", (tone) => {
+    expect(group(draw({ tone }).container)).not.toHaveAttribute("data-dashed");
   });
 
   it("marks dashes and a selected wire", () => {
@@ -137,14 +156,51 @@ describe("Wire", () => {
 describe("Wire's stylesheet", () => {
   const plain = css.replace(/\/\*[\s\S]*?\*\//g, "");
 
-  it("draws a tone it does not know in React Flow's edge stroke", () => {
+  it("draws no tone in React Flow's edge stroke, and a tone it does not know in the muted one", () => {
     expect(plain).toMatch(/\.pb-wire \{\s*--pb-wire-color: var\(--xy-edge-stroke\);/);
+    expect(plain).toMatch(/\.pb-wire\[data-tone\] \{\s*--pb-wire-color: var\(--pb-muted\);/);
+    // Before every tone it knows, which follow and win.
+    expect(plain.indexOf(".pb-wire[data-tone] {")).toBeLessThan(plain.indexOf('[data-tone="ok"]'));
     expect(plain).not.toMatch(/data-tone="maybe"/);
+  });
+
+  it("draws focus as its own ring along the path, shown only while React Flow's edge has :focus-visible", () => {
+    expect(plain).toMatch(/\.pb-wire-focus-gap \{\s*visibility: hidden;/);
+    expect(plain).toMatch(
+      /\.react-flow__edge:focus-visible \.pb-wire-focus-ring,\s*\.react-flow__edge:focus-visible \.pb-wire-focus-gap \{\s*visibility: visible;/,
+    );
+    expect(plain).toMatch(/\.pb-wire-focus-ring \{\s*stroke: var\(--pb-accent\);/);
+    // Focus does not take React Flow's selected stroke, which is the selected look.
+    expect(plain).toMatch(
+      /\.react-flow__edge:focus-visible \.pb-wire \.react-flow__edge-path\.pb-wire-path \{\s*stroke: var\(--pb-wire-color\);/,
+    );
   });
 
   it("draws the level as width and brightness from the variable", () => {
     expect(plain).toMatch(/stroke-width: calc\(1\.5px \+ 2px \* var\(--pb-wire-emphasis\)\)/);
     expect(plain).toMatch(/stroke-opacity: calc\(0\.45 \+ 0\.55 \* var\(--pb-wire-emphasis\)\)/);
+  });
+
+  it("draws the seven state tones, the four change tones and refused", () => {
+    const tones = new Set([...plain.matchAll(/data-tone="([^"]+)"/g)].map((match) => match[1]));
+    expect([...tones].sort()).toEqual([
+      "accent",
+      "added",
+      "changed",
+      "err",
+      "muted",
+      "off",
+      "ok",
+      "quiet",
+      "refused",
+      "removed",
+      "renamed",
+      "warn",
+    ]);
+  });
+
+  it("has no pending tone: a request on its way is GhostWire's, and a queued wire a change tone", () => {
+    expect(plain).not.toMatch(/data-tone="pending"/);
   });
 
   it("puts the selected rule after the tones", () => {

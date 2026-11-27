@@ -1,6 +1,7 @@
 import { Canvas, Meta } from "@storybook/addon-docs/blocks";
 import * as CommandPaletteStories from "../composites/command-palette/CommandPalette.stories";
 import * as ShortcutSheetStories from "../composites/shortcut-sheet/ShortcutSheet.stories";
+import * as WireStories from "../graph/wire/Wire.stories";
 import * as ShortcutsStories from "../hooks/use-shortcuts/useShortcuts.stories";
 
 <Meta title="Patterns/Keyboard and Escape" />
@@ -27,6 +28,13 @@ Every command, from Mod+K:
 
 <Canvas of={ShortcutsStories.All} />
 
+## A focused wire
+
+React Flow holds the canvas's focus; patchbay draws the ring. A focused wire is ringed along its
+path in the accent, and keeps its tone, so it reads apart from a selected one:
+
+<Canvas of={WireStories.Focused} />
+
 ## Escape, innermost first
 
 A focused toast, then the palette, a dialog or the shortcut sheet, then the inspector's sheet while
@@ -39,4 +47,3 @@ the inspector's sheet, at the narrow width) and
 ## Not built yet
 
 - Nested dialogs mounted in one commit: `pb-nx9.27`.
-- A focus look for a focused wire: `pb-nx9.71`.

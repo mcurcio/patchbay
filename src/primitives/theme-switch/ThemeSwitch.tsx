@@ -1,9 +1,12 @@
 // The theme switch: one button that cycles system, light and dark. Its word is shown beside the icon, and its
 // accessible name always says the choice, so it is never just a glyph; the icon is SVG, since a font may lack a ◐
 // character. The choice is the app's (useTheme keeps it); the switch only says it and asks for the next. At phone
-// width the word gives way to the icon alone, and the name still says the choice.
+// width the word gives way to the icon alone, and the name still says the choice. It is a neutral Button, so its face,
+// hover, focus ring, touch size and forced-colours edge are Button's.
 import type { ComponentPropsWithRef } from "react";
 import type { ThemeChoice } from "../../hooks/use-theme/useTheme";
+import { Button } from "../button";
+import { Glyph } from "../glyph";
 import "./ThemeSwitch.css";
 
 export type { ThemeChoice };
@@ -55,9 +58,9 @@ export function themeSwitchTitle(choice: ThemeChoice, labels: ThemeSwitchLabels 
 export function ThemeSwitch({ choice, onChoose, labels, className, ...rest }: ThemeSwitchProps) {
   const words = { ...defaultThemeSwitchLabels, ...labels };
   return (
-    <button
+    <Button
       {...rest}
-      type="button"
+      tone="neutral"
       className={className === undefined ? "pb-theme-switch" : `pb-theme-switch ${className}`}
       title={themeSwitchTitle(choice, words)}
       aria-label={`${words.theme}: ${words[choice]}`}
@@ -65,11 +68,11 @@ export function ThemeSwitch({ choice, onChoose, labels, className, ...rest }: Th
         onChoose(following(choice));
       }}
     >
-      <svg className="pb-theme-switch-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
-        <circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" strokeWidth="1.5" />
-        <path d="M8 1.75a6.25 6.25 0 0 1 0 12.5z" fill="currentColor" />
-      </svg>
+      <Glyph className="pb-theme-switch-icon">
+        <circle cx="8" cy="8" r="6" />
+        <path d="M8 2a6 6 0 0 1 0 12z" fill="currentColor" stroke="none" />
+      </Glyph>
       <span className="pb-theme-switch-word">{words[choice]}</span>
-    </button>
+    </Button>
   );
 }

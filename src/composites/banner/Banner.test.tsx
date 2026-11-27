@@ -1,33 +1,74 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { createRef } from "react";
+import { createRef, useLayoutEffect } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { Banner } from "./Banner";
 import css from "./Banner.css?raw";
 
+/** The banner's own box, which is not a live region: its words are read through the regions inside it. */
+function bannerOf(container: HTMLElement): HTMLElement {
+  const banner = container.querySelector<HTMLElement>(".pb-banner");
+  if (banner === null) throw new Error("no banner");
+  return banner;
+}
+
 describe("Banner", () => {
-  it("is a status with its words and tone", () => {
-    render(
+  it("draws its words in its tone and says them in its status region", () => {
+    const { container } = render(
       <Banner tone="warn" className="mine">
         Changed on disk.
       </Banner>,
     );
-    const banner = screen.getByRole("status");
-    expect(banner).toHaveTextContent("Changed on disk.");
+    const banner = bannerOf(container);
     expect(banner).toHaveClass("pb-banner", "mine");
     expect(banner).toHaveAttribute("data-tone", "warn");
+    expect(banner).not.toHaveAttribute("role");
+    expect(banner.querySelector(".pb-banner-text")).toHaveTextContent("Changed on disk.");
+    expect(screen.getByRole("status")).toHaveTextContent("Changed on disk.");
+    expect(screen.getByRole("alert")).toBeEmptyDOMElement();
   });
 
-  it("is an alert for an error", () => {
+  it("says an error in its alert region", () => {
     render(<Banner tone="err">Lost.</Banner>);
     expect(screen.getByRole("alert")).toHaveTextContent("Lost.");
+    expect(screen.getByRole("status")).toBeEmptyDOMElement();
   });
 
-  it("draws a tone it does not know neutrally, as a status", () => {
-    render(<Banner tone="sleeping">Idle.</Banner>);
-    expect(screen.getByRole("status")).toHaveAttribute("data-tone", "sleeping");
+  it("has its regions in the page, empty, in the commit that mounts it with its words", () => {
+    const seen: (string | null)[] = [];
+    function Probe() {
+      useLayoutEffect(() => {
+        seen.push(document.querySelector('[role="status"]')?.textContent ?? null);
+      }, []);
+      return <>Changed on disk.</>;
+    }
+    render(
+      <Banner tone="warn">
+        <Probe />
+      </Banner>,
+    );
+    // The probe in the drawn words saw the region there and empty; the words came in the next commit.
+    expect(seen[0]).toBe("");
+    expect(screen.getByRole("status")).toHaveTextContent("Changed on disk.");
+  });
+
+  it("moves its words to the region its new tone picks", () => {
+    const { rerender } = render(<Banner tone="warn">Reconnecting.</Banner>);
+    const status = screen.getByRole("status");
+    const alert = screen.getByRole("alert");
+    rerender(<Banner tone="err">Lost.</Banner>);
+    expect(screen.getByRole("status")).toBe(status);
+    expect(screen.getByRole("alert")).toBe(alert);
+    expect(status).toBeEmptyDOMElement();
+    expect(alert).toHaveTextContent("Lost.");
+  });
+
+  it("draws a tone it does not know neutrally, said as a status", () => {
+    const { container } = render(<Banner tone="sleeping">Idle.</Banner>);
+    expect(bannerOf(container)).toHaveAttribute("data-tone", "sleeping");
+    expect(screen.getByRole("status")).toHaveTextContent("Idle.");
     const tones = new Set([...css.matchAll(/data-tone="([^"]+)"/g)].map((match) => match[1]));
-    expect([...tones].sort()).toEqual(["err", "off", "ok", "quiet", "warn"]);
+    expect([...tones].sort()).toEqual(["accent", "err", "muted", "off", "ok", "quiet", "warn"]);
   });
 
   it("puts its actions at the end", () => {
@@ -63,25 +104,28 @@ describe("Banner", () => {
     expect(screen.getByRole("button", { name: "Hide" })).toBeInTheDocument();
   });
 
-  it("passes native props and the ref, but keeps its own role", () => {
+  it("passes native props and the ref", () => {
     const ref = createRef<HTMLDivElement>();
-    render(
-      <Banner ref={ref} tone="warn" id="news" aria-label="News">
+    const { container } = render(
+      <Banner ref={ref} tone="warn" id="news" data-pane="files">
         Changed.
       </Banner>,
     );
-    const banner = screen.getByRole("status", { name: "News" });
+    const banner = bannerOf(container);
     expect(ref.current).toBe(banner);
     expect(banner).toHaveAttribute("id", "news");
+    expect(banner).toHaveAttribute("data-pane", "files");
   });
 
-  it("closes by an IconButton, which keeps a touch target of its own", () => {
+  it("closes by the close glyph on an IconButton, which keeps a touch target of its own", () => {
     render(
       <Banner tone="ok" onDismiss={() => {}}>
         Saved.
       </Banner>,
     );
-    expect(screen.getByRole("button", { name: "Dismiss" })).toHaveClass("pb-icon-button");
+    const button = screen.getByRole("button", { name: "Dismiss" });
+    expect(button).toHaveClass("pb-icon-button");
+    expect(button.querySelector("svg.pb-close-glyph")).not.toBeNull();
   });
 
   it("has nothing to stop under reduced motion: no animation or transition", () => {

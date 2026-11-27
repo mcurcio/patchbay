@@ -107,7 +107,8 @@ export function useFollowFit<NodeType extends Node = Node>({
   // each end a task). Each start with an event sets it afresh.
   const movedFrom = useRef<Viewport | null>(null);
   const flowProps = useMemo<FollowFitFlowProps>(() => {
-    // A move made by code (a fit, a zoom from a tool) has no event; only the person's own move counts.
+    // A move made by code (a fit, a zoom from a tool, a minimap drag) has no event, so it does not count here; the
+    // tools' moves the person asked for reach stop() through CanvasTools' onViewMove.
     const moved: OnMove = (event, viewport) => {
       const from = movedFrom.current;
       if (event === null || from === null) return;

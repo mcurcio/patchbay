@@ -105,6 +105,17 @@ describe("Splitter", () => {
     expect(onSize.mock.calls.map((call) => call[0] as number)).toEqual([336, 320, 304, 560, 280]);
   });
 
+  it("leaves a press inside an input method's composition to the input method", () => {
+    const onChange = vi.fn();
+    render(<Splitter orientation="vertical" label="R" value={320} min={280} max={560} onChange={onChange} />);
+    const splitter = screen.getByRole("separator");
+    expect(fireEvent.keyDown(splitter, { key: "ArrowLeft", isComposing: true })).toBe(true);
+    expect(fireEvent.keyDown(splitter, { key: "Process" })).toBe(true);
+    expect(onChange).not.toHaveBeenCalled();
+    expect(fireEvent.keyDown(splitter, { key: "ArrowLeft" })).toBe(false);
+    expect(onChange).toHaveBeenCalledOnce();
+  });
+
   it("leaves keys it does not own, and does not call onChange when the size would not move", () => {
     const onChange = vi.fn();
     render(<Splitter orientation="vertical" label="R" value={280} min={280} max={560} onChange={onChange} />);
@@ -224,11 +235,23 @@ describe("Splitter", () => {
     expect(splitter).toHaveAttribute("id", "split");
   });
 
+  it("rings the focused bar in the accent, 1 px clear, and keeps the fill", () => {
+    expect(css).toMatch(
+      /\.pb-splitter:focus-visible \{\s*outline: 2px solid var\(--pb-accent\);\s*outline-offset: 1px;/,
+    );
+    expect(css).toMatch(
+      /\.pb-splitter:focus-visible,\s*\.pb-splitter\[data-dragging\] \{\s*background: var\(--pb-accent\);/,
+    );
+  });
+
   it("takes no drag-and-scroll gesture from touch, and widens its hit area to 36 px on touch", () => {
     expect(css).toMatch(/\.pb-splitter \{[^}]*touch-action: none;/);
     const touch = /@media \(hover: none\) and \(pointer: coarse\)\s*\{([\s\S]*?)\n\}/.exec(css)?.[1] ?? "";
     // 6 px bar, 15 px either side.
     expect(css).toMatch(/width: 6px/);
     expect(touch.match(/inset-(?:inline|block): -15px/g)).toHaveLength(2);
+    // The grip, drawn at rest so the bar can be found without hover, and gone while the bar fills.
+    expect(touch).toMatch(/\.pb-splitter::after \{[^}]*background: var\(--pb-line-strong\);/);
+    expect(touch).toMatch(/\.pb-splitter\[data-dragging\]::after \{\s*display: none;/);
   });
 });

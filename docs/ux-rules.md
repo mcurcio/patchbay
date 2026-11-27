@@ -8,16 +8,16 @@ cite them. How to read a rule (Built, The app's, Not yet):
 
 - **U1. Focus is always visible.** A 2 px ring in the accent on `:focus-visible`: 2 px outside a
   discrete control, 1 px outside a field or a packed tool, inset 2 px on a scroll body or a code
-  box. **Built:** every control's stylesheet; `base.css` for the page. **Not yet:** the Splitter
-  shows focus as an accent fill with no ring (pb-nx9.69), and the DiffView fold toggle's ring
-  has no offset (pb-nx9.70).
+  box. **Built:** every control's stylesheet (the Splitter's ring 1 px clear of its accent fill,
+  as a packed control's); `base.css` for the page; a Wire's ring along its path (U17).
 - **U2. Every action has a keyboard path.** A gesture only a pointer can make has a keyboard path
   beside it: adding at a point is the app's add command ([`graph.md`](graph.md#useaddat)); a
   gutter mark is the caret moved by line and column ([`components.md`](components.md#code),
   CodeEditor); connecting two ports is the inspector's "Connect to" choice for each port
   ([patterns](patterns.md#connecting)); moving a node, where dragging is allowed, is React Flow's
-  arrow keys on the selected node. **Not yet:** patchbay gives no list of the ports `canConnect`
-  accepts for one port, which the "Connect to" choice needs: pb-nx9.81.
+  arrow keys on the selected node. **Built:** [`connectTargets`](graph.md#connecttargets) lists the
+  ports `canConnect` accepts for one port, for the "Connect to" choice; `NodeBox` leaves React
+  Flow's keys to move a node. **The app's:** the choice and what it does.
 - **U3. A group of tools is one Tab stop.** Arrows move within it and wrap, Home and End go to the
   ends, arrows swap in right-to-left text, and the last focused item keeps the stop. **Built:**
   Toolbar, ToolGroup, CanvasTools ([`components.md`](components.md#layout)).
@@ -54,16 +54,16 @@ cite them. How to read a rule (Built, The app's, Not yet):
   palette, the shortcut sheet and the canvas tools show the app's. **Built:** CanvasTools
   `keyShortcuts`, ShortcutSheet, CommandPalette.
 - **U14. A handled press is left alone.** A press marked `defaultPrevented`, or inside an input
-  method's composition, does nothing more. **Built:** useShortcuts and CodeEditor for both;
-  Toolbar, Splitter, Dialog, Sheet and Toaster for a handled press. **Not yet:** those five act on
-  a press inside a composition: pb-nx9.94.
+  method's composition, does nothing more. **Built:** useShortcuts, CodeEditor, CommandPalette,
+  Toolbar, Splitter, Dialog, Sheet and Toaster; Dialog's Tab trap still holds during a composition,
+  so the focus never leaves the modal.
 - **U15. The keyboard can always leave a text editor:** Escape, then Tab, moves on, and the editor's
   description says so. **Built:** CodeEditor.
 - **U16. Undo history survives a programmatic edit.** **Built:** CodeEditor's Tab.
 - **U17. React Flow owns the canvas's focus.** Node and edge focus, selection, dragging and Delete
   are React Flow's; patchbay adds no tab stops beyond its slots, and draws the ring React Flow does
-  not. **Built:** NodeBox ([`graph.md`](graph.md#nodebox)). **Not yet:** a focused Wire has no look
-  of its own; only `selected` restyles it: pb-nx9.71.
+  not, distinct from the selected look. **Built:** NodeBox ([`graph.md`](graph.md#nodebox)), Wire
+  ([`graph.md`](graph.md#wire)).
 - **U18. The standard keys.** Every app binds Mod+K to the whole palette (adding is one group in
   it, never the palette's only use), `?` to the shortcut sheet, Delete and Backspace to removing
   the selection, F to fit, A to add, and, where its model has them, Mod+S to commit and Mod+Z to
@@ -87,21 +87,22 @@ cite them. How to read a rule (Built, The app's, Not yet):
   inspector is the app's. **Built:** AppShell.
 - **U22. Escape never discards typed work.** Closing a dialog or a sheet asks the app to close it
   and keeps no draft of its own, so a draft the app holds is still there; a draft left in the
-  inspector survives the window crossing a width. **Built:** Dialog, Sheet, AppShell's drawer.
-  **Not yet:** the inspector's content is drawn afresh when the window crosses 760 px, which drops
-  a draft held in it: pb-nx9.88.
+  inspector survives the window crossing a width. **Built:** Dialog, Sheet, AppShell's drawer, and
+  AppShell's inspector, whose content stays mounted as it moves between the region and the sheet
+  ([`components.md`](components.md#appshell), Narrow windows).
 
 ## Words
 
 - **U23. A component's own words come through `labels`**
   ([`components.md`](components.md#rules-every-component-keeps), rule 8). **Built:** every
-  component. **Not yet:** Meter's default name, "Level", is a plain prop default: pb-nx9.66.
+  component, Meter's default name ("Level", `labels.name`) included.
 - **U24. The app's content is a prop of its own:** a Field's or a Pill's `label`, the names
   Splitter and Toolbar require, `busyLabel`, what a Meter measures. **Built:** the prop types.
 - **U25. Default words are plain English,** in sentence case, actions as verbs with their object
   ("Zoom in", "Fit the view", "Resize the inspector"), and never pointer-only ("press", not
   "click"). **Built:** the defaults. **Not yet:** ThemeSwitch's tooltip says "click for":
-  pb-nx9.67.
+  pb-nx9.67; EmptyCanvasHint's default, without the app's add key, names only a pointer gesture
+  ("Double-click to add a node"): pb-nx9.96.
 - **U26. An icon-only control is named,** and its tooltip defaults to its name. **Built:**
   IconButton (`label` required).
 - **U27. A glyph is hidden;** the control's name carries it (F49). **Built:** every SVG glyph.
@@ -113,8 +114,8 @@ cite them. How to read a rule (Built, The app's, Not yet):
 - **U30. "Close" and "Dismiss".** "Close" for what the person opened (a dialog, a sheet, the
   inspector); "Dismiss" for news that came by itself (a banner, a toast). Both are one look, the
   close glyph on an IconButton named by the word. **Built:** Dialog, Sheet and AppShell's
-  inspector sheet (Close); Banner and Toaster say Dismiss. **Not yet:** Banner draws its own glyph
-  and a toast's Dismiss is a text button: pb-nx9.84.
+  inspector sheet (Close); Banner and Toaster (Dismiss); all draw
+  [`CloseGlyph`](components.md#actions), which an app's own close buttons use too.
 - **U31. An error says what happened, then what to do,** in plain words; the source's code comes
   after them, in code type (U29). **The app's:** the words of its errors.
 
@@ -125,11 +126,11 @@ cite them. How to read a rule (Built, The app's, Not yet):
 - **U33. On its way is shown, never blocking:** a pulsing dot (Pill `pulse`) or a ghost wire, and
   the rest of the screen stays usable. **Built:** Pill, GhostWire.
 - **U34. An empty list says so,** in a status line there from the start. **Built:** CommandPalette,
-  ShortcutSheet.
+  ShortcutSheet, DiagnosticList (its count).
 - **U35. An empty canvas says what to do,** in words drawn on the canvas itself: the app's words
   and the add gestures, gone with the first node
-  ([patterns](patterns.md#empty-loading-and-offline)). **Not yet:** patchbay has no component for
-  it: pb-nx9.87.
+  ([patterns](patterns.md#empty-loading-and-offline)). **Built:**
+  [`EmptyCanvasHint`](graph.md#emptycanvashint). **The app's:** its words, and its add key.
 - **U36. A field's error is described, not announced:** wired to the field, and not a live region,
   so it is not read at each key. **Built:** Field, RadioGroup, CodeEditor's diagnostics
   ([`components.md`](components.md#forms)).
@@ -145,13 +146,14 @@ cite them. How to read a rule (Built, The app's, Not yet):
 
 ## Feedback
 
-- **U41. Urgency by role.** An `err` message is `role="alert"`, read at once; every other is
-  `role="status"`, read when the reader is free. **Built:** Banner, Toaster.
+- **U41. Urgency by role.** An `err` message is read in a `role="alert"` region, at once; every
+  other in a `role="status"` one, when the reader is free. **Built:** Banner, Toaster.
 - **U42. A live region exists before its words,** as a region added with its words is not reliably
-  read. **Built:** Toaster, Button's busy region, CommandPalette's status line, StatusWords. **Not
-  yet:** Banner carries its role on itself, so the region arrives with its words and changes with
-  its tone (pb-nx9.64); a labelled Spinner is its own region, mounted with its label
-  (pb-nx9.65).
+  read. **Built:** Toaster, Button's busy region, CommandPalette's status line, StatusWords,
+  DiagnosticList's count,
+  Banner's two hidden regions, and a labelled Spinner, whose region comes a commit before its
+  label ([`components.md`](components.md#news-and-state), Banner;
+  [`components.md`](components.md#state), Spinner).
 - **U43. Nothing is read twice.** **Built:** Toaster, whose toasts are not live regions.
 - **U44. The channel follows where the news is and how long it lasts.**
 
@@ -173,10 +175,16 @@ cite them. How to read a rule (Built, The app's, Not yet):
 - **U47. No fact only in a tooltip.** A native tooltip shows on neither touch nor keyboard focus, so
   whatever a `title` says is also in words elsewhere: the inspector, a node's line, or the canvas's
   status line, which also says why a port refuses while a wire is dragged (U59). Tooltips stay, as
-  a convenience. **Not yet:** a wire's `title`, a meter's numbers, the gutter mark's list of
-  diagnostics and a cut node title are in a tooltip only, with no place named for their words
-  (pb-nx9.79); the canvas has no status line (pb-nx9.78); a cut palette row
-  (pb-nx9.80).
+  a convenience. **Built:** CommandPalette, whose active row (every row on touch) is written out
+  whole (F20); [`ConnectStatus`](graph.md#connectstatus), the canvas's status line, for a refusing
+  port's reason; CodeEditor, whose gutter marks' diagnostics are read in its description and
+  listed in words under the box by [`DiagnosticList`](components.md#code). Each
+  other tooltip's docs name where its words go: a cut node title, line or port name in the
+  inspector ([`NodeBox`](graph.md#nodebox), [`PortRow`](graph.md#portrow)); a wire's `title` in its
+  `label` or the inspector ([`Wire`](graph.md#wire)); a meter's numbers in the inspector, written
+  with `formatMeterDb` ([`Meter`](graph.md#meter)). **The app's:** writing those words there, and
+  every `title` it gives a component (Pill, Badge, KeyValue, StatusWords, RadioGroup, WarnMark).
+  **Not yet:** DiffView's whole file path is only its heading's tooltip: pb-nx9.95.
 
 ## Confirmation and undo
 
@@ -191,8 +199,9 @@ cite them. How to read a rule (Built, The app's, Not yet):
   (U28). **Built:** a toast's `action` ([`useToasts`](components.md#usetoasts)). **The app's:** the
   inverse.
 - **U50. A queue holds the net change.** Queuing the reverse of a queued change drops it, rather
-  than adding a second; taking back is dropping a queued change. **The app's:** the queue. **Not
-  yet:** patchbay has no list of queued changes to draw it with: pb-nx9.90.
+  than adding a second; taking back is dropping a queued change. **Built:** [`ChangeList`](components.md#queued-changes)
+  draws the queue and asks to drop a change. **The app's:** the queue, and keeping its net change
+  (`ChangeList`'s docs give the cases).
 
 ## Live, pending, queued, refused
 
@@ -202,26 +211,26 @@ are F10's:
 | State | Means | A wire | A node | A button or text |
 |---|---|---|---|---|
 | Live | The source holds it | [`Wire`](graph.md#wire) in its tone | [`NodeBox`](graph.md#nodebox) in its tone | — |
-| Pending | Asked, no answer yet | [`GhostWire`](graph.md#ghostwire) `pending` | A ghost NodeBox (not yet: pb-nx9.82) | Button `busy` with `busyLabel` |
+| Pending | Asked, no answer yet | [`GhostWire`](graph.md#ghostwire) `pending` | [`GhostNode`](graph.md#ghostnode) | Button `busy` with `busyLabel` |
 | Queued | Changed here, not saved | Wire in a change tone, `dashed` | NodeBox `change` | A "queued" or "unsaved" status word |
 | Refused | The source or a check said no | GhostWire `refused`, or a queued wire in `err` | NodeBox `failed` and its `line` | Field `error`, Banner, toast |
 | Stale | Changed underneath what is being edited | — | — | A `warn` Banner with the recovery |
 
 - **U51. Draw the asking, never the answer.** A pending request is drawn as a request until the
-  source answers. **Built:** GhostWire; **the app's:** removing it when answered.
+  source answers. **Built:** GhostWire, GhostNode; **the app's:** removing it when answered.
 - **U52. A ghost is not a thing.** It is drawn dashed and faint, takes no pointer events, and is not
-  selectable, focusable or deletable. **Built:** GhostWire ([`graph.md`](graph.md#ghostwire)).
+  selectable, focusable or deletable. **Built:** GhostWire ([`graph.md`](graph.md#ghostwire)),
+  GhostNode ([`graph.md`](graph.md#ghostnode)); **the app's:** the flags on its edge or node.
 - **U53. Queued is a change tone and dashes.** A queued wire is a change tone, dashed; a queued
-  node has its change border and badge; removed strikes the title. **Built:** Wire, NodeBox. **Not
-  yet:** Wire's `pending` tone (F10): pb-nx9.74.
+  node has its change border and badge; removed strikes the title. **Built:** Wire, NodeBox.
 - **U54. Selected wins over tone.** **Built:** Wire.
 - **U55. A level is emphasis, not a tone:** a wire's level is its width and opacity. **Built:**
   Wire.
 - **U56. One rule judges the hint, the drop and the keyboard.** The app's `canConnect` marks each
   handle while a wire is dragged, checks the drop, and lists the ports the "Connect to" choice
   offers (U2), so a hint never promises what the drop refuses. **Built:** useConnectHints for the
-  hint and the drop ([`graph.md`](graph.md#useconnecthints)). **Not yet:** the keyboard's list:
-  pb-nx9.81.
+  hint and the drop ([`graph.md`](graph.md#useconnecthints)), and `connectTargets` for the
+  keyboard's list ([`graph.md`](graph.md#connecttargets)).
 - **U57. While dragging, every port says yes or no.** The origin is ringed in the accent; an
   accepting handle grows and goes `ok`; a refusing one goes `off` with muted words and a
   not-allowed cursor; ports on the origin's side are not candidates. **Built:** PortRow.
@@ -231,7 +240,8 @@ are F10's:
   ghost too. **The app's:** removing the ghost with its toast.
 - **U59. A refusal's reason lands where it was asked,** in words (U44). While a wire is dragged,
   the canvas's status line says why the port under the pointer refuses, and the verdict of a
-  refused drop. **Not yet:** the reason is only the port's tooltip: pb-nx9.78.
+  refused drop. **Built:** [`ConnectStatus`](graph.md#connectstatus), fed by `useConnectHints`.
+  **The app's:** drawing it on the canvas.
 - **U60. A read-only graph turns off every edit and says why:** adding, connecting, removing,
   dragging and editing text, with a `quiet` Banner saying why and where it can be changed
   ([patterns](patterns.md#a-read-only-graph)). **Built:** the switches (`useAddAt`'s `enabled`,
@@ -250,8 +260,9 @@ are F10's:
   any input (a pan, a wheel, a pinch, the zoom tools and their keys, a minimap drag, going to a
   node), stops the view following the graph; a layout or canvas-size change never restarts it, and
   only Fit follows again. **Built:** [`useFollowFit`](graph.md#usefollowfit) for pans, wheels and
-  pinches, and `stop()` for going to a node. **Not yet:** the zoom tools and a minimap drag do not
-  stop it: pb-nx9.52.
+  pinches; its `stop()` for the zoom tools and the minimap, through
+  [`CanvasTools`](graph.md#canvastools)' `onViewMove`. **The app's:** passing `stop` to
+  `onViewMove`, and calling it beside its own zoom keys and going to a node.
 - **U64. A fit leaves the canvas tools clear,** so the graph is never drawn under them and an app
   chooses no inset of its own. **Not yet:** CanvasTools' default fit ignores its own corner:
   pb-nx9.83.
@@ -260,8 +271,9 @@ are F10's:
   **The app's:** its node types draw no fields.
 - **U66. A context menu is the palette at the point.** A right-click or a long-press on a node or
   the canvas opens the [`CommandPalette`](components.md#commands-and-keys) at the point (`at`),
-  with the selection's commands first; there is no menu of its own. **Not yet:** React Flow gives
-  the point of a right-click, and nothing gives a long-press's: pb-nx9.92.
+  with the selection's commands first; there is no menu of its own. **Built:**
+  [`useContextAt`](graph.md#usecontextat) gives the point and the node for both gestures. **The
+  app's:** the commands, and opening the palette.
 - **U67. Several things can be selected,** by React Flow's shift-click and box select, and the
   inspector shows their count and the actions for all
   ([patterns](patterns.md#selecting-and-inspecting)). **The app's:** the actions.
@@ -270,27 +282,25 @@ are F10's:
 
 - **U68. Edges are logical.** Start and end follow the text direction: Splitter `edge`, Sheet
   `side`, Toaster placements, stripes on the inline start, paddings and margins.
-  **Built:** Splitter, Sheet, Toaster, Banner. **Not yet:** Panel's header actions
-  (pb-nx9.60), Dialog's header padding (pb-nx9.61), Pill's padding (pb-nx9.62), and
-  DiffView's and CodeEditor's line and gutter paddings (pb-nx9.63) are physical.
+  **Built:** Splitter, Sheet, Toaster, Banner, Panel's header actions, Dialog's head, Pill's padding
+  (the dot's side), DiffView's lines, CodeEditor's gutter and text, each with a `RightToLeft` story.
 - **U69. Direction is read at the moment of use** (a key press, a drag's start), so a page that
   changes `dir` is followed. **Built:** Splitter.
 - **U70. Handles stay physical.** Inputs on the left and outputs on the right, as React Flow's
-  positions are; the row's words follow their handle. **Built:** PortRow, NodeBox. **Not yet:** the
-  built CSS mirrors the rows only under an RTL `lang`, not under `dir="rtl"` alone: pb-nx9.58.
+  positions are; the row's words follow their handle. **Built:** PortRow, NodeBox, under `dir="rtl"`
+  in any language, as the build keeps their `:dir()` selectors ([`README.md`](../README.md#browsers)).
 - **U71. Safe-area insets are physical,** and so are the side paddings that clear them. **Built:**
-  AppShell.
+  AppShell, and the scrims of Dialog and CommandPalette.
 - **U72. A level bar mirrors.** A horizontal Meter fills from the inline start, so from the right
-  in right-to-left text; a vertical one fills from the bottom. **Not yet:** it fills from the left
-  in any direction: pb-nx9.86.
+  in right-to-left text, its lamp at the inline end; a vertical one fills from the bottom.
+  **Built:** Meter ([`graph.md`](graph.md#meter)).
 
 ## Forced colours
 
 - **U73. Every edge and state stays.** What a fill carried moves to a system colour, with
   `forced-color-adjust: none` where a shape would vanish. **Built:** a
   `@media (forced-colors: active)` block in each stylesheet whose fill or hidden edge would be
-  lost; the rest keep native edges. **Not yet:** ThemeSwitch, which copies Button's look without
-  its block: pb-nx9.68.
+  lost (ThemeSwitch keeps Button's, as it is drawn with Button); the rest keep native edges.
 - **U74. Three system roles.** Selection is `Highlight`; refused and disabled are `GrayText`;
   ordinary marks are `CanvasText`. **Built:** per component.
 

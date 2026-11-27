@@ -88,12 +88,31 @@ primary per view), `size?`, `busy?`, `busyLabel?`, plus native button props.
 
 **`IconButton`**: a square glyph button on `Button`'s rules (`tone`, `size`, `busy`, `busyLabel`,
 pressed). `label` (required) is its accessible name and, unless `title` is given, its tooltip;
-`children` is the glyph, hidden from screen readers. A glyph has no words to swap, so while busy a
+`children` is the glyph (a [`Glyph`](#actions), or a character, set in the same 16 px box at 16 px),
+hidden from screen readers. A glyph has no words to swap, so while busy a
 `busyLabel` becomes its name and (unless `title` is given) its tooltip, and is announced as on
 `Button`; the spinner covers the glyph as without one. 28 px (22 px when `sm`), borderless until
-hovered, pressed or toned; 36 px on touch, 40 px in a `ToolGroup`.
+hovered, pressed or toned; 36 px on touch, edged in `--pb-line-strong` at rest there (not when
+disabled), as nothing hovers ([F40](foundations.md#density-and-touch)); 40 px in a `ToolGroup`,
+whose frame is the edge.
 
-**`ThemeSwitch`**: one button that cycles system, light and dark. `choice`, `onChoose(next)`,
+**`CloseGlyph`**: the close glyph, a cross in the current text colour, hidden from screen readers.
+It is the one look for Close (what the person opened: a dialog, a sheet, the inspector) and Dismiss
+(news that came by itself: a banner, a toast), always as the child of an `IconButton` named by the
+word ([U30](ux-rules.md#words)); `Dialog`, `Sheet`, `Banner` and `Toaster` draw theirs with it. It is
+drawn with `Glyph`.
+
+**`Glyph`**: the one glyph grid ([F50](foundations.md#glyphs)), for patchbay's glyphs and an app's own:
+an SVG 16 px square (`viewBox="0 0 16 16"`) whose `children`, its shapes, lie within the middle 12 px
+(2 to 14), stroked at 1.75 with round caps and joins in the current text colour, no fill unless a shape
+gives one, hidden from screen readers and never focused; `className` is added to its own `pb-glyph`,
+and other native `svg` props pass through. `GLYPH_BOX` (16), `GLYPH_DRAWN` (12) and `GLYPH_STROKE`
+(1.75) are its sizes. It does not shrink in a row of words. The close glyph, the theme switch's, a
+diff's fold chevron, the drawer's chevron and the canvas tools are drawn with it; a text glyph in an
+`IconButton` or a `ToolGroup` is set at 16 px, the same box.
+
+**`ThemeSwitch`**: one button that cycles system, light and dark, drawn as a neutral `Button`
+(its face, hover, focus ring, touch height and forced colours). `choice`, `onChoose(next)`,
 `labels?` (its words, [rule 8](#rules-every-component-keeps): `theme`, `system`, `light`, `dark`,
 `systemHint`, `clickFor`; `defaultThemeSwitchLabels`). It shows an icon and the choice's word; its
 name is "Theme: dark", its tooltip says what a press does (`themeSwitchTitle`). Below 600 px the
@@ -115,7 +134,8 @@ system's text colour.
 "outlined" | "filled"`, `children`, `title?`.
 
 - Outlined (the default): text and border in the tone on the sunken surface; warn, err and changed
-  on their soft surfaces. A tone it does not know, and `off`, have a plain line.
+  on their soft surfaces. A tone it does not know has its words in `--pb-muted` and its border in
+  `--pb-line-strong` ([F7](foundations.md#tones)); `off` has a plain line.
 - Filled: the tone's colour as the fill, the words in `--pb-on-strong`, for a fact that must stand
   out. A tone it does not know is filled with `--pb-muted`. Under forced colours the fill gives way
   to the border, which stays.
@@ -126,7 +146,11 @@ text. Under forced colours the circle stays, in the system's text colour.
 
 **`Spinner`**: the busy mark, an open ring in the current text colour, turning once per
 `--pb-motion-spin` and still under reduced motion. Without `label` it is decoration, hidden from
-screen readers (as inside a busy `Button`); with one it is a `role="status"` that announces it.
+screen readers (as inside a busy `Button`); with one it is a `role="status"` that announces it,
+drawn empty in the commit that adds it and given its label in the next
+([U42](ux-rules.md#feedback)). A label that goes takes the region with it, and one that comes
+back brings it back empty first; to say more than one thing over time, keep the Spinner mounted
+and change its label.
 
 ### Text and facts
 
@@ -134,8 +158,10 @@ screen readers (as inside a busy `Button`); with one it is a `role="status"` tha
 `level?` (h2 to h6, h3 by default).
 
 **`KeyValue`**: facts as a `<dl>`, keys and values side by side. `rows: { key, value, tone?,
-title? }[]` (a row's `tone` colours its value; its `title` is the key's tooltip; two rows may share
-a key), `label?` (the list's name when no heading gives one).
+title? }[]` (a row's `tone`, one of `Pill`'s seven, colours its value and adds a dot before it, as
+`Pill`'s, hidden from screen readers; one it does not know draws both in `--pb-muted`; its `title`
+is the key's tooltip; two rows may share a key), `label?` (the list's name when no heading gives
+one). Under forced colours the dot keeps its shape in the system's text colour.
 
 ### Forms
 
@@ -199,6 +225,11 @@ inspector"), `edge?: "start" | "end"` (which edge of the pane it sits on, `start
   to `min`, End to `max`. Keys with Ctrl, Alt or Meta are left alone.
 - **Pointer:** the main button drags it, with pointer capture; it takes the focus and has
   `data-dragging` while dragging.
+- **Look:** transparent until hovered, focused or dragged, when the bar fills in the accent. Focus
+  also draws the 2 px accent ring, 1 px clear of the bar ([U1](ux-rules.md#focus-and-keyboard)).
+  On touch, where nothing hovers, it draws its grip at rest: a 4 by 32 px bar in
+  `--pb-line-strong` across its middle, gone while it fills
+  ([F40](foundations.md#density-and-touch)).
 - It sits absolutely on one edge of its positioned parent, placed with logical properties
   (`inset-inline-start`, `inset-block-end`). The bar is 6 px; on touch its hit area is 36 px.
 
@@ -263,20 +294,25 @@ stylesheet too. Their own words come through `labels`, as the primitives' do ([r
 
 **`Banner`**: a line of news across a pane or page (a conflict, a lost connection, a refused edit),
 on a raised surface with a stripe in its tone at the start (warn and err on their soft surfaces).
-`tone: "ok" | "warn" | "err" | "quiet" | "off"` (open; one it does not know keeps a plain stripe),
+`tone` ([`Pill`](#state)'s seven tones; open: one it does not know has its stripe in `--pb-line-strong`),
 `children` (the news), `actions?` (a slot at its end: the buttons that act on it), `onDismiss?`
 (shows a close button that calls it), `labels?` (its words, [rule 8](#rules-every-component-keeps):
 `dismiss`, the close button's name, "Dismiss"), plus native `div` props.
 
-- An `err` banner is `role="alert"`, read at once; every other tone is `role="status"`, read when
-  the screen reader is free. The role is the banner's own.
-- The words wrap and the actions drop under them in a narrow pane. The close button is an
-  `IconButton`, so it keeps a 36 px target on touch.
+- **What is read:** two visually hidden live regions inside the banner, a `role="status"` and a
+  `role="alert"`, drawn empty when it mounts and given its words in the next commit, so a banner
+  mounted with its words is read ([U42](ux-rules.md#feedback)). An `err` banner's words are in the
+  alert, read at once; every other tone's in the status, read when the screen reader is free. A
+  change of words is read in its region, and a change of tone moves them to the other. The banner
+  itself is not a live region and takes no `role`.
+- The words wrap and the actions drop under them in a narrow pane. The close button is the
+  [`CloseGlyph`](#actions) on an `IconButton` named `labels.dismiss`, so it keeps a 36 px target on
+  touch.
 
 **`StatusWords`**: a short row of states, each a word in its tone, a dot between each two (a pane's
-"2 errors · 1 warning · saved"). `items: { tone, label, title? }[]` (tones `"ok" | "warn" | "err" |
-"quiet" | "off"`, open), drawn in the order given, which is most urgent first, plus native `ul`
-props (name it with `aria-label`).
+"2 errors · 1 warning · saved"). `items: { tone, label, title? }[]` (`Pill`'s seven tones, open:
+one it does not know in `--pb-muted`), drawn in the order given, which is most urgent first, plus native `ul` props (name it with
+`aria-label`).
 
 - The list is one `aria-live="polite"` region (an app may pass another `aria-live`), so a screen
   reader reads a change when it is free; it stays in the page while empty, ready for the next
@@ -286,8 +322,8 @@ props (name it with `aria-label`).
 a saved file), each on a raised, shadowed surface with a stripe in its tone at the start, as
 `Banner`'s. The queue is the app's ([`useToasts`](#usetoasts) holds one, and its `toasterProps`
 are this component's props): `toasts: { id, tone, text, count?, action? }[]` (the shown ones,
-oldest first; tones `"ok" | "warn" | "err" | "quiet" | "off"`, open, one it does not know drawn
-with a plain stripe; `text` any node; `action: { label, run }`), `more?` (how many older ones are
+oldest first; `Pill`'s seven tones, open, one it does not know drawn
+with its stripe in `--pb-line-strong`; `text` any node; `action: { label, run }`), `more?` (how many older ones are
 folded away), `onDismiss(id)`, `onHold?(held)`, `placement?`, `labels?` (its words, [rule
 8](#rules-every-component-keeps): `region`, the region's name, "Notifications", which an
 `aria-label` the app gives replaces; `dismiss`, "Dismiss"; `more(more)`, "and n more";
@@ -302,8 +338,9 @@ folded away), `onDismiss(id)`, `onHold?(held)`, `placement?`, `labels?` (its wor
   and the container's width less the gutters on a phone. It draws nothing with no toasts but its
   two empty live regions, so keep it mounted.
 - **Each toast** says its text, then `×n` when it was shown n times (read as ", n times"), then
-  its action (a press runs it and dismisses the toast) and a Dismiss button, which the text
-  describes, so several read apart.
+  its action (a press runs it and dismisses the toast) and its Dismiss button, the
+  [`CloseGlyph`](#actions) on an `IconButton` named `labels.dismiss` (also its tooltip), which the
+  text describes, so several read apart.
 - **What is read:** two visually hidden live regions beside the stack, there before any toast
   ([U42](ux-rules.md#feedback)), say each toast's text (and ", n times") when
   it first shows and again when its count goes up, without its buttons: an `err` toast's in a
@@ -318,7 +355,7 @@ folded away), `onDismiss(id)`, `onHold?(held)`, `placement?`, `labels?` (its wor
   not passed on (so a sheet or dialog behind it stays open). After a toast that held the focus is
   dismissed, the focus moves to the toast beside it, or back to where it came from into the stack
   when none is left.
-- The buttons are `Button`s, so they keep a 36 px target on touch. A toast rises in over
+- The action is a `Button` and Dismiss an `IconButton`, so both keep a 36 px target on touch. A toast rises in over
   `--pb-motion-slow`, still under reduced motion; under forced colours the stripe stays, in the
   system's text colour.
 
@@ -337,12 +374,16 @@ none by default) and `className?`.
   second line (what the command does, or what it acts on), shown but not matched. A `disabled`
   command is listed, dimmed and `aria-disabled`; the keys skip it and a press on it does nothing.
   An option's name is its words as shown: the label, the hint and the keys.
+- **Long rows.** A label or hint too long for its row ends in an ellipsis at rest, and the active
+  row writes both out whole, wrapping, so the keyboard reads a cut row by moving to it
+  ([F20](foundations.md#type)); on touch every row is written out, as a tap runs a row without
+  making it active first.
 - **Matching.** The query matches a label when its letters appear in it in order, in any case,
   white space ignored ("adn" matches "Add a node"). The best way the letters can be found is kept:
   the label's start and the start of a word (after a space or a mark, or a capital after a small
   letter) score more, letters together score more, gaps and a late start less. Each group's
   matches go best first and the groups by their best, ties in the order given; the matched letters
-  are drawn in `<mark>`, in the accent and bold (underlined under forced colours), so a match never
+  are drawn in `<mark>`, in the accent at weight 600 (underlined under forced colours), so a match never
   rests on colour alone. An empty query lists every command as given. `rankCommands(commands,
   query)`, `matchSubsequence(text, query)` and `markRuns(label, indices)` are the same steps,
   exported and pure.
@@ -435,7 +476,10 @@ props.
   units (a tab is one); a line past the end is read as the last. Each line a diagnostic names gets
   a mark in the gutter by its worst severity: a circle in `--pb-err` for `error`, a diamond in
   `--pb-warn` for `warning`, and a ring in `--pb-muted` for any other severity, so the severity
-  never rests on colour alone; the mark's tooltip lists the line's diagnostics. Under the text a
+  never rests on colour alone; the mark's tooltip lists the line's diagnostics, a convenience: the
+  same words are read in the textarea's description (below) and listed under the box by
+  `DiagnosticList` (below), each row putting the caret at its place
+  ([patterns](patterns.md#editing-text), [U47](ux-rules.md#feedback)). Under the text a
   wavy line in the same tone runs from the column to the end of the word there (one character on
   white space), or under the line's text when there is no column; where marks overlap, error
   wins over warning over any other. A press on a gutter mark focuses the textarea and puts the
@@ -453,8 +497,9 @@ props.
   (`execCommand("insertText")`, the one way to keep the undo history, so Ctrl+Z takes an indent
   back), and by value where the browser has none. `tabEdit(text, start, end, indent, out)` is the
   rule, exported and pure.
-- **The caret.** `onCaret` is called when the caret moves (a key, a press, an edit, a gutter mark),
-  once per place, with its line and column (from 1) and offset; the caret is the selection's
+- **The caret.** `onCaret` is called when the caret moves (a key, a press, an edit, a gutter mark,
+  or code that moves the selection, as a `DiagnosticList` row: the textarea's own `selectionchange`
+  and `select` events count while it has the focus), once per place, with its line and column (from 1) and offset; the caret is the selection's
   moving end. `caretAt(text, offset)` and `offsetAt(text, line, column)` are the conversions, and
   `shownText`, `codeRuns`, `gutterRows` and `markLevel` the other steps, exported and pure.
 - **The gutter** numbers every line in `--pb-muted` on `--pb-sunken`, as wide as the widest
@@ -464,11 +509,69 @@ props.
   pointer shortcut; the keyboard reaches each diagnostic by its line and column. It does not
   animate, so there is nothing to stop under reduced motion.
 
+**`DiagnosticList`**: an editor's diagnostics listed in words, for under the box (where it sits is the
+app's layout). `diagnostics` (the `CodeDiagnostic`s the app gives `CodeEditor`, listed in the order
+given), `editor?` (a ref to the editor's textarea: the `ref` given to `CodeEditor`), `onGo?(diagnostic)`
+(after a row's press, as when the app must first show the editor), `labels?` (its words, [rule
+8](#rules-every-component-keeps): `diagnostic(d)`, a row's words, CodeEditor's own by default, "Line 3,
+column 5: error E1: message", so a row reads as the mark's tooltip and the editor's description do;
+`count(n)`, "No problems", "1 problem", "n problems"; `defaultDiagnosticListLabels`), plus native
+`div` props.
+
+- **Rows.** Each diagnostic is a `<button>` in a list named by the count, its words written out whole
+  and wrapping, after a mark of its severity in the gutter's shapes and tones (a circle in `--pb-err`
+  for `error`, a diamond in `--pb-warn` for `warning`, a ring in `--pb-muted` for any other), hidden
+  from screen readers as the words say the severity. A press (or Enter or Space) focuses the
+  editor's textarea and puts the caret at the diagnostic's line and column (`offsetAt`; the line's
+  start without a column), as a press on its gutter mark does, and then calls `onGo`.
+- **The count** is a `role="status"` line, there from the start, so a new check's count is read
+  politely ([U34](ux-rules.md#states), [U42](ux-rules.md#feedback)); with no diagnostics it says `labels.count(0)` and there
+  is no list.
+- **Look:** `--pb-text-sm` words, a row's face `--pb-sunken` on hover, the 2 px focus ring; on touch
+  each row is at least 36 px tall with 16 px words. Its stylesheet's logical paddings and `text-align:
+  start` put the mark at the inline start in right-to-left text. Hover changes over
+  `--pb-motion-fast`. Under forced colours the marks keep their shapes in `CanvasText`.
+
 **`CodeText`**: read-only highlighted text, in code type on the read-only code surface. `value`,
 `language?: "knobly"`, `highlight?` (highlighted as `CodeEditor` is, `highlight` winning), plus
 native `pre` props (`ref` included; name it with `aria-label` where no heading does). CRLF reads as
 LF; lines are kept as written, and a wide one scrolls sideways; the box is a tab stop, so it
 scrolls from the keyboard too. It has no words of its own, so no `labels`.
+
+### Queued changes
+
+**`ChangeList`**: the changes an app holds until a save, listed in words
+([patterns](patterns.md#saving-or-queuing-changes)). `changes: { id, change, label, detail?, refused?
+}[]` (in the order the app holds them, the newest last; `change` is `"added" | "removed" | "renamed" |
+"changed"`, open; `label` and `detail` any node, the app's words for what changes; `refused` a check's
+reason, a string), `onDrop?(id)` (each row's drop button; without it there is none), `actions?` (a slot
+at the head's far end: the app's Check, Save and Discard), `labels?` (its words, [rule
+8](#rules-every-component-keeps): `added`, `removed`, `renamed`, `changed`, the Badge's words; `count(n)`,
+"No changes", "1 change", "n changes"; `drop`, "Drop"; `refused(reason)`, "Refused: " and the reason;
+`defaultChangeListLabels`), plus native `section` props.
+
+- **Rows.** Each change is a list item: a [`Badge`](#state) in its change's tone with its word (a change
+  it does not know is drawn neutrally, by its own word), then its `label`, its `detail` in `--pb-muted`
+  and `--pb-text-sm`, and, for a refused change, `labels.refused(reason)` in `--pb-err` with an
+  `--pb-err` stripe at the row's inline start, so the change at fault is marked in words as on the
+  canvas ([U58](ux-rules.md#live-pending-queued-refused)). The drop button, a small neutral `Button` at
+  the inline end, is described by the row's words, so several read apart; it asks `onDrop` with the id,
+  and the app takes the change out of its queue.
+- **The count** is a `role="status"` line, there from the start (the section's name, unless the app
+  names it), so a change of count is read politely ([U34](ux-rules.md#states),
+  [U42](ux-rules.md#feedback)); with no changes it says `labels.count(0)` and there is no list.
+- **The queue is the app's,** and holds only the net change ([U50](ux-rules.md#confirmation-and-undo)):
+  the list draws the changes it is given. Queuing the reverse of a queued change drops that change
+  rather than adding a second: removing a node added in the queue drops the add (and any change to
+  it); adding back a node removed in the queue drops the removal; renaming back to the name the
+  source holds drops the rename; setting a value back to the source's drops the change. A change to
+  something added in the queue folds into the add, which stays `added` with the new settings. Mod+Z
+  drops the last change ([U18](ux-rules.md#focus-and-keyboard)), and Discard drops them all. Save is
+  unavailable while a check refuses ([U6](ux-rules.md#focus-and-keyboard)).
+- **Look:** rows edged by `--pb-line` between them; on touch each drop button is at least 36 px tall,
+  as a `Button` is. Its paddings and the stripe are logical, so in right-to-left text the Badge is at
+  the right and Drop at the left. It does not animate. Under forced colours a refused row's stripe is
+  in `CanvasText`.
 
 ## Shell (`/shell`)
 
@@ -535,8 +638,13 @@ is a [`Sheet`](#overlays) over the canvas's inline end (the left in right-to-lef
 wide inspector is too), `width` px wide (and 48 px short of the canvas); below 600 px it rises from
 the bottom, at most 62 % of the workspace. The sheet is named by the inspector's `title`, or by
 `labels.inspector` without one, and has no splitter; its close button and Escape inside it call
-`onOpen(false)`. Moving between widths draws the inspector's `content` afresh (it moves between the
-region and the sheet), so state it must keep belongs to the app. The root has `data-layout` (`wide`,
+`onOpen(false)`. Moving between widths keeps the inspector's `content` mounted: it is drawn once, into
+an element of its own that moves between the region and the sheet, so what it holds (a draft, a
+caret) survives the window crossing a width, and a focus inside it stays there. It is mounted while
+the inspector is open, as before; closing the inspector still unmounts it. Its events reach React
+through the shell rather than through the sheet around it, so the shell takes the sheet's Escape
+inside it itself, by the same rule (a press already handled, or inside a composition, is left
+alone). The root has `data-layout` (`wide`,
 `narrow` or `phone`) for the app's own stylesheet.
 
 **Escape.** The shell's only Escape is the inspector sheet's, and it acts while the focus is in the
@@ -644,7 +752,11 @@ With no window to ask (on a server, before hydration, or with no `matchMedia`) i
 not touch.
 
 `narrowBelow` (760), `phoneBelow` (600), `mediaQueries` (the three queries, for an app's own
-stylesheet or `matchMedia`), `widthOf(px)` and `readBreakpoint()` are exported too.
+stylesheet or `matchMedia`), `widthOf(px)` and `readBreakpoint()` are exported too. The queries
+are the one source of the widths: `(max-width: 759.98px)` and `(max-width: 599.98px)`, so a
+window a fraction of a pixel under a width is below it, as `widthOf` says. patchbay's stylesheets
+write them exactly, and `useMediaBreakpoint.test.tsx` fails on a stylesheet with any other width
+or touch query; an app's own stylesheet writes them from `mediaQueries` too.
 
 ### `useLiveValue`
 

@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, fn } from "storybook/test";
+import { expect, fn, waitFor } from "storybook/test";
 import { Button } from "../../primitives/button";
+import { tokenColor } from "../../test/token-color";
 import { Banner } from "./Banner";
 
 const meta = {
@@ -8,33 +9,46 @@ const meta = {
   component: Banner,
   args: { tone: "warn", children: "The file changed on disk since it was opened." },
   argTypes: {
-    tone: { control: "select", options: ["ok", "warn", "err", "quiet", "off", "unknown-tone"] },
+    tone: { control: "select", options: ["ok", "warn", "err", "quiet", "off", "accent", "muted", "unknown-tone"] },
   },
 } satisfies Meta<typeof Banner>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+/** Read when the reader is free: its words go into its hidden status region once that region is there. */
 export const Warn: Story = {
   play: async ({ canvas }) => {
-    await expect(canvas.getByRole("status")).toHaveTextContent("The file changed on disk");
+    await waitFor(() => expect(canvas.getByRole("status")).toHaveTextContent("The file changed on disk"));
+    await expect(canvas.getByRole("alert")).toBeEmptyDOMElement();
   },
 };
 
-/** An error is an alert, read at once. */
+/** An error is read at once, from its hidden alert region. */
 export const Err: Story = {
   args: { tone: "err", children: "The connection was lost." },
   play: async ({ canvas }) => {
-    await expect(canvas.getByRole("alert")).toHaveTextContent("The connection was lost.");
+    await waitFor(() => expect(canvas.getByRole("alert")).toHaveTextContent("The connection was lost."));
+    await expect(canvas.getByRole("status")).toBeEmptyDOMElement();
   },
 };
 
 export const Ok: Story = { args: { tone: "ok", children: "Saved." } };
 export const Quiet: Story = { args: { tone: "quiet", children: "Reconnecting…" } };
 export const Off: Story = { args: { tone: "off", children: "The service is stopped." } };
+export const Accent: Story = { args: { tone: "accent", children: "Showing your own changes only." } };
+export const Muted: Story = { args: { tone: "muted", children: "This view has no live values." } };
 
-/** A tone the banner does not know: drawn neutrally. */
-export const UnknownTone: Story = { args: { tone: "sleeping", children: "Nothing has run for an hour." } };
+/** A tone the banner does not know: drawn neutrally, its stripe in line-strong. */
+export const UnknownTone: Story = {
+  args: { tone: "sleeping", children: "Nothing has run for an hour." },
+  play: async ({ canvasElement }) => {
+    const box = canvasElement.querySelector(".pb-banner");
+    if (box === null) throw new Error("no banner");
+    const banner = getComputedStyle(box);
+    await expect(banner.borderInlineStartColor).toBe(tokenColor(canvasElement, "line-strong"));
+  },
+};
 
 /** The app's buttons at its end. */
 export const WithActions: Story = {
@@ -86,7 +100,7 @@ export const Narrow: Story = {
 export const All: Story = {
   render: (args) => (
     <div style={{ display: "grid", gap: "8px" }}>
-      {["ok", "warn", "err", "quiet", "off", "sleeping"].map((tone) => (
+      {["ok", "warn", "err", "quiet", "off", "accent", "muted", "sleeping"].map((tone) => (
         <Banner key={tone} {...args} tone={tone} actions={<Button size="sm">Act</Button>} onDismiss={() => {}}>
           A {tone} banner.
         </Banner>

@@ -111,6 +111,15 @@
   flex: 1 1 auto;
 }
 
+/* The inspector's content is drawn once into an element of its own, which moves between the region and the sheet as
+   the window crosses a width (AppShell.tsx). The slot it moves into, that element and the wrapper inside it draw no box
+   of their own, so the content lays out as the body's own child. */
+.pb-shell-inspector-slot,
+.pb-shell-inspector-content,
+.pb-shell-inspector-events {
+  display: contents;
+}
+
 /* The drawer: its header always, its body while open; its splitter on its top edge. */
 .pb-shell-drawer {
   position: relative;

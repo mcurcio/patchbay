@@ -1,6 +1,7 @@
 import { Canvas, Meta } from "@storybook/addon-docs/blocks";
 import * as AddAtStories from "../graph/add-at/useAddAt.stories";
-import * as ButtonStories from "../primitives/button/Button.stories";
+import * as EmptyCanvasHintStories from "../graph/empty-canvas-hint/EmptyCanvasHint.stories";
+import * as GhostNodeStories from "../graph/ghost-node/GhostNode.stories";
 import * as CommandPaletteStories from "../composites/command-palette/CommandPalette.stories";
 
 <Meta title="Patterns/Adding a node" />
@@ -21,6 +22,10 @@ an app opens the palette:
 
 <Canvas of={AddAtStories.All} />
 
+On an empty canvas, the hint says how to add, and goes with the first node:
+
+<Canvas of={EmptyCanvasHintStories.Empty} />
+
 ## Picking a type
 
 The palette opened at the point, `at`:
@@ -29,11 +34,7 @@ The palette opened at the point, `at`:
 
 ## Adding
 
-The form's Add button is busy while the request is out:
+The form's Add button is busy while the request is out, and a ghost stands at the point in the room
+the node will take, until the source answers:
 
-<Canvas of={ButtonStories.BusyLabel} />
-
-## Not built yet
-
-- A ghost NodeBox at the point while the add is pending: `pb-nx9.82`.
-- An empty-canvas hint saying how to add: `pb-nx9.87`.
+<Canvas of={GhostNodeStories.Asking} />

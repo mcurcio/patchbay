@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
@@ -145,6 +145,27 @@ describe("Dialog", () => {
     expect(scrim).not.toBeNull();
     if (scrim !== null) await user.click(scrim);
     expect(onClose).toHaveBeenCalledTimes(3);
+  });
+
+  it("leaves an Escape inside an input method's composition to the input method, and still holds Tab", () => {
+    const onClose = vi.fn();
+    render(
+      <Dialog open onClose={onClose} title="T">
+        <input aria-label="Name" />
+      </Dialog>,
+    );
+    const name = screen.getByRole("textbox", { name: "Name" });
+    expect(fireEvent.keyDown(name, { key: "Escape", isComposing: true })).toBe(true);
+    expect(onClose).not.toHaveBeenCalled();
+    // Shift+Tab from the first control (the close button) during a composition still comes round to the last, not out
+    // of the modal.
+    const close = screen.getByRole("button", { name: "Close" });
+    close.focus();
+    expect(fireEvent.keyDown(close, { key: "Tab", shiftKey: true, isComposing: true })).toBe(false);
+    expect(screen.getByRole("dialog").contains(document.activeElement)).toBe(true);
+    expect(close).not.toHaveFocus();
+    fireEvent.keyDown(name, { key: "Escape" });
+    expect(onClose).toHaveBeenCalledOnce();
   });
 
   it("keeps Escape from the page behind it", async () => {

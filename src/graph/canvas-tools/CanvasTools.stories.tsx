@@ -3,7 +3,7 @@ import "@xyflow/react/dist/style.css";
 import { ReactFlow, ReactFlowProvider } from "@xyflow/react";
 import { useState } from "react";
 import { expect, fn, waitFor } from "storybook/test";
-import { IconButton } from "../../primitives";
+import { Glyph, IconButton } from "../../primitives";
 import { type BoxNode, storyNodeTypes } from "../../test/story-canvas";
 import { CanvasTools, type CanvasToolsProps } from "./CanvasTools";
 
@@ -104,9 +104,9 @@ export const Plain: Story = {
         <ReactFlow defaultNodes={nodes} nodeTypes={storyNodeTypes} defaultViewport={{ x: 24, y: 24, zoom: 1 }}>
           <CanvasTools position="top-right" labels={args.labels}>
             <IconButton label="Lock the view">
-              <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
-                <path d="M4 7h8v6H4zM6 7V5a2 2 0 0 1 4 0v2" fill="none" stroke="currentColor" strokeWidth="1.5" />
-              </svg>
+              <Glyph>
+                <path d="M4 7h8v6H4zM6 7V5a2 2 0 0 1 4 0v2" />
+              </Glyph>
             </IconButton>
           </CanvasTools>
         </ReactFlow>

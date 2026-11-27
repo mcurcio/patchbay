@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, within } from "storybook/test";
+import { tokenColor } from "../../test/token-color";
 import { Pill } from "./Pill";
 
 const meta = {
@@ -22,8 +23,14 @@ export const Off: Story = { args: { tone: "off", label: "stopped" } };
 export const Accent: Story = { args: { tone: "accent", label: "reconfiguring" } };
 export const Muted: Story = { args: { tone: "muted", label: "offline" } };
 
-/** A tone the pill does not know: drawn neutrally, by its own word. */
-export const UnknownTone: Story = { args: { tone: "sleeping", label: "sleeping" } };
+/** A tone the pill does not know: drawn neutrally, by its own word, its dot and word muted. */
+export const UnknownTone: Story = {
+  args: { tone: "sleeping", label: "sleeping" },
+  play: async ({ canvasElement }) => {
+    const pill = within(canvasElement).getByText("sleeping");
+    await expect(getComputedStyle(pill).color).toBe(tokenColor(canvasElement, "muted"));
+  },
+};
 
 /** The dot pulses while a state is on its way; the word stays still. */
 export const Pulsing: Story = {
@@ -39,6 +46,28 @@ export const WithDetail: Story = {
   play: async ({ canvasElement }) => {
     const detail = within(canvasElement).getByText("E_GONE");
     await expect(detail.tagName).toBe("CODE");
+  },
+};
+
+/** Right-to-left text: the dot leads at the inline start, the right, with the narrower padding on its side. */
+export const RightToLeft: Story = {
+  args: { label: "قيد التشغيل" },
+  decorators: [
+    (Story) => (
+      <div dir="rtl">
+        <Story />
+      </div>
+    ),
+  ],
+  play: async ({ canvasElement }) => {
+    const pill = canvasElement.querySelector(".pb-pill");
+    const dot = canvasElement.querySelector(".pb-pill-dot");
+    if (pill === null || dot === null) throw new Error("no pill");
+    const box = pill.getBoundingClientRect();
+    const mark = dot.getBoundingClientRect();
+    await expect(mark.left - box.left).toBeGreaterThan(box.width / 2);
+    const style = getComputedStyle(pill);
+    await expect(parseFloat(style.paddingRight)).toBeLessThan(parseFloat(style.paddingLeft));
   },
 };
 

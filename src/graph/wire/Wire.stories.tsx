@@ -4,6 +4,7 @@ import { type Edge, ReactFlow, ReactFlowProvider } from "@xyflow/react";
 import { useEffect, useState } from "react";
 import { expect, waitFor } from "storybook/test";
 import { type BoxNode, StoryCanvas, storyNodeTypes } from "../../test/story-canvas";
+import { tokenColor } from "../../test/token-color";
 import { Wire, type WireData } from "./Wire";
 
 const edgeTypes = { wire: Wire };
@@ -58,8 +59,8 @@ const meta = {
         "muted",
         "added",
         "removed",
+        "renamed",
         "changed",
-        "pending",
         "refused",
       ],
     },
@@ -88,7 +89,7 @@ export const Plain: Story = {
 /** A tone: here the ok tone, as a signal that flows. */
 export const Tone: Story = { args: { tone: "ok" } };
 
-/** A tone it does not know is drawn as the plain wire. */
+/** A tone it does not know: the muted stroke. */
 export const UnknownTone: Story = {
   args: { tone: "maybe" },
   play: async ({ canvasElement }) => {
@@ -97,20 +98,36 @@ export const UnknownTone: Story = {
       if (found === null) throw new Error("no wire yet");
       return found;
     });
-    const plain = getComputedStyle(path).stroke;
-    const group = canvasElement.querySelector(".pb-wire");
-    await expect(group).toHaveAttribute("data-tone", "maybe");
-    // The same stroke as React Flow's edge colour, which tokens.css points at --pb-muted.
-    const probe = document.createElement("div");
-    probe.style.color = "var(--pb-muted)";
-    document.body.append(probe);
-    await expect(plain).toBe(getComputedStyle(probe).color);
-    probe.remove();
+    await expect(canvasElement.querySelector(".pb-wire")).toHaveAttribute("data-tone", "maybe");
+    await expect(getComputedStyle(path).stroke).toBe(tokenColor(canvasElement, "muted"));
   },
 };
 
-/** An edit not yet saved: dashed; a queued one also takes a change's tone. */
+/** A queued edit: a change's tone, dashed. */
 export const Dashed: Story = { args: { tone: "added", dashed: true } };
+
+const changes = ["added", "removed", "renamed", "changed"];
+
+/** Each change tone, a queued edit: always dashed, so it never rests on colour alone, with or without `dashed`. */
+export const Changes: Story = {
+  render: () => (
+    <StoryCanvas
+      height={240}
+      nodes={pair(changes.length)}
+      edges={changes.map((tone, index) => wire(index, { tone, label: tone }))}
+      edgeTypes={edgeTypes}
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    await waitFor(() => expect(canvasElement.querySelectorAll(".pb-wire-path")).toHaveLength(changes.length));
+    for (const path of canvasElement.querySelectorAll(".pb-wire-path")) {
+      await expect(getComputedStyle(path).strokeDasharray).not.toBe("none");
+    }
+  },
+};
+
+/** A refused or failed wire says why in words, here its label; a longer reason goes in the inspector. */
+export const Refused: Story = { args: { tone: "refused", dashed: true, label: "refused: types differ" } };
 
 /** Dots moving toward the input; under reduced motion they are not drawn. */
 export const Flow: Story = { args: { tone: "ok", flow: true, emphasis: 0.6 } };
@@ -183,6 +200,33 @@ export const Keyboard: Story = {
   },
 };
 
+/** Focused from the keyboard: a ring in the accent along the path, 2 px clear of it, while the stroke keeps its tone;
+ * selected as well, the stroke takes the accent and the ring stays, so the two looks are told apart. */
+export const Focused: Story = {
+  args: { tone: "ok" },
+  play: async ({ canvasElement, userEvent }) => {
+    const edge = await waitFor(() => {
+      const found = canvasElement.querySelector<SVGGElement>(".react-flow__edge");
+      if (found === null) throw new Error("no wire yet");
+      return found;
+    });
+    const path = canvasElement.querySelector(".pb-wire-path");
+    const ring = canvasElement.querySelector(".pb-wire-focus-ring");
+    if (path === null || ring === null) throw new Error("no wire paths");
+    // Read once: tokenColor draws a probe, and a waitFor that drew one would wake itself on its own change.
+    const accent = tokenColor(canvasElement, "accent");
+    await expect(getComputedStyle(ring).visibility).toBe("hidden");
+    edge.focus();
+    await expect(edge.matches(":focus-visible")).toBe(true);
+    await expect(getComputedStyle(ring).visibility).toBe("visible");
+    await expect(getComputedStyle(ring).stroke).toBe(accent);
+    await expect(getComputedStyle(path).stroke).toBe(tokenColor(canvasElement, "ok"));
+    await userEvent.keyboard("{Enter}");
+    await waitFor(() => expect(getComputedStyle(path).stroke).toBe(accent));
+    await expect(getComputedStyle(ring).visibility).toBe("visible");
+  },
+};
+
 const levels = [0, 0.25, 0.5, 0.75, 1];
 
 /** Levels from silent to full: 1.5 px to 3.5 px, dim to bright. */
@@ -215,8 +259,8 @@ const looks: WireData[] = [
   { tone: "muted" },
   { tone: "added", dashed: true, label: "added" },
   { tone: "removed", dashed: true, label: "removed" },
+  { tone: "renamed", dashed: true, label: "renamed" },
   { tone: "changed", dashed: true, label: "changed" },
-  { tone: "pending", dashed: true },
   { tone: "refused", label: "refused" },
   { tone: "maybe" },
 ];

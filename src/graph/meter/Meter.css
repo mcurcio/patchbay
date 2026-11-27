@@ -27,7 +27,9 @@
   border-radius: 0;
 }
 
-/* The bar covers the whole track in its three zones and is clipped to the level, so each zone keeps its place. */
+/* The bar covers the whole track in its three zones and is clipped to the level, so each zone keeps its place. A
+   horizontal bar fills from the inline start, the right in right-to-left text, with the lamp at the inline end (the
+   row's order does that); docs/ux-rules.md#right-to-left, U72. */
 .pb-meter-bar {
   position: absolute;
   inset: 0;
@@ -40,11 +42,21 @@
   clip-path: inset(0 calc((1 - var(--pb-meter-level)) * 100%) 0 0);
 }
 
+.pb-meter:not([data-orientation="vertical"]):dir(rtl) .pb-meter-bar {
+  background: linear-gradient(
+    to left,
+    var(--pb-meter-low) calc(var(--pb-meter-mid-at) * 100%),
+    var(--pb-meter-mid) 0 calc(var(--pb-meter-hot-at) * 100%),
+    var(--pb-meter-hot) 0
+  );
+  clip-path: inset(0 0 0 calc((1 - var(--pb-meter-level)) * 100%));
+}
+
 .pb-meter-peak {
   position: absolute;
   top: 0;
   bottom: 0;
-  left: calc(var(--pb-meter-tick) * (100% - 2px));
+  inset-inline-start: calc(var(--pb-meter-tick) * (100% - 2px));
   width: 2px;
   background: var(--pb-meter-peak);
 }
@@ -85,9 +97,8 @@
 
 .pb-meter[data-orientation="vertical"] .pb-meter-peak {
   top: auto;
-  right: 0;
   bottom: calc(var(--pb-meter-tick) * (100% - 2px));
-  left: 0;
+  inset-inline: 0;
   width: auto;
   height: 2px;
 }
@@ -104,7 +115,8 @@
   }
 
   .pb-meter-bar,
-  .pb-meter[data-orientation="vertical"] .pb-meter-bar {
+  .pb-meter[data-orientation="vertical"] .pb-meter-bar,
+  .pb-meter:not([data-orientation="vertical"]):dir(rtl) .pb-meter-bar {
     forced-color-adjust: none;
     background: Highlight;
   }

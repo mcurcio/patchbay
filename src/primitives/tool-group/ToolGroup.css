@@ -21,7 +21,8 @@
   margin: 0;
   padding: 0;
   font-family: var(--pb-font-ui);
-  font-size: 15px;
+  /* A text glyph fills the one glyph box, as an SVG Glyph does (docs/foundations.md#glyphs, F50). */
+  font-size: 16px;
   line-height: 1;
   color: var(--pb-text);
   background: transparent;

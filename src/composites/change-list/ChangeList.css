@@ -1,0 +1,91 @@
+/* The queued changes (ChangeList.tsx): a head of the count and the app's actions, then one row per change: its Badge,
+   its words (the label, a quieter detail, a refusal's reason in the error tone) and its drop button at the inline end.
+   A refused row also has an error-tone stripe at its inline start, so the mark never rests on the words' colour alone:
+   the reason says it. It sets its own box and type; the Badge and the Button draw themselves. */
+.pb-change-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pb-space-2);
+  font-family: var(--pb-font-ui);
+  font-size: var(--pb-text-md);
+  color: var(--pb-text);
+}
+
+.pb-change-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pb-space-2) var(--pb-space-3);
+}
+
+.pb-change-count {
+  flex: 1 1 auto;
+  margin: 0;
+  font-size: var(--pb-text-sm);
+  color: var(--pb-muted);
+}
+
+.pb-change-actions {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pb-space-2);
+}
+
+.pb-change-rows {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pb-change-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--pb-space-2);
+  padding-block: var(--pb-space-1);
+  padding-inline: var(--pb-space-2);
+  border-inline-start: 2px solid transparent;
+}
+
+.pb-change-row + .pb-change-row {
+  border-top: 1px solid var(--pb-line);
+}
+
+.pb-change-row[data-refused] {
+  border-inline-start-color: var(--pb-err);
+}
+
+.pb-change-row > .pb-badge {
+  flex: none;
+}
+
+.pb-change-words {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.pb-change-detail {
+  font-size: var(--pb-text-sm);
+  color: var(--pb-muted);
+}
+
+.pb-change-refused {
+  font-size: var(--pb-text-sm);
+  color: var(--pb-err);
+}
+
+.pb-button.pb-change-drop {
+  flex: none;
+  align-self: center;
+}
+
+/* Forced colours: a refused row's stripe stays, in the system's text colour. */
+@media (forced-colors: active) {
+  .pb-change-row[data-refused] {
+    border-inline-start-color: CanvasText;
+  }
+}

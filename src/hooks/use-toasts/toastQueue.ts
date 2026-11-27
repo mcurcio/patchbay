@@ -6,7 +6,7 @@
 import type { ReactNode } from "react";
 
 /** The tones a toast is drawn in; any other string is drawn neutrally. An `err` toast is an alert, the rest status. */
-export type ToastTone = "ok" | "warn" | "err" | "quiet" | "off" | (string & {});
+export type ToastTone = "ok" | "warn" | "err" | "quiet" | "off" | "accent" | "muted" | (string & {});
 
 /** A button on a toast that acts on its news. Pressing it runs `run`, then dismisses the toast. */
 export type ToastAction = {

@@ -1,5 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, fn } from "storybook/test";
+import { expect, fn, waitFor } from "storybook/test";
+import { tokenColor } from "../../test/token-color";
+import { underTouch } from "../../test/touch-rules";
+import { CloseGlyph } from "./CloseGlyph";
 import { IconButton } from "./IconButton";
 
 const meta = {
@@ -24,13 +27,46 @@ export const Neutral: Story = {
   },
 };
 
+/**
+ * On a touch screen, where nothing hovers, it is a 36 px target with its line-strong edge at rest, so it can be found.
+ * A desktop browser matches no coarse pointer, so the story applies the page's touch rules while it measures.
+ */
+export const Touch: Story = {
+  play: async ({ canvas, canvasElement }) => {
+    const button = canvas.getByRole("button", { name: "Zoom in" });
+    // Read once: tokenColor draws a probe, and a waitFor that drew one would wake itself on its own change.
+    const edge = tokenColor(canvasElement, "line-strong");
+    await expect(getComputedStyle(button).borderTopColor).not.toBe(edge);
+    await underTouch(async () => {
+      await expect(button.getBoundingClientRect().width).toBe(36);
+      // The edge fades in over --pb-motion-fast.
+      await waitFor(() => expect(getComputedStyle(button).borderTopColor).toBe(edge));
+    });
+  },
+};
+
 export const Primary: Story = { args: { tone: "primary", label: "Add", children: "+" } };
 
 export const Danger: Story = { args: { tone: "danger", label: "Remove", children: "×" } };
 
 export const UnknownTone: Story = { args: { tone: "sparkly", label: "Unknown tone", children: "?" } };
 
-export const Small: Story = { args: { size: "sm", label: "Close", children: "×" } };
+export const Small: Story = { args: { size: "sm", label: "Close", children: <CloseGlyph /> } };
+
+/**
+ * The close glyph, `CloseGlyph`: the one look for Close (a dialog, a sheet, the inspector) and Dismiss (a banner, a
+ * toast), always on an IconButton named by the word (U30).
+ */
+export const Close: Story = {
+  args: { label: "Close", children: <CloseGlyph /> },
+  play: async ({ canvas }) => {
+    const button = canvas.getByRole("button", { name: "Close" });
+    await expect(button).toHaveAttribute("title", "Close");
+    const glyph = button.querySelector("svg.pb-close-glyph");
+    await expect(glyph).not.toBeNull();
+    await expect(glyph?.closest("[aria-hidden='true']")).not.toBeNull();
+  },
+};
 
 export const Pressed: Story = { args: { "aria-pressed": true, label: "Minimap", children: "▦" } };
 

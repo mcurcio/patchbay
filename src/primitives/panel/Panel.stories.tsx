@@ -58,6 +58,22 @@ export const LongTitle: Story = {
   },
 };
 
+/** Right-to-left text, actions and no title: the actions sit at the inline end, the left. */
+export const RightToLeft: Story = {
+  args: { title: undefined, "aria-label": "Details", actions: <IconButton label="Close">×</IconButton> },
+  render: (args) => (
+    <div dir="rtl" style={frame}>
+      <Panel {...args} style={{ flex: "1 1 auto" }} />
+    </div>
+  ),
+  play: async ({ canvas, canvasElement }) => {
+    const header = canvasElement.querySelector(".pb-panel-header")?.getBoundingClientRect();
+    if (header === undefined) throw new Error("no header");
+    const close = canvas.getByRole("button", { name: "Close" }).getBoundingClientRect();
+    await expect(close.left - header.left).toBeLessThan(header.width / 2);
+  },
+};
+
 /** No title: named by aria-label, with no header at all. */
 export const Untitled: Story = { args: { title: undefined, "aria-label": "Details" } };
 

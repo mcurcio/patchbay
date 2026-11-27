@@ -1,0 +1,45 @@
+/* The empty canvas's hint (EmptyCanvasHint.tsx): the app's words and the add gestures, resting on the canvas as the
+   status line does, but quieter: the gestures in the muted colour. It takes no pointer events, so a double-click on it
+   reaches the canvas. */
+.react-flow__panel.pb-empty-canvas {
+  box-sizing: border-box;
+  max-width: min(420px, calc(100% - 2 * var(--pb-space-4)));
+  margin-top: var(--pb-space-5);
+  padding: var(--pb-space-3) var(--pb-space-4);
+  font-family: var(--pb-font-ui);
+  font-size: var(--pb-text-md);
+  line-height: 1.4;
+  color: var(--pb-text);
+  text-align: center;
+  overflow-wrap: anywhere;
+  background: var(--pb-raised);
+  border: 1px solid var(--pb-line);
+  border-radius: var(--pb-radius-box);
+  box-shadow: var(--pb-shadow);
+  pointer-events: none;
+}
+
+.pb-empty-canvas-words > :first-child {
+  margin-top: 0;
+}
+
+.pb-empty-canvas-words > :last-child {
+  margin-bottom: 0;
+}
+
+.pb-empty-canvas-add {
+  margin: 0;
+  font-size: var(--pb-text-sm);
+  color: var(--pb-muted);
+}
+
+.pb-empty-canvas-words + .pb-empty-canvas-add {
+  margin-top: var(--pb-space-2);
+}
+
+/* Forced colours drop the surface and the shadow; the edge stays. */
+@media (forced-colors: active) {
+  .react-flow__panel.pb-empty-canvas {
+    border-color: CanvasText;
+  }
+}

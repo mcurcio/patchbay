@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import { useLayoutEffect } from "react";
 import { describe, expect, it } from "vitest";
 import { Spinner } from "./Spinner";
 import css from "./Spinner.css?raw";
@@ -22,6 +23,26 @@ describe("Spinner", () => {
     const status = screen.getByRole("status");
     expect(status).toHaveTextContent("Saving");
     expect(status).not.toHaveAttribute("aria-hidden");
+  });
+
+  it("has its region in the page, empty, in the commit that adds it, and its label in the next", () => {
+    const seen: (string | null)[] = [];
+    function Probe({ label }: { label?: string }) {
+      useLayoutEffect(() => {
+        seen.push(document.querySelector('[role="status"]')?.textContent ?? null);
+      });
+      return <Spinner label={label} />;
+    }
+    const { rerender } = render(<Probe label="Saving" />);
+    expect(seen[0]).toBe("");
+    expect(screen.getByRole("status")).toHaveTextContent("Saving");
+    // The label goes and comes back: the region comes back empty first, as on mounting.
+    rerender(<Probe />);
+    expect(screen.queryByRole("status")).toBeNull();
+    seen.length = 0;
+    rerender(<Probe label="Loading" />);
+    expect(seen[0]).toBe("");
+    expect(screen.getByRole("status")).toHaveTextContent("Loading");
   });
 
   it("passes native props and keeps its own class", () => {

@@ -101,6 +101,25 @@ export const Wide: Story = {
   ),
 };
 
+/** Right-to-left text: each line's change bar and its narrower padding at the inline start, the right. */
+export const RightToLeft: Story = {
+  args: { files: undefined, diff: config },
+  decorators: [
+    (Story) => (
+      <div dir="rtl">
+        <Story />
+      </div>
+    ),
+  ],
+  play: async ({ canvasElement }) => {
+    const line = canvasElement.querySelector('.pb-diff-line[data-kind="add"]');
+    if (line === null) throw new Error("no added line");
+    const style = getComputedStyle(line);
+    await expect(style.borderRightWidth).toBe("3px");
+    await expect(parseFloat(style.paddingRight)).toBeLessThan(parseFloat(style.paddingLeft));
+  },
+};
+
 /** No files: nothing to show. */
 export const Empty: Story = { args: { files: [] } };
 

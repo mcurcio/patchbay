@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect } from "storybook/test";
+import { expect, within } from "storybook/test";
+import { tokenColor } from "../../test/token-color";
 import { StatusWords } from "./StatusWords";
 
 const meta = {
@@ -33,7 +34,7 @@ export const One: Story = { args: { items: [{ tone: "ok", label: "saved" }] } };
 /** Nothing to say: an empty region, still live for the next change. */
 export const Empty: Story = { args: { items: [] } };
 
-/** A tone the words do not know: drawn neutrally. */
+/** A tone the words do not know: drawn neutrally, in muted words. */
 export const UnknownTone: Story = {
   args: {
     items: [
@@ -41,12 +42,16 @@ export const UnknownTone: Story = {
       { tone: "quiet", label: "connecting" },
     ],
   },
+  play: async ({ canvasElement }) => {
+    const word = within(canvasElement).getByText("sleeping");
+    await expect(getComputedStyle(word).color).toBe(tokenColor(canvasElement, "muted"));
+  },
 };
 
 /** Every tone together, for a glance under each brand and theme. */
 export const All: Story = {
   args: {
-    items: ["err", "warn", "ok", "quiet", "off", "sleeping"].map((tone) => ({ tone, label: tone })),
+    items: ["err", "warn", "ok", "quiet", "off", "accent", "muted", "sleeping"].map((tone) => ({ tone, label: tone })),
   },
 };
 

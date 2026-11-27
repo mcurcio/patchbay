@@ -1,9 +1,17 @@
 // CanvasTools inside React Flow's own canvas: the tools and their words, the optional tidy and minimap tools, the
 // minimap drawn with the app's node class, the fit tool's own fit or the app's, the zoom moving the view over
-// --pb-motion-slow (0 ms under reduced motion), the open panel position, one tab stop, and the stylesheet's rules.
+// --pb-motion-slow (0 ms under reduced motion), the person's view moves through the tools said through onViewMove, the
+// open panel position, one tab stop, and the stylesheet's rules.
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { type Node, ReactFlow, ReactFlowProvider, useViewport } from "@xyflow/react";
-import type { CSSProperties, ReactNode } from "react";
+import {
+  type Node,
+  ReactFlow,
+  ReactFlowProvider,
+  type ReactFlowInstance,
+  useReactFlow,
+  useViewport,
+} from "@xyflow/react";
+import { type CSSProperties, type ReactNode, useLayoutEffect } from "react";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { installFlowMeasuring } from "../../test/flow";
 import { CanvasTools, defaultCanvasToolsLabels } from "./CanvasTools";
@@ -20,6 +28,19 @@ const nodes: Node[] = [
 function Zoom() {
   const { zoom } = useViewport();
   return <output data-testid="zoom">{zoom}</output>;
+}
+
+/** Hands the test React Flow's instance, to move the view by code. */
+function Instance({ seen }: { seen: { current: ReactFlowInstance | null } }) {
+  const flow = useReactFlow();
+  useLayoutEffect(() => {
+    hand(seen, flow);
+  });
+  return null;
+}
+
+function hand(seen: { current: ReactFlowInstance | null }, flow: ReactFlowInstance) {
+  seen.current = flow;
 }
 
 /** The canvas with the tools as its child, the motion token at 0 ms so a zoom lands at once. */
@@ -185,6 +206,52 @@ describe("CanvasTools", () => {
     await waitFor(() => {
       expect(zoom()).toBeCloseTo(1);
     });
+  });
+
+  it("says a zoom tool's press as the person's view move, before it zooms", () => {
+    const onViewMove = vi.fn();
+    render(
+      <Canvas>
+        <CanvasTools onViewMove={onViewMove} />
+      </Canvas>,
+    );
+    fireEvent.click(button("Zoom in"));
+    fireEvent.click(button("Zoom out"));
+    expect(onViewMove).toHaveBeenCalledTimes(2);
+    fireEvent.click(button("Fit the view"));
+    expect(onViewMove).toHaveBeenCalledTimes(2);
+  });
+
+  it("says a move of the view during a press or a wheel on the minimap, and no other move by code", async () => {
+    const onViewMove = vi.fn();
+    const seen: { current: ReactFlowInstance | null } = { current: null };
+    const { container } = render(
+      <Canvas>
+        <CanvasTools minimap onViewMove={onViewMove} />
+        <Instance seen={seen} />
+      </Canvas>,
+    );
+    const minimap = container.querySelector(".pb-canvas-minimap");
+    if (minimap === null) throw new Error("no minimap");
+    const move = async (x: number) => {
+      await act(async () => {
+        await seen.current?.setViewport({ x, y: 0, zoom: 1 });
+      });
+    };
+    await move(10);
+    expect(onViewMove).not.toHaveBeenCalled();
+    fireEvent.pointerDown(minimap);
+    await move(20);
+    expect(onViewMove).toHaveBeenCalledOnce();
+    fireEvent.pointerUp(window);
+    await move(30);
+    expect(onViewMove).toHaveBeenCalledOnce();
+    fireEvent.wheel(minimap);
+    await move(40);
+    expect(onViewMove).toHaveBeenCalledTimes(2);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    await move(50);
+    expect(onViewMove).toHaveBeenCalledTimes(2);
   });
 
   it("draws the tools whatever the position, one it does not know too", () => {

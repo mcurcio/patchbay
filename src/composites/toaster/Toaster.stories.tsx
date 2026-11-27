@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
-import { expect, fn, waitFor } from "storybook/test";
+import { expect, fn, waitFor, within } from "storybook/test";
+import { tokenColor } from "../../test/token-color";
 import { type ToasterProps, type ToasterToast, Toaster } from "./Toaster";
 
 const toasts: ToasterToast[] = [
@@ -93,9 +94,13 @@ export const Labels: Story = {
   },
 };
 
-/** A tone it does not know: drawn with a plain stripe. */
+/** A tone it does not know: drawn neutrally, its stripe in line-strong. */
 export const UnknownTone: Story = {
   args: { toasts: [{ id: 1, tone: "sleeping", text: "Nothing has run for an hour." }] },
+  play: async ({ canvasElement }) => {
+    const toast = getComputedStyle(within(canvasElement).getByRole("listitem"));
+    await expect(toast.borderInlineStartColor).toBe(tokenColor(canvasElement, "line-strong"));
+  },
 };
 
 /** Inline, in the flow where the app put it: inside a canvas's own panel, say. */
@@ -161,7 +166,7 @@ export const Narrow: Story = {
 export const All: Story = {
   args: {
     more: 2,
-    toasts: ["ok", "warn", "err", "quiet", "off", "sleeping"].map((tone, index) => ({
+    toasts: ["ok", "warn", "err", "quiet", "off", "accent", "muted", "sleeping"].map((tone, index) => ({
       id: index + 1,
       tone,
       text: `A ${tone} toast.`,
@@ -170,7 +175,7 @@ export const All: Story = {
     })),
   },
   render: (args) => (
-    <div style={{ position: "relative", height: "560px" }}>
+    <div style={{ position: "relative", height: "720px" }}>
       <Toaster {...args} />
     </div>
   ),

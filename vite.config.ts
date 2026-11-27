@@ -98,10 +98,39 @@ function layersImportLayers(): Plugin {
   };
 }
 
+/**
+ * The browsers the stylesheets are written for (README.md#browsers): the oldest of each that has every selector and
+ * function they use, :dir() (Chromium 120, Safari 16.4), :has() (Firefox 121) and color-mix(). Below a browser that
+ * has :dir(), the build would rewrite it into a list of right-to-left :lang()s, which a page that sets dir="rtl" with
+ * another language does not match (docs/ux-rules.md#right-to-left, U70).
+ */
+const cssBrowsers = ["chrome120", "edge120", "firefox121", "safari16.4"];
+
+/**
+ * The build writes the stylesheets' selectors as they are: none of patchbay's stylesheets uses :lang(), so one in the
+ * built CSS is a :dir() the build lowered (cssBrowsers), and the build stops rather than ship it.
+ */
+function keepDirSelectors(): Plugin {
+  return {
+    name: "patchbay:keep-dir-selectors",
+    apply: "build",
+    generateBundle(_options, bundle) {
+      for (const file of Object.values(bundle)) {
+        if (file.type !== "asset" || !file.fileName.endsWith(".css")) continue;
+        const css = typeof file.source === "string" ? file.source : new TextDecoder().decode(file.source);
+        if (css.includes(":lang(")) {
+          this.error(`${file.fileName} has a :lang() selector: the build lowered a :dir(); see cssBrowsers`);
+        }
+      }
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [react(), copyStylesheets(), importOwnCss(), layersImportLayers()],
+  plugins: [react(), copyStylesheets(), importOwnCss(), layersImportLayers(), keepDirSelectors()],
   build: {
     target: "es2022",
+    cssTarget: cssBrowsers,
     sourcemap: true,
     cssCodeSplit: true,
     lib: {

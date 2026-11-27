@@ -379,7 +379,9 @@ export const StaleDraft: Story = {
     const box = canvas.getByRole("textbox", { name: "Step 1's text" });
     await userEvent.type(box, "# mine");
     await userEvent.click(canvas.getByRole("button", { name: "Change it underneath" }));
-    await expect(await canvas.findByText(/This text changed while you were editing it/)).toBeVisible();
+    await expect(
+      await canvas.findByText(/This text changed while you were editing it/, { selector: ".pb-banner-text" }),
+    ).toBeVisible();
     await expect(box).toHaveValue(`${first}# mine`);
     await userEvent.click(canvas.getByRole("button", { name: "Reload" }));
     await expect(box).toHaveValue(changed);
@@ -414,7 +416,9 @@ export const ReadOnlyGraph: Story = {
     </StoryCanvas>
   ),
   play: async ({ canvas, canvasElement }) => {
-    await expect(await canvas.findByText(/Read only: this graph is a saved copy/)).toBeVisible();
+    await expect(
+      await canvas.findByText(/Read only: this graph is a saved copy/, { selector: ".pb-banner-text" }),
+    ).toBeVisible();
     await found(canvasElement, ".react-flow__handle");
     await expect(canvasElement.querySelectorAll(".react-flow__handle.connectable")).toHaveLength(0);
     await expect(canvas.getByText("locked")).toHaveClass("pb-badge");

@@ -5,17 +5,8 @@
 // ask the app to close it; if the focus was inside when it closes, it goes back to where it came from. The sheet is
 // placed absolutely, so its container (the app's workspace) is positioned; the app holds open, and chooses the side
 // (the inline end below 760 px, the bottom below 600 px).
-import {
-  type FocusEvent,
-  type KeyboardEvent,
-  type ReactNode,
-  type CSSProperties,
-  useEffect,
-  useId,
-  useRef,
-} from "react";
-import { CloseGlyph } from "../dialog/CloseGlyph";
-import { IconButton } from "../icon-button";
+import { type KeyboardEvent, type ReactNode, type CSSProperties, useEffect, useId, useRef } from "react";
+import { CloseGlyph, IconButton } from "../icon-button";
 import "./Sheet.css";
 
 /**
@@ -75,7 +66,15 @@ function OpenSheet({
 
   useEffect(() => {
     const sheet = sheetRef.current;
+    // A native listener, so a focus anywhere inside the sheet's element counts, a portal's content moved into it as
+    // AppShell's inspector is included: React's own onFocus follows its tree, not the page's.
+    const onFocusIn = (event: FocusEvent) => {
+      const from = event.relatedTarget;
+      if (sheet !== null && from instanceof HTMLElement && !sheet.contains(from)) cameFrom.current = from;
+    };
+    sheet?.addEventListener("focusin", onFocusIn);
     return () => {
+      sheet?.removeEventListener("focusin", onFocusIn);
       const back = cameFrom.current;
       const active = document.activeElement;
       const held = active === null || active === document.body || (sheet?.contains(active) ?? false);
@@ -83,13 +82,10 @@ function OpenSheet({
     };
   }, []);
 
-  const onFocus = (event: FocusEvent<HTMLElement>) => {
-    const from = event.relatedTarget;
-    if (from instanceof HTMLElement && !event.currentTarget.contains(from)) cameFrom.current = from;
-  };
-
   const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
-    if (event.defaultPrevented || event.key !== "Escape") return;
+    // Not a press already handled, nor one inside an input method's composition (docs/ux-rules.md#focus-and-keyboard,
+    // U14).
+    if (event.defaultPrevented || event.nativeEvent.isComposing || event.key !== "Escape") return;
     event.preventDefault();
     event.stopPropagation();
     onClose();
@@ -106,7 +102,6 @@ function OpenSheet({
       aria-labelledby={title === undefined ? undefined : titleId}
       aria-label={title === undefined ? label : undefined}
       style={style}
-      onFocus={onFocus}
       onKeyDown={onKeyDown}
     >
       <div className="pb-sheet-head">

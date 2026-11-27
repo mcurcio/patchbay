@@ -8,7 +8,7 @@
 // beside it, or back to where it came from when none is left.
 import { type ComponentPropsWithRef, type ReactNode, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import type { ToastAction, ToastTone } from "../../hooks";
-import { Button } from "../../primitives";
+import { Button, CloseGlyph, IconButton } from "../../primitives";
 import "./Toaster.css";
 
 /** Where the stack sits; any other string is drawn inline. */
@@ -236,7 +236,8 @@ export function Toaster({
                 tabIndex={-1}
                 onKeyDown={(event) => {
                   // Escape here is the toast's alone, so a sheet or dialog behind it does not also close.
-                  if (event.key !== "Escape" || event.defaultPrevented) return;
+                  // Not a press already handled, nor one inside an input method's composition (U14).
+                  if (event.key !== "Escape" || event.defaultPrevented || event.nativeEvent.isComposing) return;
                   event.preventDefault();
                   event.stopPropagation();
                   dismiss(toast.id);
@@ -263,15 +264,17 @@ export function Toaster({
                       {toast.action.label}
                     </Button>
                   )}
-                  <Button
+                  <IconButton
+                    className="pb-toast-dismiss"
                     size="sm"
+                    label={words.dismiss}
                     aria-describedby={textId}
                     onClick={() => {
                       dismiss(toast.id);
                     }}
                   >
-                    {words.dismiss}
-                  </Button>
+                    <CloseGlyph />
+                  </IconButton>
                 </div>
               </li>
             );

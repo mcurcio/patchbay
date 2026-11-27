@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useRef, useState } from "react";
 import { expect, waitFor } from "storybook/test";
-import type { LiveSubscribe } from "../../hooks";
+import { type LiveSubscribe, useLiveValue } from "../../hooks";
 import { Button } from "../../primitives";
-import { Meter, type MeterHandle } from "./Meter";
+import { formatMeterDb, Meter, type MeterHandle, toDb } from "./Meter";
 
 type Level = readonly [peak: number, rms: number];
 
@@ -117,21 +117,93 @@ export const Vertical: Story = {
   ],
 };
 
+/** Where the drawn bar's clip leaves off and the lamp and tick sit, against the track's edges. */
+function parts(root: HTMLElement) {
+  const track = root.querySelector(".pb-meter-track");
+  const bar = root.querySelector(".pb-meter-bar");
+  const lamp = root.querySelector(".pb-meter-lamp");
+  const peak = root.querySelector(".pb-meter-peak");
+  if (track === null || bar === null || lamp === null || peak === null) throw new Error("no meter parts");
+  return {
+    track: track.getBoundingClientRect(),
+    bar,
+    lamp: lamp.getBoundingClientRect(),
+    peak: peak.getBoundingClientRect(),
+  };
+}
+
+/**
+ * Right-to-left text: a horizontal bar fills from the inline start, the right, its lamp at the inline end, the left;
+ * a vertical one still fills from the bottom.
+ */
+export const RightToLeft: Story = {
+  decorators: [
+    (Story) => (
+      <div dir="rtl">
+        <Story />
+      </div>
+    ),
+  ],
+  play: async ({ canvas, canvasElement }) => {
+    const meter = canvas.getByRole("img", { name: "Level" });
+    await waitFor(() => expect(Number(meter.style.getPropertyValue("--pb-meter-level"))).toBeCloseTo(0.7));
+    const { track, bar, lamp, peak } = parts(canvasElement);
+    await expect(lamp.right).toBeLessThanOrEqual(track.left);
+    // The clip takes the empty part off the left, the inline end; the RMS is 70 % of the bar, from the right.
+    await expect(getComputedStyle(bar).clipPath).toMatch(/^inset\(0px 0px 0px /);
+    // The tick, -12 dBFS (80 %), sits 80 % of the way along from the right.
+    await expect((track.right - peak.right) / (track.width - peak.width)).toBeCloseTo(0.8, 1);
+  },
+};
+
 /** An orientation it does not know is drawn horizontal. */
 export const UnknownOrientation: Story = { args: { orientation: "diagonal" } };
 
-/** The tooltip's words are the app's, through `labels`: here in the app's own phrasing. */
+/** The meter's own words are the app's, through `labels`: its default name and the tooltip, here in the app's own
+ * phrasing. A `label` (what the meter measures) wins over `labels.name`. */
 export const Labels: Story = {
   args: {
+    label: undefined,
     labels: {
+      name: "Signal level",
       title: (peak, rms, clipped) =>
         `${clipped ? "Clipped. " : ""}Peak ${peak.toFixed(0)} dBFS, average ${rms.toFixed(0)} dBFS`,
     },
   },
   play: async ({ canvas, userEvent }) => {
     const meter = canvas.getByRole("img");
+    await expect(meter).toHaveAccessibleName("Signal level");
     await userEvent.hover(meter);
     await expect(meter).toHaveAttribute("title", "Peak -12 dBFS, average -18 dBFS");
+  },
+};
+
+/**
+ * The numbers in words, as an app's inspector writes them beside the meter (U47): read from the same source through
+ * useLiveValue and painted into a text node, never through React state, with formatMeterDb so they read as the
+ * tooltip does.
+ */
+function NumbersDemo({ source }: { source: { subscribe: LiveSubscribe; read: () => Level } }) {
+  const words = useRef<HTMLSpanElement>(null);
+  useLiveValue(source.subscribe, source.read, ([peak, rms]) => {
+    if (words.current !== null) {
+      words.current.textContent = `Peak ${formatMeterDb(toDb(peak))} dB, RMS ${formatMeterDb(toDb(rms))} dB`;
+    }
+  });
+  return (
+    <div style={box}>
+      <Meter {...source} label="Left output" />
+      <p style={{ margin: "var(--pb-space-2) 0 0", fontSize: "var(--pb-text-sm)" }}>
+        <span ref={words} data-testid="numbers" />
+      </p>
+    </div>
+  );
+}
+
+export const NumbersInWords: Story = {
+  render: () => <NumbersDemo source={steady(-12, -18)} />,
+  play: async ({ canvas }) => {
+    await expect(canvas.getByTestId("numbers")).toHaveTextContent("Peak -12.0 dB, RMS -18.0 dB");
   },
 };
 

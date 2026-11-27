@@ -1,0 +1,108 @@
+/* The diagnostics listed under an editor (DiagnosticList.tsx): a count, then one row per diagnostic, each a button the
+   width of the list with its severity's mark (the gutter's shapes: a circle for an error, a diamond for a warning, a
+   ring for any other) and its words, written out whole and wrapping. It sets its own box, type and focus ring. */
+.pb-diagnostic-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pb-space-1);
+  font-family: var(--pb-font-ui);
+  font-size: var(--pb-text-sm);
+  color: var(--pb-text);
+}
+
+.pb-diagnostic-count {
+  margin: 0;
+  color: var(--pb-muted);
+}
+
+.pb-diagnostic-rows {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pb-diagnostic-go {
+  display: flex;
+  align-items: baseline;
+  gap: var(--pb-space-2);
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 28px;
+  margin: 0;
+  padding: var(--pb-space-1) var(--pb-space-2);
+  font: inherit;
+  line-height: 1.4;
+  color: inherit;
+  text-align: start;
+  overflow-wrap: anywhere;
+  background: transparent;
+  border: 0;
+  border-radius: var(--pb-radius-control);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color var(--pb-motion-fast);
+}
+
+.pb-diagnostic-go:hover {
+  background: var(--pb-sunken);
+}
+
+.pb-diagnostic-go:focus-visible {
+  outline: 2px solid var(--pb-accent);
+  outline-offset: 2px;
+}
+
+.pb-diagnostic-mark {
+  position: relative;
+  flex: none;
+  box-sizing: border-box;
+  width: 7px;
+  height: 7px;
+}
+
+.pb-diagnostic-mark::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+}
+
+.pb-diagnostic-mark[data-mark="error"]::before {
+  border-radius: var(--pb-radius-pill);
+  background: var(--pb-err);
+}
+
+.pb-diagnostic-mark[data-mark="warning"]::before {
+  border-radius: 0;
+  background: var(--pb-warn);
+  transform: rotate(45deg) scale(0.85);
+}
+
+.pb-diagnostic-mark[data-mark="other"]::before {
+  border: 2px solid var(--pb-muted);
+  border-radius: var(--pb-radius-pill);
+}
+
+/* On a touch screen each row is a full target, with 16 px words as the editor's are. */
+@media (hover: none) and (pointer: coarse) {
+  .pb-diagnostic-go {
+    min-height: 36px;
+    align-items: center;
+    font-size: 16px;
+  }
+}
+
+/* Forced colours: the marks keep their shapes in the system's text colour, and a row its edge while focused. */
+@media (forced-colors: active) {
+  .pb-diagnostic-mark[data-mark="error"]::before,
+  .pb-diagnostic-mark[data-mark="warning"]::before {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+
+  .pb-diagnostic-mark[data-mark="other"]::before {
+    border-color: CanvasText;
+  }
+}

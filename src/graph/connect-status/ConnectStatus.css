@@ -1,0 +1,40 @@
+/* The canvas's status line for connecting (ConnectStatus.tsx): a line of words resting on the canvas, raised and edged
+   as the tools are, drawn only while it has words; its live region is always there. It takes no pointer events, so a
+   wire dragged under it still reaches the ports. */
+.react-flow__panel.pb-connect-status {
+  pointer-events: none;
+}
+
+.pb-connect-status-text {
+  box-sizing: border-box;
+  max-width: 420px;
+  margin: 0;
+  padding: var(--pb-space-2) var(--pb-space-3);
+  font-family: var(--pb-font-ui);
+  font-size: var(--pb-text-sm);
+  line-height: 1.4;
+  color: var(--pb-text);
+  overflow-wrap: anywhere;
+  background: var(--pb-raised);
+  border: 1px solid var(--pb-line);
+  border-radius: var(--pb-radius-box);
+  box-shadow: var(--pb-shadow);
+}
+
+.pb-connect-status-text:empty {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+/* Forced colours drop the surface and the shadow; the edge stays. */
+@media (forced-colors: active) {
+  .pb-connect-status-text {
+    border-color: CanvasText;
+  }
+
+  .pb-connect-status-text:empty {
+    border: 0;
+  }
+}

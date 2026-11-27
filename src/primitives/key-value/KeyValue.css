@@ -25,6 +25,24 @@
   overflow-wrap: anywhere;
 }
 
+/* A toned value's dot, in the value's colour, as Pill's: the tone never rests on colour alone
+   (docs/foundations.md#tones, F13). */
+.pb-key-value-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-inline-end: var(--pb-space-2);
+  border-radius: var(--pb-radius-pill);
+  background: currentColor;
+  vertical-align: 0.05em;
+}
+
+/* A tone it does not know: muted words, as every unknown tone has (docs/foundations.md#tones, F7). The tones it knows
+   follow and win. */
+.pb-key-value-row[data-tone] dd {
+  color: var(--pb-muted);
+}
+
 .pb-key-value-row[data-tone="ok"] dd {
   color: var(--pb-ok);
 }
@@ -43,4 +61,21 @@
 
 .pb-key-value-row[data-tone="off"] dd {
   color: var(--pb-off);
+}
+
+.pb-key-value-row[data-tone="accent"] dd {
+  color: var(--pb-accent);
+}
+
+.pb-key-value-row[data-tone="muted"] dd {
+  color: var(--pb-muted);
+}
+
+/* Forced colours replace the dot's fill with the canvas, so it vanishes; it keeps its shape in the system's text
+   colour. */
+@media (forced-colors: active) {
+  .pb-key-value-dot {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
 }

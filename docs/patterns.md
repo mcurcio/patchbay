@@ -36,8 +36,8 @@ Every pattern below holds in both; where they differ, it says so.
    Its name defaults to its type, numbered (`type 2`), so it never needs a name to be added.
 4. They add it. The node appears when the source holds it (U61), at the point it was asked.
 
-**States:** while the request is out, the form's Add button is busy (U5) and a ghost NodeBox
-stands at the point (not yet: pb-nx9.82). A refusal stays in the form, in words (U59).
+**States:** while the request is out, the form's Add button is busy (U5) and a
+[`GhostNode`](graph.md#ghostnode) stands at the point, in the room the node will take. A refusal stays in the form, in words (U59).
 
 **Keyboard and touch:** the palette's add commands and `A` are the double-click's keyboard path
 (U2). On touch a double-tap adds, and a wire dropped on empty canvas works by touch
@@ -71,8 +71,8 @@ unplaced nodes by its layout, and puts an added node at the point it was asked.
 
 1. They drag from a handle ([`PortRow`](graph.md#portrow)). Either end may start the wire.
 2. Every candidate port says yes or no from the app's one rule
-   ([`useConnectHints`](graph.md#useconnecthints), U56, U57), and the canvas's status line says why
-   a port refuses (U59).
+   ([`useConnectHints`](graph.md#useconnecthints), U56, U57), and the canvas's status line
+   ([`ConnectStatus`](graph.md#connectstatus)) says why a port refuses (U59).
 3. They drop on an accepting handle. Applying at once, a [`GhostWire`](graph.md#ghostwire)
    `pending` shows the request until the source answers; queuing, a dashed [`Wire`](graph.md#wire)
    in `added` shows the queued change.
@@ -80,8 +80,8 @@ unplaced nodes by its layout, and puts an added node at the point it was asked.
 
 **From the keyboard:** in the inspector, a node's subject lists its ports, each with a "Connect
 to" [`Select`](components.md#forms) of the ports on the other side that `canConnect` accepts for it
-(U56). Choosing one makes the same request or queued change as a drop. A connection's subject has
-Remove. patchbay's list of those ports: not yet, pb-nx9.81.
+(U56), listed by [`connectTargets`](graph.md#connecttargets). Choosing one makes the same request or
+queued change as a drop. A connection's subject has Remove.
 
 **States:** dragging (the origin ringed, candidates marked), pending (the ghost), live, refused
 (the ghost `refused`, the reason in a toast, U44), queued (a dashed change tone).
@@ -113,7 +113,8 @@ selection:
 The inspector's title is the subject's name and its actions sit at the header's far end
 ([`AppShell`](components.md#appshell)). What is cut or a tooltip on the canvas is written out here
 (U47, F20), and names and values are edited here, never on the canvas (U65). A right-click or a
-long-press opens the palette at the point with the selection's commands first (U66).
+long-press opens the palette at the point with the selection's commands first
+([`useContextAt`](graph.md#usecontextat), U66).
 
 On a wide window the person may hide the inspector with a top-bar button; the app keeps the choice
 ([`usePersistentState`](components.md#usepersistentstate)), and a selection does not reopen it. On
@@ -130,8 +131,8 @@ dialog to inspect.
 **When:** the person edits text the source reads (a node's definition, a whole file).
 
 **How:** [`CodeEditor`](components.md#code) for the text, in the inspector or the drawer, its
-diagnostics marked in the gutter and listed in words under the box, each row putting the caret at
-its place (patchbay's list: not yet, pb-nx9.89); [`Field`](components.md#forms) with
+diagnostics marked in the gutter and listed in words under the box by
+[`DiagnosticList`](components.md#code), each row putting the caret at its place; [`Field`](components.md#forms) with
 [`TextInput`](components.md#forms) for one value; a Save [`Button`](components.md#actions), busy
 while its request is out; the draft's state as a status word.
 
@@ -159,8 +160,9 @@ marks keep a full target (F38).
 
 - The canvas draws each queued change (U53).
 - A list of the queued changes in words, each row with its change Badge and a drop button, with
-  their count, and slots for Check, Save and Discard (patchbay's ChangeList: not yet,
-  pb-nx9.90). The queue keeps only the net change (U50).
+  their count, and a slot for Check, Save and Discard
+  ([`ChangeList`](components.md#queued-changes)). The queue keeps only the net change (U50; the
+  cases are in ChangeList's docs).
 - A [`DiffView`](components.md#code) of what the save writes.
 - One primary Save, busy while it runs, and Discard.
 - The queue is checked after each change and by an explicit Check; Save is unavailable while the
@@ -202,7 +204,8 @@ as a failure of the app, or only in a tooltip.
 **How:** [`useFollowFit`](graph.md#usefollowfit) fits the whole graph whenever the app's layout
 key changes and whenever the canvas changes size, until the person moves the view by any input
 (U63); the fit tool of [`CanvasTools`](graph.md#canvastools), passed `follow.fit`, fits and follows
-again. An app that moves the view itself at the person's asking (going to a node) calls `stop()`.
+again, and its zoom tools and minimap, passed `follow.stop` as `onViewMove`, stop it. An app that
+moves the view itself at the person's asking (its own zoom keys, going to a node) calls `stop()`.
 Every fit leaves the canvas tools clear (U64).
 
 **Do:** mark the layout ready on `onFitted`, not on a timer. **Don't:** refit while the person
@@ -244,7 +247,9 @@ says why.
 **How:**
 
 - **Empty:** words on the canvas say what to do (double-click or `A` to add) and go with the first
-  node (U35; not yet, pb-nx9.87); the graph's subject in the inspector says the same.
+  node ([`EmptyCanvasHint`](graph.md#emptycanvashint), U35); the graph's subject in the inspector
+  says the same. On a read-only graph it keeps the app's words and drops the gestures (`add:
+  false`).
 - **Loading:** a labelled [`Spinner`](components.md#state) in the canvas; `onFitted` marks it
   ready.
 - **Offline:** the connection's [`Pill`](components.md#state) in the top bar's `status` slot says

@@ -5,7 +5,7 @@ import type { ComponentPropsWithRef } from "react";
 import "./StatusWords.css";
 
 /** The tones a word draws; any other string is drawn neutrally. */
-export type StatusWordTone = "ok" | "warn" | "err" | "quiet" | "off" | (string & {});
+export type StatusWordTone = "ok" | "warn" | "err" | "quiet" | "off" | "accent" | "muted" | (string & {});
 
 export type StatusWord = {
   tone: StatusWordTone;

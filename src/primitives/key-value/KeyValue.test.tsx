@@ -68,10 +68,34 @@ describe("KeyValue", () => {
     expect(container.querySelector("dl")?.children).toHaveLength(0);
   });
 
-  it("leaves a value plain for a tone it does not know: its stylesheet styles only the ones it does", () => {
+  it("adds a dot before a toned value, hidden from screen readers, and none to a plain one", () => {
+    const { container } = render(
+      <KeyValue
+        rows={[
+          { key: "Synced", value: "no", tone: "err" },
+          { key: "Interval", value: "30 s" },
+        ]}
+      />,
+    );
+    const values = container.querySelectorAll("dd");
+    expect(values[0]?.querySelector(".pb-key-value-dot")).toHaveAttribute("aria-hidden", "true");
+    expect(values[0]).toHaveTextContent(/^no$/);
+    expect(values[1]?.querySelector(".pb-key-value-dot")).toBeNull();
+  });
+
+  it("keeps the dot under forced colours", () => {
+    const forced =
+      /@media \(forced-colors: active\)\s*\{([\s\S]*?)\n\}/.exec(css.replace(/\/\*[\s\S]*?\*\//g, ""))?.[1] ?? "";
+    expect(forced).toMatch(/\.pb-key-value-dot \{[^}]*background: CanvasText/);
+  });
+
+  it("draws a value muted for a tone it does not know: any tone is muted until one it knows wins", () => {
     render(<KeyValue rows={[{ key: "Odd", value: "?", tone: "unheard-of" }]} />);
     expect(screen.getByText("?").parentElement).toHaveAttribute("data-tone", "unheard-of");
     const tones = new Set([...css.matchAll(/data-tone="([^"]+)"/g)].map((match) => match[1]));
-    expect([...tones].sort()).toEqual(["err", "off", "ok", "quiet", "warn"]);
+    expect([...tones].sort()).toEqual(["accent", "err", "muted", "off", "ok", "quiet", "warn"]);
+    const plain = css.replace(/\/\*[\s\S]*?\*\//g, "");
+    expect(plain).toMatch(/\.pb-key-value-row\[data-tone\] dd \{\s*color: var\(--pb-muted\);/);
+    expect(plain.indexOf(".pb-key-value-row[data-tone] dd {")).toBeLessThan(plain.indexOf('[data-tone="ok"]'));
   });
 });
