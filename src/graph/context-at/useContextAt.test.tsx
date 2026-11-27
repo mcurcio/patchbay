@@ -111,6 +111,25 @@ describe("useContextAt", () => {
     expect(onPaneClick).toHaveBeenCalledTimes(1);
   });
 
+  it("swallows no click after a press elsewhere, when the long-press's lift made none", () => {
+    const onContextAt = vi.fn<OnContextAt>();
+    const { pane } = draw({ onContextAt });
+    const outside = document.createElement("button");
+    const onOutsideClick = vi.fn();
+    outside.addEventListener("click", onOutsideClick);
+    document.body.append(outside);
+    fireEvent.pointerDown(pane, touch());
+    act(() => {
+      vi.advanceTimersByTime(LONG_PRESS_MS);
+    });
+    expect(onContextAt).toHaveBeenCalledTimes(1);
+    fireEvent.pointerUp(pane, touch());
+    fireEvent.pointerDown(outside, touch(2));
+    fireEvent.click(outside);
+    expect(onOutsideClick).toHaveBeenCalledTimes(1);
+    outside.remove();
+  });
+
   it("takes a contextmenu during the press as that long-press, asking once", () => {
     const onContextAt = vi.fn<OnContextAt>();
     const { node } = draw({ onContextAt });

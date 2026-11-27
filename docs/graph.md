@@ -506,7 +506,9 @@ const context = useContextAt(({ at, node }) => openPalette({ at, node }));
   (10 px) asks, at the point where it began. A move past the slop (a pan or a drag), a lift, a
   cancel or a second finger (a pinch) before then asks nothing. A contextmenu that comes while the
   touch is held (Android fires one) is that same long-press, so a press asks once. The click its lift
-  makes is swallowed, so it neither selects nor clears the selection the menu is for. A mouse's or
+  makes is swallowed, so it neither selects nor clears the selection the menu is for; the next press
+  anywhere on the page ends the swallow, so a lift that makes no click leaves the menu's own click
+  alone. A mouse's or
   a pen's press is never timed.
 - **`flowProps`**: `onPaneContextMenu`, `onNodeContextMenu` and the pointer handlers
   (`onPointerDown`, `onPointerMove`, `onPointerUp`, `onPointerCancel`), for `<ReactFlow>` (with

@@ -99,7 +99,10 @@ export function useContextAt(
       if (press.current !== null) window.clearTimeout(press.current.timer);
       press.current = null;
     };
-    /** Swallows the next click, in the capture phase, until the next press begins. */
+    /**
+     * Swallows the next click, in the capture phase, until the next press begins anywhere on the page: a lift that makes
+     * no click must not leave the swallow waiting for the press on the menu the long-press opened.
+     */
     const swallowClick = () => {
       swallow.current?.();
       const onClick = (event: MouseEvent) => {
@@ -109,9 +112,11 @@ export function useContextAt(
       };
       const stop = () => {
         window.removeEventListener("click", onClick, true);
+        window.removeEventListener("pointerdown", stop, true);
         swallow.current = null;
       };
       window.addEventListener("click", onClick, true);
+      window.addEventListener("pointerdown", stop, true);
       swallow.current = stop;
     };
     /** A contextmenu: during a held touch it is that long-press (once); otherwise a right-click. */
