@@ -1,5 +1,6 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { useEffect } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { type MediaWidth, mediaQueries } from "../../hooks";
 import { AppShell, type AppShellDrawer, type AppShellInspector, defaultAppShellLabels } from "./AppShell";
@@ -13,6 +14,25 @@ function windowOf(width: MediaWidth) {
     addEventListener: () => {},
     removeEventListener: () => {},
   }));
+}
+
+/** A window whose width class can change, calling useMediaBreakpoint's listeners as a resize would. */
+function resizableWindow(start: MediaWidth) {
+  let width = start;
+  const listeners = new Set<() => void>();
+  vi.stubGlobal("matchMedia", (query: string) => ({
+    get matches() {
+      return (query === mediaQueries.narrow && width !== "wide") || (query === mediaQueries.phone && width === "phone");
+    },
+    addEventListener: (_type: string, listener: () => void) => listeners.add(listener),
+    removeEventListener: (_type: string, listener: () => void) => listeners.delete(listener),
+  }));
+  return (next: MediaWidth) => {
+    width = next;
+    act(() => {
+      for (const listener of listeners) listener();
+    });
+  };
 }
 
 function inspectorOf(props: Partial<AppShellInspector> = {}): AppShellInspector {
@@ -226,6 +246,88 @@ describe("AppShell", () => {
         </AppShell>,
       );
       expect(screen.getByRole("complementary").querySelector(".pb-panel")).toBeNull();
+    });
+  });
+
+  describe("across widths", () => {
+    for (const headed of [false, true]) {
+      it(`keeps a draft in the inspector, and its focus, as the window crosses each width${headed ? ", titled" : ""}`, async () => {
+        const resize = resizableWindow("wide");
+        const mounts = vi.fn();
+        function Draft() {
+          useEffect(() => {
+            mounts();
+          }, []);
+          return <textarea aria-label="Draft" defaultValue="" />;
+        }
+        render(
+          <AppShell inspector={inspectorOf({ content: <Draft />, ...(headed ? { title: "transform_1" } : {}) })}>
+            <div />
+          </AppShell>,
+        );
+        await userEvent.type(screen.getByRole("textbox", { name: "Draft" }), "half a thought");
+        for (const width of ["narrow", "phone", "narrow", "wide"] as const) {
+          resize(width);
+          const draft = screen.getByRole("textbox", { name: "Draft" });
+          expect(draft).toHaveValue("half a thought");
+          expect(draft).toHaveFocus();
+          if (width === "wide") expect(screen.getByRole("complementary")).toContainElement(draft);
+          else expect(screen.getByRole("dialog")).toContainElement(draft);
+        }
+        expect(mounts).toHaveBeenCalledTimes(1);
+      });
+    }
+
+    it("still takes Escape inside the content as the sheet's on a narrow window, and leaves a handled one", () => {
+      windowOf("narrow");
+      const onOpen = vi.fn();
+      render(
+        <AppShell
+          inspector={inspectorOf({
+            onOpen,
+            content: (
+              <input
+                aria-label="Name"
+                onKeyDown={(event) => {
+                  if (event.key === "Escape" && event.currentTarget.value !== "") event.preventDefault();
+                }}
+              />
+            ),
+          })}
+        >
+          <div />
+        </AppShell>,
+      );
+      const name = screen.getByRole("textbox", { name: "Name" });
+      fireEvent.change(name, { target: { value: "x" } });
+      fireEvent.keyDown(name, { key: "Escape" });
+      expect(onOpen).not.toHaveBeenCalled();
+      fireEvent.change(name, { target: { value: "" } });
+      fireEvent.keyDown(name, { key: "Escape" });
+      expect(onOpen).toHaveBeenCalledWith(false);
+    });
+
+    it("gives the focus back to where it came from when the sheet closes holding it in the content", () => {
+      windowOf("narrow");
+      const { rerender } = render(
+        <>
+          <button type="button">Before</button>
+          <AppShell inspector={inspectorOf({ content: <input aria-label="Name" /> })}>
+            <div />
+          </AppShell>
+        </>,
+      );
+      screen.getByRole("button", { name: "Before" }).focus();
+      screen.getByRole("textbox", { name: "Name" }).focus();
+      rerender(
+        <>
+          <button type="button">Before</button>
+          <AppShell inspector={inspectorOf({ open: false, content: <input aria-label="Name" /> })}>
+            <div />
+          </AppShell>
+        </>,
+      );
+      expect(screen.getByRole("button", { name: "Before" })).toHaveFocus();
     });
   });
 

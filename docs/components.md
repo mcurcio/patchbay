@@ -568,8 +568,13 @@ is a [`Sheet`](#overlays) over the canvas's inline end (the left in right-to-lef
 wide inspector is too), `width` px wide (and 48 px short of the canvas); below 600 px it rises from
 the bottom, at most 62 % of the workspace. The sheet is named by the inspector's `title`, or by
 `labels.inspector` without one, and has no splitter; its close button and Escape inside it call
-`onOpen(false)`. Moving between widths draws the inspector's `content` afresh (it moves between the
-region and the sheet), so state it must keep belongs to the app. The root has `data-layout` (`wide`,
+`onOpen(false)`. Moving between widths keeps the inspector's `content` mounted: it is drawn once, into
+an element of its own that moves between the region and the sheet, so what it holds (a draft, a
+caret) survives the window crossing a width, and a focus inside it stays there. It is mounted while
+the inspector is open, as before; closing the inspector still unmounts it. Its events reach React
+through the shell rather than through the sheet around it, so the shell takes the sheet's Escape
+inside it itself, by the same rule (a press already handled, or inside a composition, is left
+alone). The root has `data-layout` (`wide`,
 `narrow` or `phone`) for the app's own stylesheet.
 
 **Escape.** The shell's only Escape is the inspector sheet's, and it acts while the focus is in the

@@ -36,7 +36,8 @@ The inspector at the inline end, the left, its splitter mirrored:
 
 <Canvas of={AppShellStories.RightToLeft} story={{ inline: false, height: "520px" }} />
 
-## Not built yet
+## Crossing a width
 
-- The inspector's content kept mounted across widths, so a draft in it survives the switch:
-  `pb-nx9.88`.
+The inspector's content is drawn once and moves between the region and the sheet, so a draft
+typed into it, and the focus, are still there when the window crosses a width
+([`components.md`: AppShell, Narrow windows](https://github.com/mcurcio/patchbay/blob/main/docs/components.md#appshell)).

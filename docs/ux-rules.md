@@ -86,9 +86,9 @@ cite them. How to read a rule (Built, The app's, Not yet):
   inspector is the app's. **Built:** AppShell.
 - **U22. Escape never discards typed work.** Closing a dialog or a sheet asks the app to close it
   and keeps no draft of its own, so a draft the app holds is still there; a draft left in the
-  inspector survives the window crossing a width. **Built:** Dialog, Sheet, AppShell's drawer.
-  **Not yet:** the inspector's content is drawn afresh when the window crosses 760 px, which drops
-  a draft held in it: pb-nx9.88.
+  inspector survives the window crossing a width. **Built:** Dialog, Sheet, AppShell's drawer, and
+  AppShell's inspector, whose content stays mounted as it moves between the region and the sheet
+  ([`components.md`](components.md#appshell), Narrow windows).
 
 ## Words
 
