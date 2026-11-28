@@ -100,9 +100,8 @@ cite them. How to read a rule (Built, The app's, Not yet):
   Splitter and Toolbar require, `busyLabel`, what a Meter measures. **Built:** the prop types.
 - **U25. Default words are plain English,** in sentence case, actions as verbs with their object
   ("Zoom in", "Fit the view", "Resize the inspector"), and never pointer-only ("press", not
-  "click"). **Built:** the defaults. **Not yet:** ThemeSwitch's tooltip says "click for":
-  pb-nx9.67; EmptyCanvasHint's default, without the app's add key, names only a pointer gesture
-  ("Double-click to add a node"): pb-nx9.96.
+  "click"). **Built:** the defaults (ThemeSwitch's tooltip: "Theme: light, next: dark";
+  EmptyCanvasHint says its gestures only beside the app's add key or command).
 - **U26. An icon-only control is named,** and its tooltip defaults to its name. **Built:**
   IconButton (`label` required).
 - **U27. A glyph is hidden;** the control's name carries it (F49). **Built:** every SVG glyph.
@@ -127,10 +126,12 @@ cite them. How to read a rule (Built, The app's, Not yet):
   the rest of the screen stays usable. **Built:** Pill, GhostWire.
 - **U34. An empty list says so,** in a status line there from the start. **Built:** CommandPalette,
   ShortcutSheet, DiagnosticList (its count).
-- **U35. An empty canvas says what to do,** in words drawn on the canvas itself: the app's words
-  and the add gestures, gone with the first node
+- **U35. An empty canvas says what to do,** in words drawn on the canvas itself: that it is empty,
+  and the add gestures with the app's add key or command, gone with the first node
   ([patterns](patterns.md#empty-loading-and-offline)). **Built:**
-  [`EmptyCanvasHint`](graph.md#emptycanvashint). **The app's:** its words, and its add key.
+  [`EmptyCanvasHint`](graph.md#emptycanvashint); [`EmptyCanvas`](graph.md#emptycanvas), the slot
+  for an app's own empty state. **The app's:** its words or empty state, and its add key or
+  command.
 - **U36. A field's error is described, not announced:** wired to the field, and not a live region,
   so it is not read at each key. **Built:** Field, RadioGroup, CodeEditor's diagnostics
   ([`components.md`](components.md#forms)).
@@ -178,13 +179,13 @@ cite them. How to read a rule (Built, The app's, Not yet):
   a convenience. **Built:** CommandPalette, whose active row (every row on touch) is written out
   whole (F20); [`ConnectStatus`](graph.md#connectstatus), the canvas's status line, for a refusing
   port's reason; CodeEditor, whose gutter marks' diagnostics are read in its description and
-  listed in words under the box by [`DiagnosticList`](components.md#code). Each
+  listed in words under the box by [`DiagnosticList`](components.md#code); DiffView, whose file
+  heading writes the folder after the name ([`components.md`](components.md#code)). Each
   other tooltip's docs name where its words go: a cut node title, line or port name in the
   inspector ([`NodeBox`](graph.md#nodebox), [`PortRow`](graph.md#portrow)); a wire's `title` in its
   `label` or the inspector ([`Wire`](graph.md#wire)); a meter's numbers in the inspector, written
   with `formatMeterDb` ([`Meter`](graph.md#meter)). **The app's:** writing those words there, and
   every `title` it gives a component (Pill, Badge, KeyValue, StatusWords, RadioGroup, WarnMark).
-  **Not yet:** DiffView's whole file path is only its heading's tooltip: pb-nx9.95.
 
 ## Confirmation and undo
 
@@ -263,9 +264,10 @@ are F10's:
   pinches; its `stop()` for the zoom tools and the minimap, through
   [`CanvasTools`](graph.md#canvastools)' `onViewMove`. **The app's:** passing `stop` to
   `onViewMove`, and calling it beside its own zoom keys and going to a node.
-- **U64. A fit leaves the canvas tools clear,** so the graph is never drawn under them and an app
-  chooses no inset of its own. **Not yet:** CanvasTools' default fit ignores its own corner:
-  pb-nx9.83.
+- **U64. A fit keeps an even margin** on every side (React Flow's default padding), whatever the
+  canvas tools' corner; patchbay adds no inset for the tools (owner, 2026-11-28). **The app's:** an
+  app that wants the tools' corner clear passes its own `fitOptions` to CanvasTools and
+  useFollowFit.
 - **U65. The canvas draws; the inspector edits.** Names and values are edited in the inspector,
   never in place on the canvas, whose node geometry is fixed (F24) and whose keys are React Flow's.
   **The app's:** its node types draw no fields.

@@ -206,7 +206,8 @@ key changes and whenever the canvas changes size, until the person moves the vie
 (U63); the fit tool of [`CanvasTools`](graph.md#canvastools), passed `follow.fit`, fits and follows
 again, and its zoom tools and minimap, passed `follow.stop` as `onViewMove`, stop it. An app that
 moves the view itself at the person's asking (its own zoom keys, going to a node) calls `stop()`.
-Every fit leaves the canvas tools clear (U64).
+Every fit keeps an even margin, the tools' corner included; an app that wants that corner clear
+passes its own `fitOptions` (U64).
 
 **Do:** mark the layout ready on `onFitted`, not on a timer. **Don't:** refit while the person
 holds the view; don't animate a following fit (F32).
@@ -246,10 +247,12 @@ says why.
 
 **How:**
 
-- **Empty:** words on the canvas say what to do (double-click or `A` to add) and go with the first
-  node ([`EmptyCanvasHint`](graph.md#emptycanvashint), U35); the graph's subject in the inspector
-  says the same. On a read-only graph it keeps the app's words and drops the gestures (`add:
-  false`).
+- **Empty:** words on the canvas say it is empty and how to add (double-click or `A`) and go with
+  the first node ([`EmptyCanvasHint`](graph.md#emptycanvashint), U35); the gestures are said only
+  with the app's add key or command (U25). An app with an empty state of its own (a template, a
+  button that adds the first node) puts it in [`EmptyCanvas`](graph.md#emptycanvas), which shows it
+  only while the graph has no nodes. The graph's subject in the inspector says the same. On a
+  read-only graph the hint keeps its words and drops the gestures (`add: false`).
 - **Loading:** a labelled [`Spinner`](components.md#state) in the canvas; `onFitted` marks it
   ready.
 - **Offline:** the connection's [`Pill`](components.md#state) in the top bar's `status` slot says

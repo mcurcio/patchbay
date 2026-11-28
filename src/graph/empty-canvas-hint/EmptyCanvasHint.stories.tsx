@@ -77,11 +77,21 @@ export const EmptyHarborDark: Story = { ...Empty, globals: { brand: "harbor", th
 /** And under the example ember brand in light. */
 export const EmptyEmberLight: Story = { ...Empty, globals: { brand: "ember", theme: "light" } };
 
-/** The gestures alone, with no words of the app's and no key. */
-export const GesturesOnly: Story = {
+/** Its own words alone: with no key or command of the app's, no gesture is said, as one would name a pointer alone. */
+export const NoKey: Story = {
   args: { keys: undefined, children: undefined },
+  play: async ({ canvasElement, canvas }) => {
+    await expect(canvas.getByText("This graph has no nodes yet.")).toBeVisible();
+    await expect(hintOf(canvasElement)).not.toHaveTextContent("Double-click");
+  },
+};
+
+/** With the app's add command and no key: the gestures, then the command by name. */
+export const Command: Story = {
+  args: { keys: undefined, command: "Add node", children: undefined },
   play: async ({ canvas }) => {
-    await expect(canvas.getByText("Double-click to add a node")).toBeVisible();
+    await expect(canvas.getByText("This graph has no nodes yet.")).toBeVisible();
+    await expect(canvas.getByText("Double-click to add a node, or use “Add node”")).toBeVisible();
   },
 };
 
@@ -99,11 +109,13 @@ export const Labels: Story = {
   args: {
     children: undefined,
     labels: {
+      noNodes: "Dieser Graph hat noch keine Knoten.",
       add: (gesture, keys) =>
         `${gesture === "touch" ? "Doppeltippen" : "Doppelklicken"}${keys === undefined ? "" : ` oder ${keys}`}`,
     },
   },
   play: async ({ canvas }) => {
+    await expect(canvas.getByText("Dieser Graph hat noch keine Knoten.")).toBeVisible();
     await expect(canvas.getByText("Doppelklicken oder A")).toBeVisible();
   },
 };

@@ -1,12 +1,13 @@
 // A diff: unified diff text drawn line by line, added lines in the added tone and removed ones in the removed tone,
 // each keeping its "+" or "-" so the change never rests on colour alone. Given files, each is a section of its own
-// under a heading, labelled by its file name with its whole path on hover, that the person can fold away.
+// under a heading that the person can fold away: the file's name, then its folder in quieter words, cut from the
+// start when space runs out, so the whole path is in words and not only in the tooltip (docs/ux-rules.md#feedback).
 import { useId, useState, type ComponentPropsWithRef } from "react";
 import { Glyph } from "../../primitives";
 import "./DiffView.css";
 
 export type DiffFile = {
-  /** The file's path; the section is labelled by its last part. Unique among the files. */
+  /** The file's path; the section is headed by its last part, then its folder. Unique among the files. */
   path: string;
   /** The file's unified diff text. */
   diff: string;
@@ -58,6 +59,14 @@ export function baseName(path: string): string {
   return parts.at(-1) ?? path;
 }
 
+/** A path's folder, everything before its last part: "src/app/main.ts" is "src/app", "main.ts" is "". */
+export function folderName(path: string): string {
+  const trimmed = path.replace(/\/+$/, "");
+  const cut = trimmed.lastIndexOf("/");
+  if (cut < 0) return "";
+  return cut === 0 ? "/" : trimmed.slice(0, cut);
+}
+
 function lines(text: string): string[] {
   const all = text.split(/\r?\n/);
   // A diff ends with a newline, which starts no line of its own.
@@ -99,6 +108,8 @@ export function DiffView({ diff, files, level = 3, collapsed, onToggle, classNam
         files.map((file, index) => {
           const open = !folded.includes(file.path);
           const bodyId = `${base}-${String(index)}`;
+          const name = baseName(file.path);
+          const folder = folderName(file.path);
           return (
             <div key={file.path} className="pb-diff-file" data-open={open || undefined}>
               <Heading className="pb-diff-file-title">
@@ -115,7 +126,14 @@ export function DiffView({ diff, files, level = 3, collapsed, onToggle, classNam
                   <Glyph className="pb-diff-chevron">
                     <path d="M6.5 4.5l3.5 3.5-3.5 3.5" />
                   </Glyph>
-                  {baseName(file.path)}
+                  <bdi className="pb-diff-name">{name}</bdi>
+                  {/* Named by the file, then its folder: the space keeps the two words apart in the name. */}
+                  {folder !== "" && " "}
+                  {folder !== "" && (
+                    <span className="pb-diff-folder">
+                      <bdi dir="ltr">{folder}</bdi>
+                    </span>
+                  )}
                 </button>
               </Heading>
               <DiffBody text={file.diff} id={bodyId} hidden={!open} />

@@ -1,6 +1,6 @@
 /* A diff (DiffView.tsx): unified diff text in code type on the code surface, added and removed lines in the change
    tones with a bar of their tone at the start, hunk headers in the directive colour and git's header lines in the
-   comment colour. Given files, each is a section under a heading button that folds it. */
+   comment colour. Given files, each is a section under a heading button that folds it, its name then its folder. */
 .pb-diff {
   display: grid;
   gap: var(--pb-space-3);
@@ -16,7 +16,9 @@
   min-width: 0;
 }
 
+/* No wider than the column, whatever the folder's length (a nowrap folder is otherwise its whole width at least). */
 .pb-diff-file-title {
+  min-width: 0;
   margin: 0;
   font-size: var(--pb-text-md);
   font-weight: 600;
@@ -50,13 +52,55 @@
   outline-offset: 2px;
 }
 
+/* The name wraps only once the folder has given up all its room: the folder shrinks first, a thousand to one. */
+.pb-diff-name {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+/* The folder, quieter, on one line and cut from its start: right-to-left, the line's overflow and its ellipsis fall at
+   the left, the path's root, whatever the page's direction; the path inside keeps its left-to-right order. */
+.pb-diff-folder {
+  flex: 0 1000 auto;
+  min-width: 0;
+  margin-inline-start: var(--pb-space-2);
+  overflow: hidden;
+  direction: rtl;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--pb-muted);
+  font-weight: 400;
+}
+
 .pb-diff-chevron {
   flex: none;
   color: var(--pb-muted);
   transition: transform var(--pb-motion-fast) ease-out;
 }
 
-.pb-diff-file[data-open] .pb-diff-chevron {
+.pb-diff-file[data-open] /* The name wraps only once the folder has given up all its room: the folder shrinks first, a thousand to one. */
+.pb-diff-name {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+/* The folder, quieter, on one line and cut from its start: right-to-left, the line's overflow and its ellipsis fall at
+   the left, the path's root, whatever the page's direction; the path inside keeps its left-to-right order. */
+.pb-diff-folder {
+  flex: 0 1000 auto;
+  min-width: 0;
+  margin-inline-start: var(--pb-space-2);
+  overflow: hidden;
+  direction: rtl;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--pb-muted);
+  font-weight: 400;
+}
+
+.pb-diff-chevron {
   transform: rotate(90deg);
 }
 

@@ -35,11 +35,11 @@ describe("ThemeSwitch", () => {
   });
 
   it("says what the theme is and what a press does", () => {
-    expect(themeSwitchTitle("system")).toBe("Theme: system (follows the system's setting); click for light");
-    expect(themeSwitchTitle("light")).toBe("Theme: light; click for dark");
-    expect(themeSwitchTitle("dark")).toBe("Theme: dark; click for system");
+    expect(themeSwitchTitle("system")).toBe("Theme: system (follows the system's setting), next: light");
+    expect(themeSwitchTitle("light")).toBe("Theme: light, next: dark");
+    expect(themeSwitchTitle("dark")).toBe("Theme: dark, next: system");
     render(<ThemeSwitch choice="light" onChoose={() => undefined} />);
-    expect(screen.getByRole("button")).toHaveAttribute("title", "Theme: light; click for dark");
+    expect(screen.getByRole("button")).toHaveAttribute("title", "Theme: light, next: dark");
   });
 
   it("takes the app's words, keeping the defaults it does not replace", () => {
@@ -52,7 +52,7 @@ describe("ThemeSwitch", () => {
     );
     const button = screen.getByRole("button", { name: "Thème: système" });
     expect(button).toHaveTextContent("système");
-    expect(button).toHaveAttribute("title", "Thème: système (follows the system's setting); click for clair");
+    expect(button).toHaveAttribute("title", "Thème: système (follows the system's setting), next: clair");
   });
 
   it("passes native props and keeps its own class", () => {

@@ -1,0 +1,13 @@
+/* The empty canvas's slot (EmptyCanvas.tsx): the app's own empty state, placed as EmptyCanvasHint is (below the
+   canvas's top edge, centred, never wider than the canvas less its margins) in the UI type, with no surface of its
+   own: what it draws is the app's. It keeps React Flow's pointer events, so its controls can be pressed. */
+.react-flow__panel.pb-empty-canvas-slot {
+  box-sizing: border-box;
+  max-width: calc(100% - 2 * var(--pb-space-4));
+  margin-top: var(--pb-space-5);
+  font-family: var(--pb-font-ui);
+  font-size: var(--pb-text-md);
+  line-height: 1.4;
+  color: var(--pb-text);
+  overflow-wrap: anywhere;
+}

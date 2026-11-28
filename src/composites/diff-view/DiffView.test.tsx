@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createRef } from "react";
 import { describe, expect, it, vi } from "vitest";
-import { baseName, diffLineKind, DiffView } from "./DiffView";
+import { baseName, diffLineKind, DiffView, folderName } from "./DiffView";
 import css from "./DiffView.css?raw";
 
 const text = "--- a/x.conf\n+++ b/x.conf\n@@ -1,2 +1,2 @@\n keep\n-old\n+new\n\\ No newline at end of file\n";
@@ -43,20 +43,44 @@ describe("DiffView", () => {
     ]);
   });
 
-  it("labels each file by its base name, with its whole path as the title, under a heading", () => {
+  it("heads each file by its name, then its folder, named the same, with its whole path as the title", () => {
     render(
       <DiffView
         files={[
-          { path: "config/settings.conf", diff: text },
+          { path: "src/config/lights/settings.conf", diff: text },
           { path: "top.txt", diff: text },
         ]}
       />,
     );
     const headings = screen.getAllByRole("heading", { level: 3 });
-    expect(headings.map((heading) => heading.textContent)).toEqual(["settings.conf", "top.txt"]);
-    expect(screen.getByRole("button", { name: "settings.conf" })).toHaveAttribute("title", "config/settings.conf");
+    expect(headings.map((heading) => heading.textContent)).toEqual(["settings.conf src/config/lights", "top.txt"]);
+    const button = screen.getByRole("button", { name: "settings.conf src/config/lights" });
+    expect(button).toHaveAttribute("title", "src/config/lights/settings.conf");
+    expect(button.querySelector(".pb-diff-name")).toHaveTextContent("settings.conf");
+    expect(button.querySelector(".pb-diff-folder")).toHaveTextContent("src/config/lights");
+    // A file with no folder has no folder part.
+    const top = screen.getByRole("button", { name: "top.txt" });
+    expect(top.querySelector(".pb-diff-folder")).toBeNull();
     expect(baseName("a/b/")).toBe("b");
     expect(baseName("")).toBe("");
+  });
+
+  it("finds a path's folder", () => {
+    expect(folderName("src/app/main.ts")).toBe("src/app");
+    expect(folderName("main.ts")).toBe("");
+    expect(folderName("a/b/")).toBe("a");
+    expect(folderName("/etc/hosts")).toBe("/etc");
+    expect(folderName("/hosts")).toBe("/");
+    expect(folderName("")).toBe("");
+  });
+
+  it("draws the folder in muted words on one line, cut from its start", () => {
+    const rule = /\.pb-diff-folder \{([^}]*)\}/.exec(css)?.[1] ?? "";
+    expect(rule).toMatch(/color: var\(--pb-muted\)/);
+    expect(rule).toMatch(/direction: rtl/);
+    expect(rule).toMatch(/text-overflow: ellipsis/);
+    expect(rule).toMatch(/white-space: nowrap/);
+    expect(rule).toMatch(/overflow: hidden/);
   });
 
   it("takes the headings' level", () => {
@@ -67,7 +91,7 @@ describe("DiffView", () => {
   it("folds and opens a file by its heading button, keeping its own fold when the app holds none", async () => {
     const onToggle = vi.fn();
     render(<DiffView files={[{ path: "dir/a.txt", diff: text }]} onToggle={onToggle} />);
-    const toggle = screen.getByRole("button", { name: "a.txt" });
+    const toggle = screen.getByRole("button", { name: "a.txt dir" });
     const body = document.getElementById(toggle.getAttribute("aria-controls") ?? "");
     expect(toggle).toHaveAttribute("aria-expanded", "true");
     expect(body).toBeVisible();
