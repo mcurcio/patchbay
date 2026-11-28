@@ -6,13 +6,18 @@ name: CI
 on:
   push:
   pull_request:
-  # Publish an existing release tag (the publish-tag job): when a release's publish failed after semantic-release
-  # tagged it, a rerun releases nothing, so this builds that tag, publishes it to npm and makes its GitHub Release.
+  # Publish a release tag (the publish-tag job): when a release's publish failed after semantic-release tagged it, or
+  # its tag push failed after the CHANGELOG.md commit reached main, a rerun releases nothing, so this builds that tag,
+  # publishes it to npm and makes its GitHub Release.
   workflow_dispatch:
     inputs:
       tag:
         description: "The release tag to publish, e.g. v0.1.0"
         required: true
+        type: string
+      sha:
+        description: "Only when the tag is missing: the release's CHANGELOG.md commit on main, which this tags first"
+        required: false
         type: string
 
 # A newer push to a pull request cancels its older run; runs on branches each finish.
@@ -151,7 +156,8 @@ jobs:
   # Run by hand (Actions, CI, Run workflow, with a tag): publishes a release tag that semantic-release made but did not
   # publish (CONTRIBUTING.md, "When a publish fails after the tag"). It builds the tag's tree as the release job would,
   # publishes the package unless npm already has that version, and makes the GitHub Release from the tag's section of
-  # CHANGELOG.md unless it exists. Safe to run again. Lives in ci.yml so the trusted publisher named for ci.yml covers it.
+  # CHANGELOG.md unless it exists. Given a sha, it first makes a missing tag on that commit. Safe to run again. Lives in
+  # ci.yml so the trusted publisher named for ci.yml covers it.
   publish-tag:
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-24.04
@@ -159,15 +165,34 @@ jobs:
       group: release
       cancel-in-progress: false
     permissions:
-      contents: write # the GitHub Release
+      contents: write # the GitHub Release, and a missing tag
       id-token: write # npm trusted publishing and provenance
     env:
       TAG: ${{ inputs.tag }}
+      SHA: ${{ inputs.sha }}
     steps:
       - name: Check the tag's form
         run: |
           [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::'$TAG' is not a release tag like v1.2.3"; exit 1; }
           echo "VERSION=${TAG#v}" >> "$GITHUB_ENV"
+      # The tag only where it is missing, only on main, and only on the commit semantic-release made for that version.
+      - name: Make a missing tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          if gh api "repos/$REPO/git/ref/tags/$TAG" > /dev/null 2>&1; then
+            [ -z "$SHA" ] || echo "::notice::$TAG exists; leaving it and not using sha."
+            exit 0
+          fi
+          [ -n "$SHA" ] || { echo "::error::$TAG does not exist; give sha, its CHANGELOG.md commit on main"; exit 1; }
+          subject=$(gh api "repos/$REPO/commits/$SHA" --jq '.commit.message | split("\n")[0]')
+          [ "$subject" = "chore(release): $VERSION [skip ci]" ] ||
+            { echo "::error::$SHA is \"$subject\", not the release commit for $VERSION"; exit 1; }
+          status=$(gh api "repos/$REPO/compare/$SHA...main" --jq .status)
+          [ "$status" = identical ] || [ "$status" = ahead ] || { echo "::error::$SHA is not on main"; exit 1; }
+          gh api "repos/$REPO/git/refs" -f ref="refs/tags/$TAG" -f sha="$SHA" > /dev/null
+          echo "::notice::Tagged $SHA as $TAG."
       - uses: actions/checkout@v7
         with:
           ref: refs/tags/${{ inputs.tag }}
