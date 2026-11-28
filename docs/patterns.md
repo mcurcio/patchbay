@@ -206,7 +206,8 @@ key changes and whenever the canvas changes size, until the person moves the vie
 (U63); the fit tool of [`CanvasTools`](graph.md#canvastools), passed `follow.fit`, fits and follows
 again, and its zoom tools and minimap, passed `follow.stop` as `onViewMove`, stop it. An app that
 moves the view itself at the person's asking (its own zoom keys, going to a node) calls `stop()`.
-Every fit leaves the canvas tools clear (U64).
+Every fit keeps an even margin, the tools' corner included; an app that wants that corner clear
+passes its own `fitOptions` (U64).
 
 **Do:** mark the layout ready on `onFitted`, not on a timer. **Don't:** refit while the person
 holds the view; don't animate a following fit (F32).

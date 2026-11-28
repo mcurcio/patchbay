@@ -263,9 +263,10 @@ are F10's:
   pinches; its `stop()` for the zoom tools and the minimap, through
   [`CanvasTools`](graph.md#canvastools)' `onViewMove`. **The app's:** passing `stop` to
   `onViewMove`, and calling it beside its own zoom keys and going to a node.
-- **U64. A fit leaves the canvas tools clear,** so the graph is never drawn under them and an app
-  chooses no inset of its own. **Not yet:** CanvasTools' default fit ignores its own corner:
-  pb-nx9.83.
+- **U64. A fit keeps an even margin** on every side (React Flow's default padding), whatever the
+  canvas tools' corner; patchbay adds no inset for the tools (owner, 2026-11-28). **The app's:** an
+  app that wants the tools' corner clear passes its own `fitOptions` to CanvasTools and
+  useFollowFit.
 - **U65. The canvas draws; the inspector edits.** Names and values are edited in the inspector,
   never in place on the canvas, whose node geometry is fixed (F24) and whose keys are React Flow's.
   **The app's:** its node types draw no fields.
