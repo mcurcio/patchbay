@@ -247,10 +247,12 @@ says why.
 
 **How:**
 
-- **Empty:** words on the canvas say what to do (double-click or `A` to add) and go with the first
-  node ([`EmptyCanvasHint`](graph.md#emptycanvashint), U35); the graph's subject in the inspector
-  says the same. On a read-only graph it keeps the app's words and drops the gestures (`add:
-  false`).
+- **Empty:** words on the canvas say it is empty and how to add (double-click or `A`) and go with
+  the first node ([`EmptyCanvasHint`](graph.md#emptycanvashint), U35); the gestures are said only
+  with the app's add key or command (U25). An app with an empty state of its own (a template, a
+  button that adds the first node) puts it in [`EmptyCanvas`](graph.md#emptycanvas), which shows it
+  only while the graph has no nodes. The graph's subject in the inspector says the same. On a
+  read-only graph the hint keeps its words and drops the gestures (`add: false`).
 - **Loading:** a labelled [`Spinner`](components.md#state) in the canvas; `onFitted` marks it
   ready.
 - **Offline:** the connection's [`Pill`](components.md#state) in the top bar's `status` slot says

@@ -100,9 +100,8 @@ cite them. How to read a rule (Built, The app's, Not yet):
   Splitter and Toolbar require, `busyLabel`, what a Meter measures. **Built:** the prop types.
 - **U25. Default words are plain English,** in sentence case, actions as verbs with their object
   ("Zoom in", "Fit the view", "Resize the inspector"), and never pointer-only ("press", not
-  "click"). **Built:** the defaults (ThemeSwitch's tooltip: "Theme: light, next: dark"). **Not
-  yet:** EmptyCanvasHint's default, without the app's add key, names only a pointer gesture
-  ("Double-click to add a node"): pb-nx9.96.
+  "click"). **Built:** the defaults (ThemeSwitch's tooltip: "Theme: light, next: dark";
+  EmptyCanvasHint says its gestures only beside the app's add key or command).
 - **U26. An icon-only control is named,** and its tooltip defaults to its name. **Built:**
   IconButton (`label` required).
 - **U27. A glyph is hidden;** the control's name carries it (F49). **Built:** every SVG glyph.
@@ -127,10 +126,12 @@ cite them. How to read a rule (Built, The app's, Not yet):
   the rest of the screen stays usable. **Built:** Pill, GhostWire.
 - **U34. An empty list says so,** in a status line there from the start. **Built:** CommandPalette,
   ShortcutSheet, DiagnosticList (its count).
-- **U35. An empty canvas says what to do,** in words drawn on the canvas itself: the app's words
-  and the add gestures, gone with the first node
+- **U35. An empty canvas says what to do,** in words drawn on the canvas itself: that it is empty,
+  and the add gestures with the app's add key or command, gone with the first node
   ([patterns](patterns.md#empty-loading-and-offline)). **Built:**
-  [`EmptyCanvasHint`](graph.md#emptycanvashint). **The app's:** its words, and its add key.
+  [`EmptyCanvasHint`](graph.md#emptycanvashint); [`EmptyCanvas`](graph.md#emptycanvas), the slot
+  for an app's own empty state. **The app's:** its words or empty state, and its add key or
+  command.
 - **U36. A field's error is described, not announced:** wired to the field, and not a live region,
   so it is not read at each key. **Built:** Field, RadioGroup, CodeEditor's diagnostics
   ([`components.md`](components.md#forms)).

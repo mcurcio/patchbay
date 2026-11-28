@@ -1,5 +1,7 @@
-// An empty canvas says what to do (docs/graph.md#emptycanvashint): the app's words, and the add gestures, drawn on
-// the canvas itself in React Flow's <Panel>, and gone with the first node (docs/ux-rules.md#states, U35). It reads
+// An empty canvas says what to do (docs/graph.md#emptycanvashint): the app's words (or its own, "This graph has no
+// nodes yet."), and the add gestures with the app's add key or command, drawn on the canvas itself in React Flow's
+// <Panel>, and gone with the first node (docs/ux-rules.md#states, U35). The gestures are said only beside a key or a
+// command, so its words never name a pointer alone (U25). It reads
 // React Flow's node count unless the app says whether the graph is empty. Its words are not a live region: the canvas
 // says them while it is empty, and a node arriving is news the canvas shows. It takes no pointer events, so a
 // double-click on it still reaches the canvas and adds.
@@ -10,27 +12,36 @@ import "./EmptyCanvasHint.css";
 
 /** The hint's own words, each replaceable. */
 export interface EmptyCanvasHintLabels {
+  /** What it says when the app gives no words of its own: "This graph has no nodes yet." */
+  noNodes: string;
   /**
-   * The add gestures: "Double-click to add a node" with a pointer, "Double-tap to add a node" on a touch screen, then
-   * ", or press A" with the app's add key as people read it.
+   * The add gestures with the app's other way to add: "Double-click to add a node" with a pointer, "Double-tap to add
+   * a node" on a touch screen, then ", or press A" with the app's add key as people read it, or, with no key,
+   * ", or use “Add node”" with its add command. Called only when the app names one of the two.
    */
-  add: (gesture: "pointer" | "touch", keys: string | undefined) => string;
+  add: (gesture: "pointer" | "touch", keys: string | undefined, command: string | undefined) => string;
 }
 
 export const defaultEmptyCanvasHintLabels: EmptyCanvasHintLabels = {
-  add: (gesture, keys) =>
-    `${gesture === "touch" ? "Double-tap" : "Double-click"} to add a node${keys === undefined ? "" : `, or press ${keys}`}`,
+  noNodes: "This graph has no nodes yet.",
+  add: (gesture, keys, command) =>
+    `${gesture === "touch" ? "Double-tap" : "Double-click"} to add a node, or ${keys === undefined ? `use “${command ?? ""}”` : `press ${keys}`}`,
 };
 
 export type EmptyCanvasHintProps = {
-  /** The app's own words above the gestures ("This graph has no nodes yet"); none by default. */
+  /** The app's own words above the gestures; `labels.noNodes` ("This graph has no nodes yet.") by default. */
   children?: ReactNode;
   /** Whether the graph is empty; without it, while React Flow holds no nodes. An app drawing a ghost node passes it. */
   empty?: boolean;
   /** Whether adding is on, so the gestures are said (`useAddAt`'s `enabled`); true by default. */
   add?: boolean;
-  /** The app's add key (a key string, `"A"`), drawn through `keyLabel` after the gestures; the hint binds nothing. */
+  /**
+   * The app's add key (a key string, `"A"`), drawn through `keyLabel` after the gestures; the hint binds nothing.
+   * Without it or `command` the gestures are not said.
+   */
   keys?: string;
+  /** The name of the app's add command, as its palette shows it ("Add node"), said when it has no `keys`. */
+  command?: string;
   /** The platform the key is written for; the browser's by default. */
   platform?: Platform;
   /** Where it sits on the canvas, React Flow's `PanelPosition`: "top-center" by default. */
@@ -43,12 +54,13 @@ export type EmptyCanvasHintProps = {
 
 const noNodes = (state: ReactFlowState): boolean => state.nodes.length === 0;
 
-/** Says, on an empty canvas, what to do; draws nothing once the graph has a node. */
+/** Says, on an empty canvas, that it is empty and how to add; draws nothing once the graph has a node. */
 export function EmptyCanvasHint({
   children,
   empty,
   add = true,
   keys,
+  command,
   platform,
   position = "top-center",
   labels,
@@ -58,16 +70,16 @@ export function EmptyCanvasHint({
   const none = useStore(noNodes);
   const { touch } = useMediaBreakpoint();
   if (!(empty ?? none)) return null;
-  const gestures = add
-    ? words.add(touch ? "touch" : "pointer", keys === undefined ? undefined : keyLabel(keys, { platform }))
-    : null;
-  if (children === undefined && gestures === null) return null;
+  const gestures =
+    add && (keys !== undefined || command !== undefined)
+      ? words.add(touch ? "touch" : "pointer", keys === undefined ? undefined : keyLabel(keys, { platform }), command)
+      : null;
   return (
     <Panel
       position={position as PanelPosition}
       className={className === undefined ? "pb-empty-canvas" : `pb-empty-canvas ${className}`}
     >
-      {children !== undefined && <div className="pb-empty-canvas-words">{children}</div>}
+      <div className="pb-empty-canvas-words">{children ?? <p>{words.noNodes}</p>}</div>
       {gestures !== null && <p className="pb-empty-canvas-add">{gestures}</p>}
     </Panel>
   );

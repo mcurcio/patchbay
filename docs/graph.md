@@ -10,7 +10,7 @@ while a wire is dragged).
 
 ```ts
 import "@xyflow/react/dist/style.css";
-import { CanvasTools, ConnectHints, ConnectStatus, connectTargets, EmptyCanvasHint, GhostNode, GhostWire, mergeFlowProps, Meter, NodeBox, nodeBoxSize, PortRow, useAddAt, useConnectHints, useContextAt, useFollowFit, Wire } from "@mcurcio/patchbay/graph";
+import { CanvasTools, ConnectHints, ConnectStatus, connectTargets, EmptyCanvas, EmptyCanvasHint, GhostNode, GhostWire, mergeFlowProps, Meter, NodeBox, nodeBoxSize, PortRow, useAddAt, useConnectHints, useContextAt, useFollowFit, Wire } from "@mcurcio/patchbay/graph";
 ```
 
 Importing the layer loads its stylesheet (`dist/graph.css`) and imports `@xyflow/react` (React Flow
@@ -299,36 +299,66 @@ use, so it never says what they do not.
 
 ## `EmptyCanvasHint`
 
-An empty canvas's words, as a child of the app's `<ReactFlow>`: what to do, and the add gestures,
+An empty canvas's words, as a child of the app's `<ReactFlow>`: that it is empty, and how to add,
 drawn on the canvas itself in React Flow's `<Panel>`, gone with the first node
-([U35](ux-rules.md#states)).
+([U35](ux-rules.md#states)). The add gestures are said only beside the app's add key or command,
+so its words never name a pointer alone ([U25](ux-rules.md#words)).
 
 ```tsx
 <ReactFlow {...addAt.flowProps} … >
-  <EmptyCanvasHint keys="A" add={!readOnly}>
-    <p>This graph has no nodes yet.</p>
-  </EmptyCanvasHint>
+  <EmptyCanvasHint keys="A" add={!readOnly} />
 </ReactFlow>
 ```
 
 | Prop | What it is |
 |---|---|
-| `children?` | The app's own words, above the gestures; none by default |
+| `children?` | The app's own words, in place of `labels.noNodes`, above the gestures |
 | `empty?` | Whether the graph is empty; without it, while React Flow holds no nodes. An app that draws a node that is not yet the graph's (a [`GhostNode`](#ghostnode)) passes it |
-| `add?` | Whether adding is on, so the gestures are said; `true` by default. Pass `useAddAt`'s `enabled`, so a read-only graph keeps the app's words alone. With neither words nor gestures it draws nothing |
+| `add?` | Whether adding is on, so the gestures are said; `true` by default. Pass `useAddAt`'s `enabled`, so a read-only graph keeps the words alone |
 | `keys?` | The app's add key, a key string as [`useShortcuts`](components.md#useshortcuts) takes it (`"A"`), written through `keyLabel` after the gestures; the hint binds nothing |
+| `command?` | The name of the app's add command as its palette shows it (`"Add node"`), said after the gestures when there is no `keys` |
 | `platform?` | The platform the key is written for; the browser's by default |
 | `position?` | Its place, React Flow's `PanelPosition`: `"top-center"` by default. One it does not know is passed on, and React Flow places nothing |
-| `labels?` | Its words ([rule 8](components.md#rules-every-component-keeps)): `add(gesture, keys)`, the gestures, "Double-click to add a node" with a pointer and "Double-tap to add a node" on a touch screen ([`useMediaBreakpoint`](components.md#usemediabreakpoint)`().touch`), then ", or press A" with the key; `defaultEmptyCanvasHintLabels` |
+| `labels?` | Its words ([rule 8](components.md#rules-every-component-keeps)): `noNodes`, "This graph has no nodes yet."; `add(gesture, keys, command)`, called only with a key or a command: "Double-click to add a node" with a pointer and "Double-tap to add a node" on a touch screen ([`useMediaBreakpoint`](components.md#usemediabreakpoint)`().touch`), then ", or press A" with the key, or ", or use “Add node”" with only the command; `defaultEmptyCanvasHintLabels` |
 | `className?` | Added to the panel's `pb-empty-canvas` |
 
+- **What it says.** With no key and no command, only its words: "This graph has no nodes yet.",
+  or the app's. While the canvas is empty it always says something, adding on or off.
 - **What is read.** Its words are ordinary text, not a live region: they are there while the canvas
   is empty, and a node arriving is the canvas's own news.
 - **Look.** `--pb-text-md` words, the gestures under them in `--pb-text-sm` and `--pb-muted`, on
   `--pb-raised`, edged in `--pb-line` with the box radius and `--pb-shadow`, 420 px wide at most and
   centred. It takes no pointer events, so a double-click on it reaches the canvas and adds. It does
   not animate. **Forced colours:** the edge in `CanvasText`.
-- It takes no focus and has no keys: the add key is the app's.
+
+## `EmptyCanvas`
+
+A slot for the app's own empty state, as a child of the app's `<ReactFlow>`: whatever it is given
+(words, a template picker, a button that adds the first node), drawn on the canvas in React Flow's
+`<Panel>` while the graph has no nodes and gone with the first ([U35](ux-rules.md#states)). Given no
+children, it draws [`EmptyCanvasHint`](#emptycanvashint)'s default instead; for the hint with the
+app's key or command, use `EmptyCanvasHint` itself.
+
+```tsx
+<ReactFlow … >
+  <EmptyCanvas>
+    <Button tone="primary" onClick={addFirst}>Add a node</Button>
+  </EmptyCanvas>
+</ReactFlow>
+```
+
+| Prop | What it is |
+|---|---|
+| `children?` | The app's empty state; without it, `EmptyCanvasHint`'s default |
+| `empty?` | Whether the graph is empty; without it, while React Flow holds no nodes, as the hint's |
+| `position?` | Its place, React Flow's `PanelPosition`: `"top-center"` by default |
+| `className?` | Added to the panel's `pb-empty-canvas-slot` (without children, to the hint's) |
+
+- **Look.** Placed as the hint is (below the canvas's top edge, centred, never wider than the canvas
+  less its margins), in `--pb-font-ui` at `--pb-text-md` in `--pb-text`, with no surface of its
+  own: what it draws is the app's.
+- **Pointer.** Unlike the hint it keeps React Flow's pointer events, so its controls can be
+  pressed; a double-click on it does not reach the canvas.
 
 ## `Wire`
 
