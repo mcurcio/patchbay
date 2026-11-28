@@ -134,6 +134,11 @@ Fix the cause, then run the CI workflow by hand with that tag (Actions, CI, Run 
 version, and makes the GitHub Release from the tag's section of `CHANGELOG.md` unless it exists. It
 is safe to run again.
 
+If the tag push itself failed, the `chore(release): <version> [skip ci]` commit is on `main` with no
+tag. Give the run that commit's SHA as well (`sha`): the job first tags it, and only if the tag is
+missing, the commit is on `main`, and its subject is that release's. Do this before anything else
+merges to `main`, since the next release run would otherwise release the same version again.
+
 ### Checking a release locally
 
 CI's `release-dry-run` job does this on every push and pull request; to run it yourself, with any
