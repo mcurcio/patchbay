@@ -1,3 +1,13 @@
+## [0.11.0](https://github.com/mcurcio/patchbay/compare/v0.10.0...v0.11.0) (2026-11-28)
+
+### ⚠ BREAKING CHANGES
+
+* theme switch's "next:" wording, a slate quiet tone, diff paths in words and an empty-canvas slot (#18)
+
+### Features
+
+* theme switch's "next:" wording, a slate quiet tone, diff paths in words and an empty-canvas slot ([#18](https://github.com/mcurcio/patchbay/issues/18)) ([c7b9c4c](https://github.com/mcurcio/patchbay/commit/c7b9c4c544ea03557ddecf1a1ae3c039eae4cf13))
+
 ## [0.10.0](https://github.com/mcurcio/patchbay/compare/v0.9.0...v0.10.0) (2026-11-27)
 
 ### ⚠ BREAKING CHANGES
