@@ -433,8 +433,11 @@ paths folded away), `onToggle?(path, open)`, and native `div` props.
   `--pb-added` and removed ones in `--pb-removed`, each with a bar of its tone at the start; hunk
   headers (`@@`) are in `--pb-code-directive`; git's header lines (`diff --git`, `index`, `---`,
   `+++`) and `\ No newline at end of file` in `--pb-code-comment`. CRLF reads as LF.
-- **Files:** each is a heading holding a button labelled by the file's name (the path's last part),
-  with the whole path as its title. The button folds the file (`aria-expanded`, `aria-controls`).
+- **Files:** each is a heading holding a button that shows the file's name (the path's last part),
+  then its folder in `--pb-muted` on one line, cut from its start with an ellipsis when space runs
+  out ("…/config/lights"), so the whole path is in words (U47); the whole path is also its title. The
+  folder gives up its room before the name wraps. The button is named by the name, then the folder
+  ("settings.conf config/lights"); a file with no folder shows its name alone. The button folds the file (`aria-expanded`, `aria-controls`).
   With `collapsed` the app holds the fold and a press only calls `onToggle`; without it the view
   keeps its own, every file open at first, and still calls `onToggle`.
 - A wide diff scrolls sideways; each diff body is a tab stop, so it scrolls from the keyboard too.

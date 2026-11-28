@@ -49,11 +49,12 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** Each file a section under its name; a press on the name folds it. */
+/** Each file a section under its name, then its folder in quieter words; a press on the heading folds it. */
 export const Files: Story = {
   play: async ({ args, canvas, userEvent }) => {
-    const toggle = canvas.getByRole("button", { name: "settings.conf" });
+    const toggle = canvas.getByRole("button", { name: "settings.conf config" });
     await expect(toggle).toHaveAttribute("title", "config/settings.conf");
+    await expect(canvas.getByText("config")).toBeVisible();
     await expect(toggle).toHaveAttribute("aria-expanded", "true");
     await userEvent.click(toggle);
     await expect(toggle).toHaveAttribute("aria-expanded", "false");
@@ -82,9 +83,9 @@ export const Collapsed: Story = {
     );
   },
   play: async ({ canvas, userEvent }) => {
-    await expect(canvas.getByRole("button", { name: "layout.json" })).toHaveAttribute("aria-expanded", "false");
+    await expect(canvas.getByRole("button", { name: "layout.json views" })).toHaveAttribute("aria-expanded", "false");
     await userEvent.keyboard("{Tab}");
-    await expect(canvas.getByRole("button", { name: "settings.conf" })).toHaveFocus();
+    await expect(canvas.getByRole("button", { name: "settings.conf config" })).toHaveFocus();
   },
 };
 
@@ -117,6 +118,51 @@ export const RightToLeft: Story = {
     const style = getComputedStyle(line);
     await expect(style.borderRightWidth).toBe("3px");
     await expect(parseFloat(style.paddingRight)).toBeLessThan(parseFloat(style.paddingLeft));
+  },
+};
+
+const deep = "workspace/projects/studio/src/config/lights";
+
+/** In a narrow column, a deep folder is cut from its start, so its last folders and the file's name stay in view. */
+export const LongPath: Story = {
+  args: { files: [{ path: `${deep}/settings.conf`, diff: config }] },
+  render: (args) => (
+    <div style={{ width: "280px" }}>
+      <DiffView {...args} />
+    </div>
+  ),
+  play: async ({ canvas, canvasElement }) => {
+    const toggle = canvas.getByRole("button", { name: `settings.conf ${deep}` });
+    const folder = canvasElement.querySelector(".pb-diff-folder");
+    if (!(folder instanceof HTMLElement)) throw new Error("no folder");
+    await expect(folder.scrollWidth).toBeGreaterThan(folder.clientWidth);
+    // Cut at its start: the folder's right edge, its last part, lines up with the line's; the root is what overflows.
+    const path = folder.firstElementChild?.getBoundingClientRect();
+    const box = folder.getBoundingClientRect();
+    if (path === undefined) throw new Error("no path");
+    await expect(Math.abs(path.right - box.right)).toBeLessThan(1);
+    await expect(path.left).toBeLessThan(box.left);
+    await expect(toggle.getBoundingClientRect().width).toBeLessThanOrEqual(280);
+  },
+};
+
+/** Right-to-left: the name at the right, the folder after it to its left, still cut from the path's start. */
+export const FilesRightToLeft: Story = {
+  args: { files: [{ path: `${deep}/settings.conf`, diff: config }, ...files.slice(1)] },
+  render: (args) => (
+    <div dir="rtl" style={{ width: "280px" }}>
+      <DiffView {...args} />
+    </div>
+  ),
+  play: async ({ canvas, canvasElement }) => {
+    canvas.getByRole("button", { name: `settings.conf ${deep}` });
+    const name = canvasElement.querySelector(".pb-diff-name")?.getBoundingClientRect();
+    const folder = canvasElement.querySelector(".pb-diff-folder");
+    if (name === undefined || !(folder instanceof HTMLElement)) throw new Error("no heading");
+    await expect(folder.getBoundingClientRect().right).toBeLessThanOrEqual(name.left);
+    const path = folder.firstElementChild?.getBoundingClientRect();
+    if (path === undefined) throw new Error("no path");
+    await expect(Math.abs(path.right - folder.getBoundingClientRect().right)).toBeLessThan(1);
   },
 };
 
