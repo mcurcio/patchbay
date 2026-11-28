@@ -9,10 +9,12 @@ import {
   cssBlocks,
   customProperties,
   findBlock,
+  hexColour,
   isColour,
   resolveToken,
   stripComments,
   tokenSets,
+  tokensInForce,
 } from "../testing/brand-css";
 import { checkBrandContrast } from "../testing";
 import tokensCss from "./tokens.css?raw";
@@ -143,6 +145,53 @@ describe("contrast", () => {
 
   it.each(cases)("keeps every text at 4.5:1 on what it is drawn on, light and dark: $name", ({ name, css }) => {
     expect(checkBrandContrast(css, name).map((failure) => failure.message)).toEqual([]);
+  });
+});
+
+// A colour in OKLab (Björn Ottosson's), from sRGB hex: L 0 to 1, a and b about -0.4 to 0.4, so a distance is one
+// number for how far apart two colours look, lightness, hue and chroma together.
+function oklab(hex: string): [number, number, number] {
+  const rgb = hexColour(hex);
+  if (rgb === null) throw new Error(`${hex} is not a hex colour`);
+  const [r, g, b] = rgb.map((c) => {
+    const s = c / 255;
+    return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+  }) as [number, number, number];
+  const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+  const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+  const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+  return [
+    0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s,
+    1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s,
+    0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s,
+  ];
+}
+
+function oklabDistance(a: string, b: string): number {
+  const [x, y] = [oklab(a), oklab(b)];
+  return Math.hypot(x[0] - y[0], x[1] - y[1], x[2] - y[2]);
+}
+
+// quiet (in progress, nothing wrong) is a slate of its own: never read as the person's own choice (accent) nor as
+// stopped (off), in any theme or brand (docs/foundations.md#tones).
+describe("the quiet tone", () => {
+  const minimumDistance = 0.08;
+  const cases = [{ name: "base", sets: null }, ...brands.map((brand) => ({ name: brand.name, sets: brand }))];
+  const themes = ["light", "dark", "system dark"] as const;
+
+  it.each(cases)("is at least 0.08 in OKLab from accent and off, light and dark: $name", ({ sets }) => {
+    const near: string[] = [];
+    for (const theme of themes) {
+      const tokens = tokensInForce(base, sets, theme);
+      const value = (name: string) => resolveToken(tokens, tokens.get(name) ?? "");
+      const quiet = value("--pb-quiet");
+      for (const other of ["--pb-accent", "--pb-off"]) {
+        const distance = oklabDistance(quiet, value(other));
+        if (distance < minimumDistance)
+          near.push(`${theme}: --pb-quiet ${quiet} is ${distance.toFixed(3)} from ${other}`);
+      }
+    }
+    expect(near).toEqual([]);
   });
 });
 

@@ -32,7 +32,7 @@ one of them:
 | `ok` | Working as asked | A running node, a live connection, a port that accepts a drop | `--pb-ok` |
 | `warn` | Needs attention, still working | A rise in errors, a stale draft, a change that applies later | `--pb-warn`, on `--pb-warn-soft` where it fills a surface |
 | `err` | Failed or refused | A failed node, a refused edit, a lost connection | `--pb-err`, on `--pb-err-soft` where it fills a surface |
-| `quiet` | Information, or on its way | A state starting, a request pending, a note | `--pb-quiet` |
+| `quiet` | In progress, nothing wrong | A state starting, a request pending, a note that asks nothing | `--pb-quiet`, a slate grey (F9) |
 | `off` | Stopped, or not a candidate | A stopped node, a port that refuses a drop | `--pb-off` |
 | `accent` | Yours: chosen or selected | A chip for the person's own choice | `--pb-accent` |
 | `muted` | Neutral by choice | A fact with no state, such as a kind or a count | `--pb-muted` |
@@ -59,7 +59,9 @@ The change tones draw an edit that is queued, not true yet (F10):
   ([`components.md`](components.md#code), CodeEditor). **Built:** CodeEditor, DiagnosticList.
 - **F9. Pending is `quiet`, not `off`.** A request on its way is drawn in `--pb-quiet`, as
   GhostWire's `pending` is ([`graph.md`](graph.md#ghostwire)); `off` is stopped, or not a
-  candidate. **Built:** GhostWire.
+  candidate. So the two never read alike, nor quiet as the person's own choice, `--pb-quiet` is a
+  slate grey of its own, apart from both `--pb-off` and `--pb-accent` in every theme and brand
+  ([`tokens.md`](tokens.md#the-tests)). **Built:** GhostWire, the tokens.
 - **F10. Pending and queued are two words.** **Pending** is a request sent and not answered yet:
   GhostWire's `pending` tone, a busy Button. **Queued** is a change held here until a save: a change
   tone with dashes (U53). Wire has no `pending` tone. **Built:** GhostWire, Button, Wire.

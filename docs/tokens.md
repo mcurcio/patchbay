@@ -170,6 +170,9 @@ blanks stylesheets otherwise) and fails:
   and each code token on the code surfaces (the code error also on its own surface). It runs
   [`checkBrandContrast`](#checking-a-brand) for the base alone and each example brand, in light,
   chosen dark and system dark.
+- naming the theme and the token, when `--pb-quiet` is less than 0.08 from `--pb-accent` or
+  `--pb-off` in OKLab (the straight-line distance of L, a and b), for the base and each example
+  brand in each theme, so quiet stays a slate of its own ([F9](foundations.md#tones));
 - when the two copies of a dark set differ, in `tokens.css` or a brand;
 - when a colour in the light set has no dark value, or the dark set names a token the light set
   lacks;
