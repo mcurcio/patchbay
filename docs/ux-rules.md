@@ -100,8 +100,8 @@ cite them. How to read a rule (Built, The app's, Not yet):
   Splitter and Toolbar require, `busyLabel`, what a Meter measures. **Built:** the prop types.
 - **U25. Default words are plain English,** in sentence case, actions as verbs with their object
   ("Zoom in", "Fit the view", "Resize the inspector"), and never pointer-only ("press", not
-  "click"). **Built:** the defaults. **Not yet:** ThemeSwitch's tooltip says "click for":
-  pb-nx9.67; EmptyCanvasHint's default, without the app's add key, names only a pointer gesture
+  "click"). **Built:** the defaults (ThemeSwitch's tooltip: "Theme: light, next: dark"). **Not
+  yet:** EmptyCanvasHint's default, without the app's add key, names only a pointer gesture
   ("Double-click to add a node"): pb-nx9.96.
 - **U26. An icon-only control is named,** and its tooltip defaults to its name. **Built:**
   IconButton (`label` required).

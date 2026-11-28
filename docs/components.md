@@ -114,8 +114,9 @@ diff's fold chevron, the drawer's chevron and the canvas tools are drawn with it
 **`ThemeSwitch`**: one button that cycles system, light and dark, drawn as a neutral `Button`
 (its face, hover, focus ring, touch height and forced colours). `choice`, `onChoose(next)`,
 `labels?` (its words, [rule 8](#rules-every-component-keeps): `theme`, `system`, `light`, `dark`,
-`systemHint`, `clickFor`; `defaultThemeSwitchLabels`). It shows an icon and the choice's word; its
-name is "Theme: dark", its tooltip says what a press does (`themeSwitchTitle`). Below 600 px the
+`systemHint`, `next`; `defaultThemeSwitchLabels`). It shows an icon and the choice's word; its
+name is "Theme: dark", its tooltip says the choice and the one a press moves to, "Theme: light, next: dark"
+(`themeSwitchTitle`). Below 600 px the
 word gives way to the icon alone. 36 px on touch. The choice is the app's, kept by
 [`useTheme`](#usetheme).
 

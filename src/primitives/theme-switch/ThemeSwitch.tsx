@@ -20,8 +20,8 @@ export interface ThemeSwitchLabels {
   dark: string;
   /** Said of system in the tooltip: "follows the system's setting". */
   systemHint: string;
-  /** Before the next choice in the tooltip: "click for". */
-  clickFor: string;
+  /** Before the next choice in the tooltip: "next:". */
+  next: string;
 }
 
 export const defaultThemeSwitchLabels: ThemeSwitchLabels = {
@@ -30,7 +30,7 @@ export const defaultThemeSwitchLabels: ThemeSwitchLabels = {
   light: "light",
   dark: "dark",
   systemHint: "follows the system's setting",
-  clickFor: "click for",
+  next: "next:",
 };
 
 const order: readonly ThemeChoice[] = ["system", "light", "dark"];
@@ -49,10 +49,10 @@ export type ThemeSwitchProps = Omit<ComponentPropsWithRef<"button">, "children" 
   labels?: Partial<ThemeSwitchLabels>;
 };
 
-/** The switch's tooltip: what the theme is and what a press does. */
+/** The switch's tooltip: what the theme is, then the one a press moves to ("Theme: light, next: dark"). */
 export function themeSwitchTitle(choice: ThemeChoice, labels: ThemeSwitchLabels = defaultThemeSwitchLabels): string {
   const hint = choice === "system" ? ` (${labels.systemHint})` : "";
-  return `${labels.theme}: ${labels[choice]}${hint}; ${labels.clickFor} ${labels[following(choice)]}`;
+  return `${labels.theme}: ${labels[choice]}${hint}, ${labels.next} ${labels[following(choice)]}`;
 }
 
 export function ThemeSwitch({ choice, onChoose, labels, className, ...rest }: ThemeSwitchProps) {
